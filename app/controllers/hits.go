@@ -154,26 +154,26 @@ type Hits struct {
 	*revel.Controller
 }
 
-func getHits(whereGroupOrder string) []app.Hit {
+func getHits(whereGroupOrder string) ([]app.Hit, error) {
 	var newHit app.Hit
 	hits := make([]app.Hit, 0)
 
 	rows, err := app.DB.Query(Q_HITS + whereGroupOrder)
 	if err != nil {
-		// TODO: render an error
 		revel.AppLog.Error(err.Error())
-		return nil
+		return nil, err
 	}
 	for rows.Next() {
 		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)
+			return nil, err
 		} else {
 			newHit.EntDate = newHit.EntDate[0:10]
 			hits = append(hits, newHit)
 		}
 	}
-	return hits
+	return hits, nil
 }
 
 func (c Hits) Index() revel.Result {
@@ -215,9 +215,9 @@ func (c Hits) Index() revel.Result {
 		order += "order by entdate desc, id desc"
 	}
 
-	hits := getHits(where + order)
-	if hits == nil {
-		return c.Render()
+	hits, err := getHits(where + order)
+	if err != nil {
+		return c.RenderError(err)
 	}
 	rowCount := len(hits)
 	if filterSort == "asc" {
@@ -273,9 +273,8 @@ func (c Hits) Breakdown() revel.Result {
 			rows, err = app.DB.Query(Q_BREAKDOWN_US_CA, hitSet)
 		}
 		if err != nil {
-			// TODO: render an error
 			revel.AppLog.Error(err.Error())
-			return c.Render()
+			return c.RenderError(err)
 		}
 		for rows.Next() {
 			var (

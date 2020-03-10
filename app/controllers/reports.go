@@ -53,9 +53,8 @@ func (c Reports) HitsCalendar() revel.Result {
 
 	rows, err := app.DB.Query(Q_HITS_CALENDAR)
 	if err != nil {
-		// TODO: render an error
-		revel.AppLog.Errorf("%v", err)
-		return c.Render()
+		revel.AppLog.Errorf("query hits calendar: %#v", err)
+		return c.RenderError(err)
 	}
 
 	for rows.Next() {
@@ -65,8 +64,8 @@ func (c Reports) HitsCalendar() revel.Result {
 		err = rows.Scan(&date, &count)
 		if err != nil {
 			// TODO: render an error
-			revel.AppLog.Errorf("%v", err)
-			return c.Render()
+			revel.AppLog.Errorf("read hits calendar: %#v", err)
+			return c.RenderError(err)
 		}
 
 		dates[date] = count
