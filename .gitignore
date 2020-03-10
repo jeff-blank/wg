@@ -5,3 +5,4 @@ jq/
 conf/app.conf
 revel.log
 revel.pid
+*.sw?
