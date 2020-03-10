@@ -1,0 +1,14 @@
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">United States</th>
+        </tr>
+          <th class="bordered">State</th>
+          <th class="bordered">Hits</th>
+        <tr>
+      {{ range index .breakdowns "US" }}
+        <tr>
+          <td class="bordered"><a href="#" class="brklnk" id="US_{{.Region}}">{{.Region}}</a></td>
+          <td class="bordered aright">{{.Count}}</td>
+        </tr>
+      {{ end }}
+      </table>

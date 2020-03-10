@@ -1,0 +1,49 @@
+{{set . "title" "WG Utils 2.0: Reports: Hits Calendar"}}
+{{template "header.html" .}}
+
+<h1>Hits Calendar</h1>
+
+<table class="bordered" style="width: 44em">
+  <thead>
+  <tr>
+    <th class="bordered" style="width: 6.5em">&nbsp;</th>
+    <th class="bordered">Jan</th>
+    <th class="bordered">Feb</th>
+    <th class="bordered">Mar</th>
+    <th class="bordered">Apr</th>
+    <th class="bordered">May</th>
+    <th class="bordered">Jun</th>
+    <th class="bordered">Jul</th>
+    <th class="bordered">Aug</th>
+    <th class="bordered">Sep</th>
+    <th class="bordered">Oct</th>
+    <th class="bordered">Nov</th>
+    <th class="bordered">Dec</th>
+    <th class="bordered" style="width: 6.5em">Date Totals</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  {{ range .calendar }}
+  <tr>
+    <td class="bordered aright" style="width: 6.5em"><strong>{{ .Label }}</strong></td>
+    {{range .Months}}{{ $styles := "" }}{{if eq . 0}}{{$styles = " noHits"}}{{end}}{{if ge . 10}}{{$styles = " manyHits"}}{{end}}{{if eq . -1}}{{$styles = " noDate"}}{{end}}
+    <td class="bordered aright{{$styles}}">{{if eq . -1}}&nbsp;{{else}}{{ . }}{{end}}</td>{{ end }}
+    <td class="bordered aright" style="width: 6.5em">{{.Total}}</td>
+  </tr>
+  {{ end }}
+  <tr>
+    <td class="bordered aright" style="width: 6.5em"><strong>Month total</strong></td>
+    {{range .totalsRow.Months}}<td class="bordered aright">{{.}}</td>{{end}}
+    <td class="bordered" style="width: 6.5em">&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="bordered aright" style="width: 6.5em"><strong>Missing days</strong></td>
+    {{range .missingRow.Months}}<td class="bordered aright{{if eq . 0}} goodNumber{{end}}">{{.}}</td>
+    {{end}}
+    <td class="bordered aright{{if eq .missingRow.Total "0"}} goodnumber{{end}}" style="width: 6.5em">{{.missingRow.Total}}</td>
+  </tr>
+  </tbody>
+</table>
+
+{{template "footer.html" .}}

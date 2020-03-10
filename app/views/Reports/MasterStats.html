@@ -1,0 +1,73 @@
+{{set . "title" "WG Utils 2.0: Reports: Stats Table"}}
+{{template "header.html" .}}
+
+<h1 id="h1">Monthly and Cumulative Statistics</h1>
+
+<table id="hTable" class="bordered">
+  <tr id="headRow">
+    <th id="c_month" class="c_month bordered">Month</th>
+    <th id="c_monthHits" class="c_monthHits bordered">Hits</th>
+    <th id="c_cumulativeHits" class="c_cumulativeHits bordered">Cumulative<div>Hits</div></th>
+    <th id="c_avgMonthlyHits" class="c_avgMonthlyHits bordered">Hits/Month<div>(all-time)</div></th>
+    <th id="c_oneYrAvgMonthlyHits" class="c_oneYrAvgMonthlyHits bordered">Hits/Month<div>(preceding year)</div></th>
+    <th id="c_monthBills" class="c_monthBills bordered">Entries</th>
+    <th id="c_allBills" class="c_allBills bordered">Cumulative<div>Entries</div></th>
+    <th id="c_oneYrAvgMonthlyBills" class="c_oneYrAvgMonthlyBills bordered">Entries/Month<div>(1-year avg)</div></th>
+    <th id="c_score" class="c_score bordered">Score</th>
+    <th id="c_yearHits" class="c_yearHits bordered">Year's<div>Hits</div></th>
+  </tr>
+  <!-- /thead -->
+  </table><div id="scroller" class="bordered scrollable"><table>
+  <tbody id="tbody">
+
+  {{ $rowTint := "" }}{{ $entsLink := .entsLink }}{{ $monthNum := "" }}{{ $heavy := "" }}
+  {{ range $i, $v := .tableOut }}
+  {{if even $i}}{{$rowTint = ""}}{{else}}{{$rowTint = " oddRow"}}{{end}}{{$entCell := index . "monthBills"}}{{$yrHitCell := index . "yearHits"}}{{$monthsInYear := index . "monthsInYear"}}{{$monthNum = slice (index . "month") 5 7}}{{if eq $monthNum "12"}}{{$heavy = " topBlack"}}{{end}}
+  <tr>
+    <td class="c_month bordered{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "month" }}</td>
+    <td class="c_monthHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "monthHits" }}</td>
+    <td class="c_cumulativeHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "cumulativeHits" }}</td>
+    <td class="c_avgMonthlyHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.4f" (index . "avgMonthlyHits") }}</td>
+    <td class="c_oneYrAvgMonthlyHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyHits") }}</td>
+    <td class="c_monthBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}><a href="{{$entsLink}}?month={{ index $entCell "month"}}">{{ index $entCell "entries"}}</a></td>
+    <td class="c_allBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "cumulativeBills"}}</td>
+    <td class="c_oneYrAvgMonthlyBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyBills") }}</td>
+    <td class="c_score bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "score") }}</td>
+    {{ if $monthsInYear }}<td class="c_yearHits bordered aright vmid" rowspan="{{$monthsInYear}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{index . "yearHits"}}</td>{{end}}
+  </tr{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>
+  {{ end }}
+  </tbody>
+</table></div>
+
+<script src="/public/js/scrollBar.js"></script>
+<script type="application/javascript">
+  $( document ).ready(function() {
+    var lastColumnId = '#c_yearHits';
+
+    $wh = $(window).innerHeight();
+    $h1h = $('#h1').outerHeight();
+    $thh = $('#hTable').outerHeight();
+    $('#scroller').height(0.9 * $wh - ($h1h + $thh) );
+
+    $('#headRow').children('th').each(function() {
+      $mw = 0
+      $className = $(this).attr('id')
+      $cells = $('.' + $className).each(function() {
+        $mw = Math.max($mw, $(this).width())
+      });
+      $cells = $('.' + $className).each(function() {
+        $(this).width($mw)
+      });
+    });
+    $tw = 0
+    $('#headRow').children('th').each(function() {
+      $tw += $(this).outerWidth();
+    });
+    $sw = getScrollBarWidth()
+    $('#scroller').width($tw+$sw)
+    $(lastColumnId).width($(lastColumnId).width() + $sw)
+    $(lastColumnId).attr('margin-right', $sw)
+  });
+</script>
+
+{{template "footer.html" .}}

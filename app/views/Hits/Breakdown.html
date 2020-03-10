@@ -1,0 +1,68 @@
+{{set . "title" "WG Utils 2.0: Hits Breakdown"}}
+{{template "header.html" .}}
+
+<p>
+  <a href="{{ index .links "currentYearHits" }}">Current year's hits</a> |
+  <a href="{{ index .links "allHits" }}">All hits</a>
+</p>
+
+<hr>
+<h1>Hits Breakdown</h1>
+
+<table id="main" style="width: 100%">
+  <tr>
+    <td id="us" class="vtop">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">United States</th>
+        </tr>
+          <th class="bordered">State</th>
+          <th class="bordered">Hits</th>
+        <tr>
+      {{ range index .breakdowns "US" }}
+        <tr>
+          <td class="bordered"><a href="#" class="brklnk" id="US_{{.Region}}">{{.Region}}</a></td>
+          <td class="bordered aright">{{.Count}}</td>
+        </tr>
+      {{ end }}
+      </table>
+    </td>
+    <td id="ca" class="vtop">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">Canada</th>
+        </tr>
+          <th class="bordered">Province</th>
+          <th class="bordered">Hits</th>
+        <tr>
+      {{ range index .breakdowns "Canada" }}
+        <tr>
+          <td class="bordered"><a href="#" class="brklnk" id="Canada_{{.Region}}">{{.Region}}</a></td>
+          <td class="bordered aright">{{.Count}}</td>
+        </tr>
+      {{ end }}
+      </table>
+    </td>
+    <td id="other" class="vtop">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">Other</th>
+        </tr>
+          <th class="bordered">Country</th>
+          <th class="bordered">Hits</th>
+        <tr>
+      {{ range index .breakdowns "Other" }}
+        <tr>
+          <td class="bordered"><a href="#" class="brklnk" id="{{.Region}}_--">{{.Region}}</a></td>
+          <td class="bordered aright">{{.Count}}</td>
+        </tr>
+      {{ end }}
+      </table>
+    </td>
+    <td id="breakdown" class="vtop"><div id="showbrk"></div></td>
+  </tr>
+</table>
+
+<script src="/public/js/hits-breakdown.js"></script>
+
+{{template "footer.html" .}}

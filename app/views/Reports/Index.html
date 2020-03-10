@@ -1,0 +1,11 @@
+{{set . "title" "WG Utils 2.0: Reports"}}
+{{template "header.html" .}}
+
+<h1 id="h1">Reports</h1>
+
+<ul>
+  <li><a href="{{ index .links "master"}}">Stats table</a></li>
+  <li><a href="{{ index .links "calendar"}}">Calendar of hits</a></li>
+</ul>
+
+{{template "footer.html" .}}

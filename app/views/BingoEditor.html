@@ -1,0 +1,43 @@
+<form id="form" action="{{.postDest}}" accept-charset="UTF-8" method="post">
+  <table>
+    <tr>
+      <td class="rpad1em">Title</td>
+      <td><input type="text" name="title" id="ftitle" size="15" maxlength="255" value="{{if .bTitle}}{{.bTitle}}{{end}}"></td>
+    </tr>
+    <tr>
+      <td class="rpad1em vtop tpad12pt">Counties</td>
+      <td class="vmid">
+        <table>
+          <tr>
+            <td class="rpad1em">
+              <select id="s_counties" multiple="multiple" size="20" style="width: 20em">
+              {{ if .selectedCounties }}
+                {{ range .selectedCounties }}
+                <option value="{{.Id}}">{{.County}}, {{.State}}</option>
+                {{ end }}
+              {{ end }}
+              </select>
+            </td>
+            <td class="rpad1em">
+              <p><button type="button" id="b_add">&lt;&lt;</button></p>
+              <p><button type="button" id="b_remove">&gt;&gt;</button></p>
+            </td>
+            <td class="rpad1em vtop">
+              <select id="s_state" size="20" style="width: 3em">
+              </select>
+            </td>
+            <td>
+              <select multiple="multiple" size="20" id="pickCounties">
+              </select>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <div style="padding-top: 4pt">
+    <input type="hidden" id="h_counties" name="counties" value="{{if .selectedCounties}}{{range .selectedCounties}}{{.Id}},{{end}}{{end}}">
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset" id="reset">
+  </div>
+</form>

@@ -1,0 +1,44 @@
+{{set . "title" "WG Utils 2.0: Bingos"}}
+{{template "header.html" .}}
+
+<h1 id="h1">Bingos</h1>
+
+<p id="add"><a href="{{.newLink}}">Add a custom bingo</a></p>
+
+{{ if .foundBingos }}
+<table id="main">
+  <tr>
+    <td id="custom" class="vtop">
+      <table class="bordered">
+        <tr id="th1">
+          <th class="bordered" colspan="2">Custom Bingos</th>
+        </tr>
+        <tr id="th2">
+          <th class="bordered">Bingo</th>
+          <th class="bordered">Counties</th>
+        </tr>
+        {{ range .bingoList }}
+        <tr>
+          <td class="bordered"><a href="#" class="detLink" id="custom_{{.Id}}_{{.Label}}">{{.Label}}</a></td>
+          <td class="bordered aright"><div class="floatleft">{{if eq .Count .Max}}&#x2714;{{end}}</div>{{.Count}}/{{.Max}}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </td>
+    <td style="width: 10em"></td>
+    <td id="breakdown" class="vtop"><div id="showbrk" class="scrollable"></div></td>
+  </tr>
+</table>
+{{ end }}
+
+<script src="/public/js/bingos-index.js"></script>
+
+<script type="application/javascript">
+  $( document ).ready(function() {
+    $wh = $(window).innerHeight();
+    $hgts = $('#h1').outerHeight() + $('#add').outerHeight() + $('#th1').outerHeight() + $('#th2').outerHeight();
+    $('#showbrk').height(0.95 * $wh - $hgts );
+  });
+</script>
+
+{{template "footer.html" .}}

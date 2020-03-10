@@ -1,0 +1,77 @@
+{{set . "title" "WG Utils 2.0: Add Hit"}}
+{{template "header.html" .}}
+
+<h1>Add Hit</h1>
+
+<form id="form" action="../hits" accept-charset="UTF-8" method="post">
+  <table>
+    <tr>
+      <td class="rpad1em">Report Key</td>
+      <td><input type="text" name="key" size="15" maxlength="255" value=""></td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Serial</td>
+      <td><input type="text" name="serial" id="fserial" size="15" maxlength="11" value=""></td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Denomination</td>
+      <td>
+        $<select id="sdenom" name="denom">
+          <option value="0">--</option>
+          <option value="1" selected="selected">1</option>
+          <option value="2">2</option>
+          <option>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Series</td>
+      <td><input type="text" name="series" id="fseries" size="15" maxlength="5" value=""></td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Hit Country</td>
+      <td><input type="text" name="country" id="fcountry" size="15" maxlength="64" value="US"></td>
+    </tr>
+    <tr id="stateProvince">
+      <td id="lstate" class="rpad1em">Hit State</td>
+      <td id="cstate"><select id="sstate" name="state"><option>--</option></select></td>
+    </tr>
+    <tr>
+      <td id="lcounty" class="rpad1em">Hit County</td>
+      <td id="ccounty">
+        <select name="county" id="scounty"><option>--</option></select>
+        <input type="text" id="fcounty" name="_fcounty" value="" size="15" maxlength="64">
+      </td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Hit Date</td>
+      <td>
+        <select name="year" id="syear">
+          {{ $month := .month }}{{ $year := .year }}{{ $day := .day }}
+          {{ range .years }}<option{{if eq . $year}} selected="selected"{{end}}>{{.}}</option>{{ end }}
+        </select>-<select name="month" id="smonth">
+          {{ range .months }}<option{{if eq . $month}} selected="selected"{{end}}>{{.}}</option>{{ end }}
+        </select>-<select name="day" id="sday">
+          {{ range .days }}<option{{if eq . $day}} selected="selected"{{end}}>{{.}}</option>{{ end }}
+        </select>
+      </td>
+    </tr>
+  </table>
+  <div style="padding-top: 4pt">
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset" id="reset">
+  </div>
+</form>
+
+<script src="/public/js/hits-edit.js"></script>
+<script type="application/javascript">
+//  $( document ).ready(function() {
+//    alert($("#stateProvince").css("display"))
+//  });
+</script>
+
+{{template "footer.html" .}}

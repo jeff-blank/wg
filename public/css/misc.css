@@ -1,0 +1,26 @@
+.goodNumber, .manyHits {
+  background: #a0ffa0;
+  color: black;
+}
+
+.badNumber, .noHits {
+  background: #ffa0a0;
+  color: black;
+}
+
+.noDate {
+  background: #808080;
+}
+
+.oddRow {
+  background: #d0d0d0;
+}
+
+div.bordered {
+    border: outset 1px;
+    border-spacing: 0;
+}
+
+div.scrollable {
+    overflow-y: auto;
+}

@@ -1,0 +1,48 @@
+# Routes Config
+#
+# This file defines all application routes (Higher priority routes first)
+#
+
+module:testrunner
+# module:jobs
+
+
+GET     /                                       App.Index
+GET     /hits                                   Hits.Index
+POST    /hits                                   Hits.Create
+GET     /hits/new                               Hits.New
+GET     /breakdown                              Hits.Breakdown
+GET     /showbrk                                Hits.ShowBrk
+GET     /reports                                Reports.Index
+GET     /reports/HitsCalendar                   Reports.HitsCalendar
+GET     /reports/MasterStats                    Reports.MasterStats
+GET     /util/StatesProvinces                   Util.GetStatesProvinces
+GET     /util/GetHomeState                      Util.GetHomeState
+GET     /util/GetHomeCounty                     Util.GetHomeCounty
+GET     /util/Counties                          Util.GetCounties
+POST    /entries                                Entries.Update
+GET     /entries/edit                           Entries.Edit
+GET     /bingos                                 Bingos.Index
+POST    /bingos                                 Bingos.Create
+GET     /bingos/new                             Bingos.New
+GET     /bingos/:id                             Bingos.Show
+GET     /bingos/:id/edit                        Bingos.Edit
+POST    /bingos/:id                             Bingos.Update
+GET     /charts/:mapName                        Charts.Grapher
+#GET     /login                                  Login.Index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/*filepath                       Static.Serve("public")
+
+# Catch all, this will route any request into the controller path
+#
+#                    **** WARNING ****
+# Enabling this exposes any controller and function to the web.
+# ** This is a serious security issue if used online **
+#
+# For rapid development uncomment the following to add new controller.action endpoints
+# without having to add them to the routes table.
+# *       /:controller/:action                    :controller.:action
