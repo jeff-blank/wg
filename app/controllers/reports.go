@@ -63,7 +63,6 @@ func (c Reports) HitsCalendar() revel.Result {
 
 		err = rows.Scan(&date, &count)
 		if err != nil {
-			// TODO: render an error
 			revel.AppLog.Errorf("read hits calendar: %#v", err)
 			return c.RenderError(err)
 		}
