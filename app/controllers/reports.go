@@ -133,7 +133,9 @@ func (c Reports) MasterStats() revel.Result {
 	revel.AppLog.Debugf("%#v", tableOut)
 
 	entsLink := routes.Entries.Edit()
-	return c.Render(tableOut, entsLink)
+	graphLinks := make(map[string]string)
+	graphLinks["score"] = routes.Charts.Grapher("score")
+	return c.Render(tableOut, entsLink, graphLinks)
 }
 
 // vim:foldmethod=marker:
