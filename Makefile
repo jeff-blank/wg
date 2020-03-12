@@ -2,11 +2,11 @@ RELEASEDEST=	${HOME}/revel/wg.new
 APPDIR=         src/github.com/jeff-blank/wg
 JSDIR=		public/js
 JQPROD=		jq/prod
-JQSRC=          ${JQPROD}/bingo-county-select.js ${JQPROD}/bingos-index.js ${JQPROD}/entries-edit.js ${JQPROD}/hits-breakdown.js ${JQPROD}/hits-edit.js
+JQSRC=          ${JQPROD}/bingo-county-select.js ${JQPROD}/bingos-index.js ${JQPROD}/entries-edit.js ${JQPROD}/hits-breakdown.js ${JQPROD}/hits-edit.js ${JQPROD}/masterStats.js
 
-pre-build:  ${JQSRC}
+js:  ${JQSRC}
 
-release: pre-build
+release: js
 	revel build -m prod github.com/jeff-blank/wg ${RELEASEDEST}
 	sed -i '' '/runMode/s/^/exec /;s/wg\.new/wg/g' ${RELEASEDEST}/run.sh
 	cp ${JQPROD}/*.js* ${RELEASEDEST}/${APPDIR}/${JSDIR}
@@ -29,5 +29,9 @@ ${JQPROD}/hits-breakdown.js:	${JSDIR}/hits-breakdown.go
 	(cd ${JQPROD} && gopherjs build -m `basename ${.ALLSRC}`)
 
 ${JQPROD}/hits-edit.js:	${JSDIR}/hits-edit.go
+	sed 's@/rvd/@/rv/@g' ${.ALLSRC} > ${JQPROD}/`basename ${.ALLSRC}`
+	(cd ${JQPROD} && gopherjs build -m `basename ${.ALLSRC}`)
+
+${JQPROD}/masterStats.js:	${JSDIR}/masterStats.go
 	sed 's@/rvd/@/rv/@g' ${.ALLSRC} > ${JQPROD}/`basename ${.ALLSRC}`
 	(cd ${JQPROD} && gopherjs build -m `basename ${.ALLSRC}`)
