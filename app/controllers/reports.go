@@ -127,14 +127,14 @@ func (c Reports) MasterStats() revel.Result {
 	// reverse table for display
 	tableOut := make([]map[string]interface{}, 0)
 	for m := len(tableIn) - 1; m >= 0; m-- {
-		revel.AppLog.Debugf("%#v", m)
 		tableOut = append(tableOut, tableIn[m])
 	}
-	revel.AppLog.Debugf("%#v", tableOut)
 
 	entsLink := routes.Entries.Edit()
 	graphLinks := make(map[string]string)
 	graphLinks["score"] = routes.Charts.Grapher("score")
+	graphLinks["hits"] = routes.Charts.Grapher("hits")
+	graphLinks["bills"] = routes.Charts.Grapher("bills")
 	return c.Render(tableOut, entsLink, graphLinks)
 }
 

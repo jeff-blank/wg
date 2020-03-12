@@ -1,19 +1,20 @@
 {{set . "title" "WG Utils 2.0: Reports: Stats Table"}}
 {{template "header.html" .}}
 
+<div id="dimmer"></div>
 <h1 id="h1">Monthly and Cumulative Statistics</h1>
 
 <table id="hTable" class="bordered">
   <tr id="headRow">
     <th id="c_month" class="c_month bordered">Month</th>
-    <th id="c_monthHits" class="c_monthHits bordered">Hits</th>
+    <th id="c_monthHits" class="c_monthHits bordered">Hits<div class="small">(<a href="{{index .graphLinks "hits"}}" class="graphLink">graph</a>)</th>
     <th id="c_cumulativeHits" class="c_cumulativeHits bordered">Cumulative<div>Hits</div></th>
     <th id="c_avgMonthlyHits" class="c_avgMonthlyHits bordered">Hits/Month<div>(all-time)</div></th>
     <th id="c_oneYrAvgMonthlyHits" class="c_oneYrAvgMonthlyHits bordered">Hits/Month<div>(preceding year)</div></th>
-    <th id="c_monthBills" class="c_monthBills bordered">Entries</th>
+    <th id="c_monthBills" class="c_monthBills bordered">Entries<div class="small">(<a href="{{index .graphLinks "bills"}}" class="graphLink">graph</a>)</div></th>
     <th id="c_allBills" class="c_allBills bordered">Cumulative<div>Entries</div></th>
     <th id="c_oneYrAvgMonthlyBills" class="c_oneYrAvgMonthlyBills bordered">Entries/Month<div>(1-year avg)</div></th>
-    <th id="c_score" class="c_score bordered"><a href="{{index .graphLinks "score"}}">Score</a></th>
+    <th id="c_score" class="c_score bordered">Score<div class="small">(<a href="{{index .graphLinks "score"}}" class="graphLink">graph</a>)</div></th>
     <th id="c_yearHits" class="c_yearHits bordered">Year's<div>Hits</div></th>
   </tr>
   <!-- /thead -->
@@ -39,6 +40,12 @@
   </tbody>
 </table></div>
 
+<div id="graphContainer">
+  <div id="graphDismiss">&times;</div>
+  <div id="graph"></div>
+</div>
+
+<script src="/public/js/masterStats.js"></script>
 <script src="/public/js/scrollBar.js"></script>
 <script type="application/javascript">
   $( document ).ready(function() {
