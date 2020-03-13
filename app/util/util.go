@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"time"
 	"math"
+	"time"
 
 	"database/sql"
 	"github.com/jeff-blank/wg/app"
@@ -187,7 +187,7 @@ func StatsData(returnType string) interface{} {
 		year := allData[m]["month"].(string)[:4]
 		if (prevYear != year && prevYear != "") || m == len(months)-1 {
 			// new year
-			firstMonthInd := m-1 // - monthsInYear
+			firstMonthInd := m - 1 // - monthsInYear
 			if m == len(months)-1 {
 				firstMonthInd++
 				monthsInYear++

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"github.com/gopherjs/jquery"
 	"honnef.co/go/js/dom"
@@ -29,7 +29,6 @@ func main() {
 		wh := dom.GetWindow().InnerHeight()
 		iw := graph.Width()
 
-
 		graph.SetWidth(fmt.Sprintf("%d", int(GRAPH_WIDTH*float64(ww))))
 
 		iw = graph.Width()
@@ -39,7 +38,7 @@ func main() {
 		graph.SetCss("left", imgLeft)
 		graph.SetCss("top", int(float64(wh)*0.2))
 
-		marginPct := (1-GRAPH_WIDTH)/2
+		marginPct := (1 - GRAPH_WIDTH) / 2
 		dismiss.SetCss("left", int((1-marginPct)*float64(ww))+1)
 		dismiss.SetCss("top", int(float64(wh)*0.2))
 		//log.Printf("%#v %#v", ww, (1-marginPct) * float64(ww))
