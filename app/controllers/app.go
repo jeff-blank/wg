@@ -10,29 +10,21 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
-	qs := ""
-	filterCountry := c.Params.Get("country")
-	filterState := c.Params.Get("state")
-	filterCounty := c.Params.Get("county")
-	filterYear := c.Params.Get("year")
-	filterSort := c.Params.Get("sort")
-	if filterYear != "" {
-		qs += "&year=" + filterYear
+	links := make(map[string]string)
+	links = map[string]string{
+		"reports":   routes.Reports.Index(),
+		"hits":      routes.Hits.Index() + "?year=current",
+		"hitAdd":    routes.Hits.New(),
+		"hitsBreak": routes.Hits.Breakdown(),
+		"bingos":    routes.Bingos.Index(),
+		"logout":    routes.Login.Logout(),
+		"newrelic":  "https://rpm.newrelic.com/accounts/1720615/applications/",
 	}
-	if filterCountry != "" {
-		qs += "&country=" + filterCountry
+	if revel.RunMode == "prod" {
+		links["newrelic"] += "252898343"
+	} else {
+		links["newrelic"] += "45030346"
 	}
-	if filterState != "" {
-		qs += "&state=" + filterState
-	}
-	if filterCounty != "" {
-		qs += "&county=" + filterCounty
-	}
-	if filterSort != "" {
-		qs += "&sort=" + filterSort
-	}
-	if qs != "" {
-		qs = "?" + qs[1:]
-	}
-	return c.Redirect(routes.Hits.Index() + qs)
+
+	return c.Render(links)
 }
