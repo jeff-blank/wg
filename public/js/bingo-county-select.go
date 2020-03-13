@@ -11,7 +11,7 @@ import (
 var jq = jquery.NewJQuery
 
 func initializeForm() {
-	jquery.Get("/private/wg/rvd/util/StatesProvinces?country=US", func(data interface{}) {
+	jquery.Get("/rvd/util/StatesProvinces?country=US", func(data interface{}) {
 		sel := jq("#s_state")
 		for _, state := range data.([]interface{}) {
 			sel.Append(jq(`<option>`).SetText(state.(string)))
@@ -30,7 +30,7 @@ func populateCounties(e jquery.Event) {
 	state := jq(e.Target).Val()
 	added := jq("#s_counties")
 	clearSelect("#pickCounties")
-	jquery.Get("/private/wg/rvd/util/Counties?id=true&state="+state, func(data interface{}) {
+	jquery.Get("/rvd/util/Counties?id=true&state="+state, func(data interface{}) {
 		sel := jq("#pickCounties")
 		for _, county := range data.([]interface{}) {
 			countyName := county.(map[string]interface{})["Region"]
