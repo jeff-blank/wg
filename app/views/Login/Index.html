@@ -1,0 +1,27 @@
+{{set . "title" "Home"}}
+{{template "header.html" .}}
+
+{{ if .flash.error }}
+<div>Error: <span style="color: red"><strong>{{.flash.error}}</strong></span></div>
+{{ end }}
+{{ if .flash.success }}
+<div style="color: #20a020"><strong>{{.flash.success}}</strong></div>
+{{ end }}
+
+<h1>Log In</h1>
+
+<form action="/login" method="post">
+<table>
+  <tr>
+    <td class="rpad1em">Username:</td>
+    <td><input type="text" name="user" size="15" maxlength="15"></td>
+  </tr>
+  <tr>
+    <td class="rpad1em">Password:</td>
+    <td><input type="password" name="passwd" size="15" maxlength="255"></td>
+  </tr>
+</table>
+<p><input type="submit" value="Submit"> <input type="reset" value="Reset"><input type=hidden name="back" value="{{.backURL}}"></p>
+</form>
+
+{{template "footer.html" .}}
