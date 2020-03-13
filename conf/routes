@@ -29,7 +29,9 @@ GET     /bingos/:id                             Bingos.Show
 GET     /bingos/:id/edit                        Bingos.Edit
 POST    /bingos/:id                             Bingos.Update
 GET     /charts/:mapName                        Charts.Grapher
-#GET     /login                                  Login.Index
+GET     /login                                  Login.Index
+GET     /logout                                 Login.Logout
+POST    /login                                  Login.Login
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

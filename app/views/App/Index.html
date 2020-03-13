@@ -1,21 +1,56 @@
-{{set . "title" "Home"}}
+{{set . "title" "WG Charts and Graphs"}}
 {{template "header.html" .}}
 
-<header class="jumbotron" style="background-color:#A9F16C">
-  <div class="container">
-    <div class="row">
-      <h1>It works!</h1>
-      <p></p>
-    </div>
-  </div>
-</header>
+{{ if .flash.error }}
+<div>Error: <span style="color: red"><strong>{{.flash.error}}</strong></span></div>
+{{ end }}
+{{ if .flash.success }}
+<div><span style="color: #20a020"><strong>{{.flash.success}}</strong></span></div>
+{{ end }}
 
-<div class="container">
-  <div class="row">
-    <div class="span6">
-      {{template "flash.html" .}}
-    </div>
-  </div>
+<div class="floatrt"><a href="{{index .links "logout"}}">Log out</a></div>
+<div>
+  <a onclick="window.open(this.href); return false" href="http://home.mr-happy.com/rvd/">Dev</a> | <a onclick="window.open(this.href); return false" href="http://home.mr-happy.com/rv/">Prod</a> ||
+  <a onclick="window.open(this.href); return false" href="{{index .links "hitAdd"}}">Add Hit</a> |
+  <a onclick="window.open(this.href); return false" href="{{index .links "hits"}}">Hits</a> |
+  <a onclick="window.open(this.href); return false" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
+  <a onclick="window.open(this.href); return false" href="{{index .links "reports"}}">Reports</a> |
+  <a onclick="window.open(this.href); return false" href="{{index .links "bingos"}}">Bingos</a> ||
+  <a onclick="window.open(this.href); return false" href="https://www.wheresgeorge.com/ybs.php">Your Bills</a> |
+  <a onclick="window.open(this.href); return false" href="https://www.wheresgeorge.com/u:USBUOywJ">Profile</a> |
+  <a onclick="window.open(this.href); return false" href="{{index .links "newrelic"}}">APM</a> |
+  <a onclick="window.open(this.href); return false" href="/?res=cmx">CMX charts</a> |
+  <a onclick="window.open(this.href); return false" href="/?res=pdx">PDX charts</a>
 </div>
 
+<table>
+  <tr><td colspan="11"><hr /></td></tr>
+  <tr>
+    <td class="denomCell">
+      <img src="../../wghbs.png" alt="HBS" />
+    </td><td class="vrule"></td><td class="denomCell">
+      <a onclick="window.open(this.href); return false" href="../../wgushbc-1.png"><img src="../../wghbs-1.png" alt="HBS-$1" /></a>
+    </td><td class="vrule"></td><td class="denomCell">
+      <a onclick="window.open(this.href); return false" href="../../wgushbc-2.png"><img src="../../wghbs-2.png" alt="HBS-$2" /></a>
+    </td><td class="vrule"></td><td class="denomCell">
+      <a onclick="window.open(this.href); return false" href="../../wgushbc-5.png"><img src="../../wghbs-5.png" alt="HBS-$5" /></a>
+    </td><td class="vrule"></td><td class="denomCell">
+      <a onclick="window.open(this.href); return false" href="../../wgushbc-10.png"><img src="../../wghbs-10.png" alt="HBS-$10" /></a>
+    </td><td class="vrule"></td><td class="denomCell">
+      <a onclick="window.open(this.href); return false" href="../../wgushbc-20.png"><img src="../../wghbs-20.png" alt="HBS-$20" /></a>
+    </td>
+  </tr>
+  <tr><td colspan="11"><hr /></td></tr>
+</table>
+<div><img src="../../wghbcreg.png" alt="RHBC" /></div>
+<hr />
+<div><img src="../../wgmhb.png" alt="MHB" /></div>
+<hr />
+<div><img src="../../wgfrb.png" alt="FRB" /></div>
+<hr />
+<div><a onclick="window.open(this.href); return false" href="../../wgushbc.svg"><img src="../../wgushbc.png" alt="USHBC" /></a></div>
+<hr />
+<div><a onclick="window.open(this.href); return false" href="../../wgushbc_glob.svg"><img src="../../wgushbc_glob.png" alt="USHBC globs" /></a></div>
+
+</body></html>
 {{template "footer.html" .}}
