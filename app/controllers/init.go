@@ -30,5 +30,4 @@ func init() {
 	//revel.InterceptFunc(Authenticate, revel.BEFORE, &Charts{})
 	//revel.InterceptFunc(Authenticate, revel.BEFORE, &Util{})
 	revel.InterceptFunc(Authenticate, revel.BEFORE, &App{})
-	revel.InterceptFunc(Authenticate, revel.BEFORE, &Testing{})
 }
