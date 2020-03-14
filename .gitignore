@@ -2,7 +2,7 @@ test-results/
 tmp/
 routes/
 conf/app.conf
-public/js/*-g.js
+public/js/*-g.js*
 revel.log
 revel.pid
 *.sw?
