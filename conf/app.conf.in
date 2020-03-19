@@ -19,7 +19,7 @@ package.folders = conf, public, app/views
 ################################################################################
 
 server.engine = newrelic
-server.newrelic.license = 
+server.newrelic.license = %%NR_LICENSE%%
 
 
 # Sets `revel.AppName` for use in-app.
@@ -31,14 +31,14 @@ app.name = WG Utils 2 (dev)
 # (and detect) user modification.
 # Keep this string secret or users will be able to inject arbitrary cookie values
 # into your application
-app.secret = 
+app.secret = %%REVEL_SECRET%%
 
 # Revel running behind proxy like nginx, haproxy, etc.
 app.behind.proxy = true
 
 
 # The IP address on which to listen.
-http.addr = localhost
+http.addr = 0.0.0.0
 
 # The port on which to listen.
 http.port = 9001
@@ -124,7 +124,7 @@ i18n.default_language = en
 module.static = github.com/revel/modules/static
 
 db.driver = postgres
-db.connect = postgres://user:pw@localhost/dbname?sslmode=disable
+db.connect = %%DB_CONNECT_STAGING%%
 
 
 ################################################################################
@@ -207,7 +207,7 @@ log.crit.output = stderr              # Everything that logs something as critic
 # INFO  21:53:55 static server-engine.go:169: Request Stats                             ip=127.0.0.1 path=/public/vendors/datatables.net-buttons/js/buttons.html5.min.js method=GET start=2017/08/31 21:53:55 status=200 duration_seconds=0.0002583 section=requestlog
 log.request.output = stdout
 
-db.connect = postgres://user:pw@localhost/dbname?sslmode=disable
+db.connect = %%DB_CONNECT_STAGING%%
 
 
 
@@ -221,7 +221,7 @@ db.connect = postgres://user:pw@localhost/dbname?sslmode=disable
 
 http.port = 9000
 app.name = WG Utils 2 (prod)
-db.connect = postgres://user:pw@localhost/dbname?sslmode=disable
+db.connect = %%DB_CONNECT_PROD%%
 
 mode.dev = false
 
