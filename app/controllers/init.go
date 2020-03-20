@@ -9,7 +9,7 @@ func Authenticate(c *revel.Controller) revel.Result {
 	username, err := c.Session.Get("username")
 	if err != nil {
 		if err.Error() == "Session value not found" {
-			revel.AppLog.Debugf("no username")
+			revel.AppLog.Debug("no username")
 			c.Flash.Error("You are not logged in")
 		} else {
 			revel.AppLog.Debugf("username error: %#v", err)
