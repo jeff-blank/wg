@@ -1,5 +1,6 @@
 JSDIR=		../public/js
 JQSRC=          \
+		${JSDIR}/app-index-g.js \
 		${JSDIR}/bingo-county-select-g.js \
 		${JSDIR}/bingos-index-g.js \
 		${JSDIR}/entries-edit-g.js \

@@ -69,3 +69,14 @@ td.vrule {
   padding-left: 5px;
   padding-right: 5px;
 }
+
+div.mapThumb {
+  width: 250px;
+}
+
+img.mapThumb {
+  width: 200px;
+  cursor: pointer;
+}
+
+.rpad2em        { padding-right: 2em; }
