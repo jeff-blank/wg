@@ -10,6 +10,12 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
+	var resPrefix string
+
+	residence := c.Params.Get("res")
+	if residence == "pdx" || residence == "cmx" {
+		resPrefix = residence + "_"
+	}
 	links := make(map[string]string)
 	links = map[string]string{
 		"reports":   routes.Reports.Index(),
@@ -26,5 +32,5 @@ func (c App) Index() revel.Result {
 		links["newrelic"] += "45030346"
 	}
 
-	return c.Render(links)
+	return c.Render(links, resPrefix)
 }

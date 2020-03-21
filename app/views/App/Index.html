@@ -10,6 +10,9 @@
 
 <div class="floatrt"><a href="{{index .links "logout"}}">Log out</a></div>
 <div>
+{{ if .resPrefix }}
+  {{ printf "%c%c%c" (index .resPrefix 0) (index .resPrefix 1) (index .resPrefix 2) }}
+{{ else }}
   <a onclick="window.open(this.href); return false" href="{{index .links "hitAdd"}}">Add Hit</a> |
   <a onclick="window.open(this.href); return false" href="{{index .links "hits"}}">Hits</a> |
   <a onclick="window.open(this.href); return false" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
@@ -21,38 +24,43 @@
   <a onclick="window.open(this.href); return false" href="/?res=cmx">CMX charts</a> |
   <a onclick="window.open(this.href); return false" href="/?res=pdx">PDX charts</a> ||
   <a onclick="window.open(this.href); return false" href="https://wg-dev.mr-happy.com/">Dev</a> | <a onclick="window.open(this.href); return false" href="https://wg.mr-happy.com/">Prod</a>
+{{ end }}
 </div>
 
-<hr />
-<div id="hbsMain" class="floatleft rpad1em" style="padding-bottom: 6px"><img src="https://home.mr-happy.com/wghbs.png" alt="HBS" /></div>
+<hr class="clearrt" />
+<div id="hbsMain" class="floatleft rpad1em" style="padding-bottom: 6px"><img src="https://home.mr-happy.com/{{.resPrefix}}wghbs.png" alt="HBS" /></div>
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
-  <img class="mapThumb" src="https://home.mr-happy.com/wghbs.png" alt="HBS" /> All
+  <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs.png" alt="HBS" /> All
 </div>
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
-  <img class="mapThumb" src="https://home.mr-happy.com/wghbs-1.png" alt="HBS-$1" /> $1
+  <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs-1.png" alt="HBS-$1" /> $1
 </div>
+{{ if ne .resPrefix "cmx_" }}
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
   <img class="mapThumb" src="https://home.mr-happy.com/wghbs-2.png" alt="HBS-$2" /> $2
 </div>
+{{ end }}
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
-  <img class="mapThumb" src="https://home.mr-happy.com/wghbs-5.png" alt="HBS-$5" /> $5
+  <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs-5.png" alt="HBS-$5" /> $5
 </div>
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
-  <img class="mapThumb" src="https://home.mr-happy.com/wghbs-10.png" alt="HBS-$10" /> $10
+  <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs-10.png" alt="HBS-$10" /> $10
 </div>
 <div class="floatleft mapThumb" style="padding-bottom: 4px">
-  <img class="mapThumb" src="https://home.mr-happy.com/wghbs-20.png" alt="HBS-$20" /> $20
+  <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs-20.png" alt="HBS-$20" /> $20
 </div>
 <hr class="clearleft" />
-<div><img src="https://home.mr-happy.com/wghbcreg.png" alt="RHBC" /></div>
+<div><img src="https://home.mr-happy.com/{{.resPrefix}}wghbcreg.png" alt="RHBC" /></div>
 <hr />
-<div><img src="https://home.mr-happy.com/wgmhb.png" alt="MHB" /></div>
+<div><img src="https://home.mr-happy.com/{{.resPrefix}}wgmhb.png" alt="MHB" /></div>
 <hr />
-<div><img src="https://home.mr-happy.com/wgfrb.png" alt="FRB" /></div>
+{{ if ne .resPrefix "pdx_" }}
+<div><img src="https://home.mr-happy.com/{{.resPrefix}}wgfrb.png" alt="FRB" /></div>
 <hr />
-<div><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/wgushbc.svg"><img src="https://home.mr-happy.com/wgushbc.png" alt="USHBC" /></a></div>
+{{ end }}
+<div><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc.png" alt="USHBC" /></a></div>
 <hr />
-<div><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/wgushbc_glob.svg"><img src="https://home.mr-happy.com/wgushbc_glob.png" alt="USHBC globs" /></a></div>
+<div><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.png" alt="USHBC globs" /></a></div>
 
 <script src="/public/js/app-index-g.js"></script>
 
