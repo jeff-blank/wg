@@ -28,9 +28,8 @@ RUN NR_LICENSE="$NR_LICENSE_B" \
 	CGO_ENABLED=0 GOOS=linux \
 	make release RELEASEDEST=/wg REINPLACE='sed -i'
 
-FROM debian:buster-slim
+FROM alpine:latest
 
-RUN apt-get update && apt-get -y upgrade
 COPY --from=builder /wg /wg
 
 ENTRYPOINT ["/wg/run.sh"]
