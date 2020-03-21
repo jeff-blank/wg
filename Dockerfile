@@ -1,6 +1,5 @@
 FROM golang:1.13.8 as builder
 
-RUN apt-get update && apt-get -y upgrade
 RUN go get golang.org/dl/go1.12.17 && /go/bin/go1.12.17 download && /go/bin/go1.12.17 get honnef.co/go/js/dom
 RUN go get github.com/revel/revel \
 	github.com/revel/cmd/revel \
@@ -31,6 +30,7 @@ RUN NR_LICENSE="$NR_LICENSE_B" \
 
 FROM debian:buster-slim
 
+RUN apt-get update && apt-get -y upgrade
 COPY --from=builder /wg /wg
 
 ENTRYPOINT ["/wg/run.sh"]
