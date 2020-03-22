@@ -230,7 +230,7 @@ func (c Hits) Index() revel.Result {
 		}
 	}
 
-	// combine filters for ease of something
+	// combine filters for ease of passing data to template
 	filters := make(map[string]string)
 	filters = map[string]string{
 		"country": filterCountry,
@@ -306,9 +306,10 @@ func (c Hits) ShowBrk() revel.Result {
 
 	rows, err := app.DB.Query(Q_REGION_BREAKDOWN, country, state)
 	if err != nil {
-		// TODO: render an error in JSON
-		revel.AppLog.Error(err.Error())
-		return c.Render()
+		// TODO(?): render an error in JSON
+		msg := fmt.Sprintf("query breakdown: %#v", err)
+		revel.AppLog.Error(msg)
+		return c.RenderText(msg)
 	}
 
 	for rows.Next() {
@@ -318,9 +319,10 @@ func (c Hits) ShowBrk() revel.Result {
 		)
 		err = rows.Scan(&county, &count)
 		if err != nil {
-			// TODO: render an error in JSON
-			revel.AppLog.Errorf("%v", err)
-			return c.RenderText("oops")
+			// TODO(?): render an error in JSON
+			msg := fmt.Sprintf("read breakdown: %#v", err)
+			revel.AppLog.Error(msg)
+			return c.RenderText(msg)
 		} else {
 			results = append(results, app.HitsBrkEnt{Region: county, Count: count})
 		}
@@ -432,9 +434,6 @@ func (c Hits) New() revel.Result {
 	for d, _ := range days {
 		days[d] = fmt.Sprintf("%02d", d+1)
 	}
-
-	//revel.AppLog.Debugf("%#v", years)
-	//revel.AppLog.Debugf("%#v|%#v", month, months)
 
 	states := util.GetStates("US")
 	homeState := util.GetHomeRegion("state")

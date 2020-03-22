@@ -17,10 +17,7 @@
     <th id="c_score" class="c_score bordered">Score<div class="small">(<a href="{{index .graphLinks "score"}}" class="graphLink">graph</a>)</div></th>
     <th id="c_yearHits" class="c_yearHits bordered">Year's<div>Hits</div></th>
   </tr>
-  <!-- /thead -->
   </table><div id="scroller" class="bordered scrollable"><table>
-  <tbody id="tbody">
-
   {{ $rowTint := "" }}{{ $entsLink := .entsLink }}{{ $monthNum := "" }}{{ $heavy := "" }}
   {{ range $i, $v := .tableOut }}
   {{if even $i}}{{$rowTint = ""}}{{else}}{{$rowTint = " oddRow"}}{{end}}{{$entCell := index . "monthBills"}}{{$yrHitCell := index . "yearHits"}}{{$monthsInYear := index . "monthsInYear"}}{{$monthNum = slice (index . "month") 5 7}}{{if eq $monthNum "12"}}{{$heavy = " topBlack"}}{{end}}
@@ -37,7 +34,6 @@
     {{ if $monthsInYear }}<td class="c_yearHits bordered aright vmid" rowspan="{{$monthsInYear}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{index . "yearHits"}}</td>{{end}}
   </tr{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>
   {{ end }}
-  </tbody>
 </table></div>
 
 <div id="graphContainer">
@@ -48,32 +44,32 @@
 <script src="/public/js/masterStats-g.js"></script>
 <script src="/public/js/scrollBar.js"></script>
 <script type="application/javascript">
-  $( document ).ready(function() {
+  $(document).ready(function() {
     var lastColumnId = '#c_yearHits';
 
     $wh = $(window).innerHeight();
     $h1h = $('#h1').outerHeight();
     $thh = $('#hTable').outerHeight();
-    $('#scroller').height(0.9 * $wh - ($h1h + $thh) );
+    $('#scroller').height(0.9 * $wh - ($h1h + $thh));
 
     $('#headRow').children('th').each(function() {
-      $mw = 0
-      $className = $(this).attr('id')
+      $mw = 0;
+      $className = $(this).attr('id');
       $cells = $('.' + $className).each(function() {
-        $mw = Math.max($mw, $(this).width())
+        $mw = Math.max($mw, $(this).width());
       });
       $cells = $('.' + $className).each(function() {
-        $(this).width($mw)
+        $(this).width($mw);
       });
     });
     $tw = 0
     $('#headRow').children('th').each(function() {
       $tw += $(this).outerWidth();
     });
-    $sw = getScrollBarWidth()
-    $('#scroller').width($tw+$sw)
-    $(lastColumnId).width($(lastColumnId).width() + $sw)
-    $(lastColumnId).attr('margin-right', $sw)
+    $sw = getScrollBarWidth();
+    $('#scroller').width($tw+$sw);
+    $(lastColumnId).width($(lastColumnId).width() + $sw);
+    $(lastColumnId).attr('margin-right', $sw);
   });
 </script>
 

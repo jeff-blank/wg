@@ -56,14 +56,11 @@ func (c Login) Login() revel.Result {
 		return c.Redirect(App.Index)
 	}
 
-	pwHash := ""
-	for _, b := range sha256.Sum256([]byte(pass)) {
-		pwHash += fmt.Sprintf("%02x", b)
-	}
+	pwHash := fmt.Sprintf("%064x", sha256.Sum256([]byte(pass)))
 
 	err := app.DB.QueryRow(`select password from auth where username=$1`, user).Scan(&dbPass)
 	if err != nil {
-		if err.Error() == `sql: no rows in result set` {
+		if err.Error() == app.SQL_ERR_NO_ROWS {
 			errStr = ERR_BAD_USER_PASS
 		} else {
 			revel.AppLog.Errorf("%#v", err)

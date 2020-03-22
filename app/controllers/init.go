@@ -10,7 +10,7 @@ func Authenticate(c *revel.Controller) revel.Result {
 	if err != nil {
 		if err.Error() == "Session value not found" {
 			revel.AppLog.Debug("no username")
-			c.Flash.Error("You are not logged in")
+			c.Flash.Error("You must be logged in to continue")
 		} else {
 			revel.AppLog.Debugf("username error: %#v", err)
 			c.Flash.Error(err.Error())
@@ -27,7 +27,7 @@ func init() {
 	revel.InterceptFunc(Authenticate, revel.BEFORE, &Entries{})
 	revel.InterceptFunc(Authenticate, revel.BEFORE, &Hits{})
 	revel.InterceptFunc(Authenticate, revel.BEFORE, &Reports{})
-	//revel.InterceptFunc(Authenticate, revel.BEFORE, &Charts{})
-	//revel.InterceptFunc(Authenticate, revel.BEFORE, &Util{})
+	revel.InterceptFunc(Authenticate, revel.BEFORE, &Charts{})
+	revel.InterceptFunc(Authenticate, revel.BEFORE, &Util{})
 	revel.InterceptFunc(Authenticate, revel.BEFORE, &App{})
 }
