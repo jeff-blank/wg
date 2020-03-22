@@ -32,7 +32,7 @@
     <td class="c_oneYrAvgMonthlyBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyBills") }}</td>
     <td class="c_score bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "score") }}</td>
     {{ if $monthsInYear }}<td class="c_yearHits bordered aright vmid" rowspan="{{$monthsInYear}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{index . "yearHits"}}</td>{{end}}
-  </tr{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>
+  </tr>
   {{ end }}
 </table></div>
 
