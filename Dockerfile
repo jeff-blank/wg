@@ -32,4 +32,5 @@ FROM alpine:latest
 
 COPY --from=builder /wg /wg
 
+ENV TZ=PST8PDT
 ENTRYPOINT ["/wg/run.sh"]
