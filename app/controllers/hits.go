@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -178,6 +179,14 @@ func getHits(whereGroupOrder string) ([]app.Hit, error) {
 
 func (c Hits) Index() revel.Result {
 
+	var newHitFlash app.NewHitInfo
+
+	if c.Flash.Data["info"] != "" {
+		revel.AppLog.Debugf("%#v", c.Flash.Data)
+		json.Unmarshal([]byte(c.Flash.Data["info"]), &newHitFlash)
+	}
+	revel.AppLog.Debugf("%#v", newHitFlash)
+
 	filterCountry := c.Params.Get("country")
 	filterState := c.Params.Get("state")
 	filterCounty := c.Params.Get("county")
@@ -247,7 +256,7 @@ func (c Hits) Index() revel.Result {
 		"breakdown":       routes.Hits.Breakdown(),
 		"new":             routes.Hits.New(),
 	}
-	return c.Render(hits, filters, links)
+	return c.Render(hits, newHitFlash, filters, links)
 }
 
 func (c Hits) Breakdown() revel.Result {
@@ -337,20 +346,23 @@ func dbSanitize(input string) string {
 
 func (c Hits) Create() revel.Result {
 	var (
-		bId     int
-		bSerial string
-		bDenom  int
-		bSeries string
-		bRptkey string
-		series  string
+		bId        int
+		bSerial    string
+		bDenom     int
+		bSeries    string
+		bRptkey    string
+		series     string
+		infoFlash  app.NewHitInfo
+		dateHits   int
+		countyHits int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
 	rptkey := dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["key"][0], ""))
 
-	country := dbSanitize(app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), ""))
-	state := dbSanitize(app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), ""))
-	county := dbSanitize(app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), ""))
+	country := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), "")
+	state := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), "")
+	county := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), "")
 
 	serial := dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["serial"][0], ""))
 	if !app.RE_serial.MatchString(serial) {
@@ -364,10 +376,48 @@ func (c Hits) Create() revel.Result {
 		return c.RenderText("missing bill series")
 	}
 	denom, _ := strconv.Atoi(dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["denom"][0], "")))
-	entdate := dbSanitize(c.Params.Form["year"][0]) + dbSanitize(c.Params.Form["month"][0]) + dbSanitize(c.Params.Form["day"][0])
+	entdate := dbSanitize(c.Params.Form["year"][0]) + "-" + dbSanitize(c.Params.Form["month"][0]) + "-" + dbSanitize(c.Params.Form["day"][0])
+
+	// if new county:
+	//   flash new county
+	//   check bingos
+	// if open date:
+	//   flash date hit
+
+	err := app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
+	if err == nil && dateHits == 0 {
+		infoFlash.FirstOnDate = entdate[5:]
+	} else if err != nil {
+		revel.AppLog.Errorf("is first date hit? err=%#v", err)
+	}
+	if country == "US" {
+		err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
+		if err == nil && countyHits == 0 {
+			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
+			rows, err := app.DB.Query(`select b.name from bingos b, bingo_counties bc, counties_master cm where cm.state=$1 and cm.county=$2 and bc.county_id=cm.id and b.id=bc.bingo_id order by b.name`, state, county)
+			if err == nil {
+				infoFlash.CountyBingoNames = make([]string, 0)
+				for rows.Next() {
+					var bingo string
+					err := rows.Scan(&bingo)
+					if err == nil {
+						infoFlash.CountyBingoNames = append(infoFlash.CountyBingoNames, bingo)
+					}
+				}
+			} else if err != nil {
+				revel.AppLog.Errorf("county in bingos err=%#v", err)
+			}
+		} else if err != nil {
+			revel.AppLog.Errorf("is first county hit? err=%#v", err)
+		}
+	}
+	flashJson, err := json.Marshal(infoFlash)
+	if err == nil {
+		c.Flash.Out["info"] = string(flashJson)
+	}
 
 	bId = -1
-	err := app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
+	err = app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {
 			revel.AppLog.Errorf("search for existing bill: %#v", err)
