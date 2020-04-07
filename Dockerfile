@@ -31,6 +31,7 @@ RUN NR_LICENSE="$NR_LICENSE_B" \
 FROM alpine:latest
 
 COPY --from=builder /wg /wg
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
 ENV TZ=PST8PDT
 ENTRYPOINT ["/wg/run.sh"]
