@@ -231,11 +231,17 @@ watch = false
 
 module.testrunner =
 
-log.warn.output  = log/%(app.name)s-warn.json    # Log all warn messages to file
-log.error.output = log/%(app.name)s-error.json   # Log all errors to file
-log.crit.output = log/%(app.name)s-critical.json # Log all critical to file
+#log.warn.output  = log/%(app.name)s-warn.json    # Log all warn messages to file
+#log.error.output = log/%(app.name)s-error.json   # Log all errors to file
+#log.crit.output = log/%(app.name)s-critical.json # Log all critical to file
 
 # Revel request access log (json format)
 # Example:
 #   log.request.output = %(app.name)s-request.json
-log.request.output = log/%(app.name)s-requests.json
+#log.request.output = log/%(app.name)s-requests.json
+
+# since this is going to run in a container
+log.all.filter.module.app = stdout    # Log all loggers for the application to the stdout
+log.error.nfilter.module.app = stderr # Everything else that logs an error to stderr
+log.crit.output = stderr              # Everything that logs something as critical goes to this
+log.request.output = stdout
