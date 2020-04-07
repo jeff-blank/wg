@@ -54,6 +54,12 @@ type BingoDetail struct {
 	Hits   bool
 }
 
+type NewHitInfo struct {
+	FirstOnDate      string
+	FirstInCounty    string
+	CountyBingoNames []string
+}
+
 const (
 	SQL_ERR_NO_ROWS = `sql: no rows in result set`
 	DATE_LAYOUT     = `2006-01-02`

@@ -7,6 +7,23 @@
 </p>
 <hr>
 
+{{ if or .newHitFlash.FirstOnDate .newHitFlash.FirstInCounty }}
+<ul>
+  {{ if .newHitFlash.FirstOnDate }}
+  <li>First hit on {{ .newHitFlash.FirstOnDate }}</li>
+  {{ end }}
+  {{ if .newHitFlash.FirstInCounty }}
+  <li>First hit in {{ .newHitFlash.FirstInCounty }}</li>
+    {{ if gt (len .newHitFlash.CountyBingoNames) 0 }}
+    <li>County is part of the following bingo(s):
+      <ul>{{ range .newHitFlash.CountyBingoNames }}<li>{{.}}</li>{{ end }}</ul>
+    </li>
+    {{ end }}
+  {{ end }}
+</ul>
+<hr>
+{{ end }}
+
 <p>
   <a href="{{ index .links "currentYearHits" }}">Show current year's hits</a> |
   <a href="{{ index .links "allHits" }}">Show all hits</a>
