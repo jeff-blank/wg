@@ -33,5 +33,7 @@ FROM alpine:latest
 COPY --from=builder /wg /wg
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-ENV TZ=PST8PDT
+ARG TZ_B
+ENV TZ=$TZ_B
+
 ENTRYPOINT ["/wg/run.sh"]

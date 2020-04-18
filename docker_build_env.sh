@@ -22,4 +22,5 @@ docker build \
 	--build-arg NR_LICENSE_B="$NR_LICENSE" \
 	--build-arg REVEL_SECRET_B="$REVEL_SECRET" \
 	--build-arg DB_CONNECT_PROD_B="$DB_CONNECT_PROD" \
+	--build-arg TZ_B="$TZ" \
 	.
