@@ -27,7 +27,7 @@
     <td class="c_cumulativeHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "cumulativeHits" }}</td>
     <td class="c_avgMonthlyHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.4f" (index . "avgMonthlyHits") }}</td>
     <td class="c_oneYrAvgMonthlyHits bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyHits") }}</td>
-    <td class="c_monthBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}><a href="{{$entsLink}}?month={{ index $entCell "month"}}">{{ index $entCell "entries"}}</a></td>
+    <td class="c_monthBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}><a class="billEnts" href="{{$entsLink}}?month={{ index $entCell "month"}}">{{ index $entCell "entries"}}</a></td>
     <td class="c_allBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "cumulativeBills"}}</td>
     <td class="c_oneYrAvgMonthlyBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyBills") }}</td>
     <td class="c_score bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "score") }}</td>

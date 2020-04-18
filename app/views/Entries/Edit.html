@@ -3,7 +3,7 @@
 
 <h1>Edit Monthly Bill Entries</h1>
 
-<form id="form" action="{{ .updateLink }}" accept-charset="UTF-8" method="post">
+<form id="form" onsubmit="refreshParentAndClose()" action="{{ .updateLink }}" accept-charset="UTF-8" method="post">
   <table>
     <tr>
       <td class="aright rpad1em">Enter updated entry total for month ending {{ .month }}:</td>
@@ -24,5 +24,11 @@
 </form>
 
 <script src="/public/js/entries-edit-g.js"></script>
+<script type="text/javascript">
+    function refreshParentAndClose() {
+      window.opener.location.reload()
+      window.close()
+    }
+</script>
 
 {{template "footer.html" .}}

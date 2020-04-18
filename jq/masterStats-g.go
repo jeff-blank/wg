@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/gopherjs/gopherjs/js"
 	"github.com/gopherjs/jquery"
 	"honnef.co/go/js/dom"
 )
@@ -48,6 +49,12 @@ func main() {
 	jq("#graphDismiss").On(jquery.CLICK, func(e jquery.Event) {
 		jq("#graphContainer").Hide()
 		jq("#dimmer").Hide()
+	})
+
+	jq(".billEnts").On(jquery.CLICK, func(e jquery.Event) {
+		e.PreventDefault()
+		href := jq(e.Target).Attr("href")
+		js.Global.Get("window").Call("open", href, "BillEnts", "width=620,height=200,location=no,menubars=no,toolbars=no,scrollbars=yes")
 	})
 
 }
