@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ -z "$SECRETS" -o ! -f "$SECRETS" ]; then
-	echo "Secrets file '$SECRETS' not found" 1>&2
+if [ -z "$BUILD_ENV" -o ! -f "$BUILD_ENV" ]; then
+	echo "Environment file '$BUILD_ENV' not found" 1>&2
 	exit 1
 fi
 
@@ -16,7 +16,7 @@ while [ ${#REVEL_SECRET} -lt 64 ]; do
 	[ $i -gt 1000 ] && exit 1
 done
 
-. $SECRETS
+. $BUILD_ENV
 docker build \
 	--tag wg:latest \
 	--build-arg NR_LICENSE_B="$NR_LICENSE" \
