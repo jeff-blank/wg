@@ -15,10 +15,14 @@ release: js ${APPCONF}
 	${REINPLACE} '/runMode/s/^/exec /;s/wg\.new/wg/g' ${RELEASEDEST}/run.sh
 
 ${APPCONF}:
-	[ -n "${NR_LICENSE}" ]
-	[ -n "${REVEL_SECRET}" ]
-	[ -n "${DB_CONNECT_PROD}" ]
+	@echo 'Check for $$NR_LICENSE...'
+	@[ -n "${NR_LICENSE}" ]
+	@echo 'Check for $$REVEL_SECRET...'
+	@[ -n "${REVEL_SECRET}" ]
+	@echo 'Check for $$DB_CONNECT_PROD...'
+	@[ -n "${DB_CONNECT_PROD}" ]
 	cp ${APPCONF_IN} $@
-	${REINPLACE} 's/%%NR_LICENSE%%/'"${NR_LICENSE}"'/' $@
-	${REINPLACE} 's/%%REVEL_SECRET%%/'"${REVEL_SECRET}"'/' $@
-	${REINPLACE} 's,%%DB_CONNECT_PROD%%,'"${DB_CONNECT_PROD}"',' $@
+	@echo Write secrets to $@
+	@${REINPLACE} 's/%%NR_LICENSE%%/'"${NR_LICENSE}"'/' $@
+	@${REINPLACE} 's/%%REVEL_SECRET%%/'"${REVEL_SECRET}"'/' $@
+	@${REINPLACE} 's,%%DB_CONNECT_PROD%%,'"${DB_CONNECT_PROD}"',' $@
