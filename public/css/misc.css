@@ -25,6 +25,10 @@ div.scrollable {
     overflow-y: auto;
 }
 
+div.indexUSCounty {
+    overflow-x: auto;
+}
+
 #graphContainer {
   display: none;
   width: 100%;
