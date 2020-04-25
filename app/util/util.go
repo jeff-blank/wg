@@ -58,6 +58,7 @@ func GetStates(country string) []string {
 		revel.AppLog.Error(err.Error())
 		return nil
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var state string
 		err := rows.Scan(&state)
@@ -80,6 +81,7 @@ func GetCounties(state string) []app.Region {
 		revel.AppLog.Error(err.Error())
 		return nil
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			id     int

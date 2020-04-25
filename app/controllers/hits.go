@@ -164,6 +164,7 @@ func getHits(whereGroupOrder string) ([]app.Hit, error) {
 		revel.AppLog.Error(err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
 		if err != nil {
@@ -285,6 +286,7 @@ func (c Hits) Breakdown() revel.Result {
 			revel.AppLog.Error(err.Error())
 			return c.RenderError(err)
 		}
+		defer rows.Close()
 		for rows.Next() {
 			var (
 				region string
@@ -321,6 +323,7 @@ func (c Hits) ShowBrk() revel.Result {
 		return c.RenderText(msg)
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			county string
@@ -397,6 +400,7 @@ func (c Hits) Create() revel.Result {
 			rows, err := app.DB.Query(`select b.name from bingos b, bingo_counties bc, counties_master cm where cm.state=$1 and cm.county=$2 and bc.county_id=cm.id and b.id=bc.bingo_id order by b.name`, state, county)
 			if err == nil {
 				infoFlash.CountyBingoNames = make([]string, 0)
+				defer rows.Close()
 				for rows.Next() {
 					var bingo string
 					err := rows.Scan(&bingo)

@@ -40,6 +40,7 @@ func (c Entries) Edit() revel.Result {
 		revel.AppLog.Errorf("get total entries: %#v", err)
 		return c.RenderText("error getting total bill entries")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ents int
 		err := rows.Scan(&ents)

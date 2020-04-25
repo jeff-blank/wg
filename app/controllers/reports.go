@@ -57,6 +57,7 @@ func (c Reports) HitsCalendar() revel.Result {
 		return c.RenderError(err)
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var date string
 		var count int

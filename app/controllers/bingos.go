@@ -92,6 +92,7 @@ func (c Bingos) Index() revel.Result {
 		foundBingos = false
 		return c.Render(newLink, foundBingos)
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			bName  string
@@ -112,6 +113,7 @@ func (c Bingos) Index() revel.Result {
 		}
 		nCounties := 0
 		nhCounties := 0
+		defer cRows.Close()
 		for cRows.Next() {
 			var (
 				cId     int
@@ -242,6 +244,7 @@ func getBingoDetail(id int) ([]app.BingoDetail, string) {
 		return nil, fmt.Sprintf("query counties in bingo: %#v", err)
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			cId, nHits    int
