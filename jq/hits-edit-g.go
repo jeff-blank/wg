@@ -115,6 +115,7 @@ func initializeForm() {
 	stateProvinceSelect("US")
 	usCounty()
 	datesOfMonth()
+	jq("#key").Focus()
 }
 
 func nonUsCity() {
