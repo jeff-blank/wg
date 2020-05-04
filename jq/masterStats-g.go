@@ -38,7 +38,7 @@ func main() {
 		graph.SetCss("top", int(float64(wh)*0.2))
 
 		marginPct := (1 - GRAPH_WIDTH) / 2
-		dismiss.SetCss("left", int((1-marginPct)*float64(ww))+1)
+		dismiss.SetCss("left", int((1-marginPct)*float64(ww))+8)
 		dismiss.SetCss("top", int(float64(wh)*0.2))
 
 		dimmer.Show()

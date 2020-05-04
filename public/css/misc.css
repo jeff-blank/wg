@@ -53,6 +53,9 @@ div.indexUSCounty {
 #graph {
   position: fixed;
   width: 80%;
+  height: 448px;
+  background-color: white;
+  border: outset 4px;
 }
 
 #graphDismiss {
@@ -61,7 +64,7 @@ div.indexUSCounty {
   top: 0;
   cursor: pointer;
   padding: 5px;
-  border: outset 1px;
+  border: outset 2px;
 }
 
 .denomCell {
