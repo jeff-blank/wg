@@ -87,3 +87,12 @@ img.mapThumb {
 }
 
 .rpad2em        { padding-right: 2em; }
+
+div.firsts {
+  border: 3px;
+  border-color: #0a0;
+  border-style: solid;
+  color: #0a0;
+  display: inline-block;
+  padding-right: 2em;
+}

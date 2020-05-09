@@ -8,12 +8,13 @@
 <hr>
 
 {{ if or .newHitFlash.FirstOnDate .newHitFlash.FirstInCounty }}
+<div class="firsts">
 <ul>
   {{ if .newHitFlash.FirstOnDate }}
-  <li>First hit on {{ .newHitFlash.FirstOnDate }}</li>
+  <li>&#128467; First hit on {{ .newHitFlash.FirstOnDate }}</li>
   {{ end }}
   {{ if .newHitFlash.FirstInCounty }}
-  <li>First hit in {{ .newHitFlash.FirstInCounty }}</li>
+  <li>&#128506; First hit in {{ .newHitFlash.FirstInCounty }}</li>
     {{ if gt (len .newHitFlash.CountyBingoNames) 0 }}
     <li>County is part of the following bingo(s):
       <ul>{{ range .newHitFlash.CountyBingoNames }}<li>{{.}}</li>{{ end }}</ul>
@@ -21,6 +22,7 @@
     {{ end }}
   {{ end }}
 </ul>
+</div>
 <hr>
 {{ end }}
 
