@@ -424,54 +424,46 @@ func (c Hits) Create() revel.Result {
 	err = app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {
-			msg := fmt.Sprintf("search for existing bill: %#v", err)
-			revel.AppLog.Error(msg)
-			return c.RenderError(msg)
+			revel.AppLog.Errorf("search for existing bill: %#v", err)
+			return c.RenderText(err.Error())
 		}
 	}
 
 	if bId == -1 {
 		res, err := app.DB.Exec(S_INSERT_BILL, serial, series, denom, rptkey)
 		if err != nil {
-			msg := fmt.Sprintf("insert new bill: %#v", err)
-			revel.AppLog.Error(msg)
-			return c.RenderError(msg)
+			revel.AppLog.Errorf("insert new bill: %#v", err)
+			return c.RenderText(err.Error())
 		}
 		n, err := res.RowsAffected()
 		if err != nil {
-			msg := fmt.Sprintf("get # rows affected by bill insert: %#v", err)
-			revel.AppLog.Error(msg)
-			return c.RenderError(msg)
+			revel.AppLog.Errorf("get # rows affected by bill insert: %#v", err)
+			return c.RenderText(err.Error())
 		}
 		if n != 1 {
-			msg := fmt.Sprintf("insert bill failed: %d rows affected", n)
-			revel.AppLog.Error(msg)
-			return c.RenderError(msg)
+			revel.AppLog.Errorf("insert bill failed: %d rows affected", n)
+			return c.RenderText(fmt.Sprintf("insert bill failed: %d rows affected", n))
 		}
 		err = app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 		if err != nil {
-			msg := fmt.Sprintf("get bill after insert: %#v", err)
-			revel.AppLog.Error(msg)
-			return c.RenderError(msg)
+			revel.AppLog.Errorf("get bill after insert: %#v", err)
+			return c.RenderText(err.Error())
 		}
 	}
 
 	res, err := app.DB.Exec(S_INSERT_HIT, bId, country, state, county, entdate)
 	if err != nil {
-		msg := fmt.Sprintf("insert new hit: %#v", err)
-		revel.AppLog.Error(msg)
-		return c.RenderError(msg)
+		revel.AppLog.Errorf("insert new hit: %#v", err)
+		return c.RenderText(err.Error())
 	}
 	n, err := res.RowsAffected()
 	if err != nil {
-		msg := fmt.Sprintf("get # rows affected by hit insert: %#v", err)
-		revel.AppLog.Error(msg)
-		return c.RenderError(msg)
+		revel.AppLog.Errorf("get # rows affected by hit insert: %#v", err)
+		return c.RenderText(err.Error())
 	}
 	if n != 1 {
-		msg := fmt.Sprintf("insert hit failed: %d rows affected", n)
-		revel.AppLog.Error(msg)
-		return c.RenderError(msg)
+		revel.AppLog.Errorf("insert hit failed: %d rows affected", n)
+		return c.RenderText(fmt.Sprintf("insert hit failed: %d rows affected", n))
 	}
 
 	return c.Redirect(routes.Hits.Index() + "?year=current")
