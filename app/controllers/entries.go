@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/jeff-blank/wg/app"
@@ -80,6 +81,32 @@ func (c Entries) Edit() revel.Result {
 	}
 	updateLink := routes.Entries.Update()
 	return c.Render(month, entries, totalEnts, updateLink)
+}
+
+func (c Entries) GetEntryByKey(key string) revel.Result {
+	var (
+		bill      app.Bill
+		id        int
+		serial    string
+		denom     int
+		series    string
+		residence string
+	)
+
+	err := app.DB.QueryRow(`select id, serial, denomination, series, residence from bills where rptkey=$1`, key).Scan(&id, &serial, &denom, &series, &residence)
+	if err == nil {
+		bill.Id = id
+		bill.Serial = serial
+		bill.Denomination = denom
+		bill.Series = series
+		bill.Residence = residence
+		bill.Rptkey = key
+	} else if err.Error() != app.SQL_ERR_NO_ROWS {
+		msg := fmt.Sprintf("look up bill with key '%s': %#v", key, err)
+		revel.AppLog.Error(msg)
+		bill.Message = msg
+	}
+	return c.RenderJSON(bill)
 }
 
 // vim:foldmethod=marker:

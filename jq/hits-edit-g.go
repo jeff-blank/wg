@@ -181,9 +181,29 @@ func denomSeries(e jquery.Event) {
 	}
 }
 
+func billFill(e jquery.Event) {
+	jquery.Get("/entries/"+jq(e.Target).Val(), func(data interface{}) {
+		var billData map[string]interface{} = data.(map[string]interface{})
+		if billData["Id"].(float64) == 0 {
+			return
+		}
+		jq("#fserial").SetVal(billData["Serial"])
+		jq("#fseries").SetVal(billData["Series"])
+		jq("#sdenom").Children("option").Each(func(i int, elem interface{}) {
+			if jq(elem).Val() == strconv.Itoa(int(billData["Denomination"].(float64))) {
+				jq(elem).SetAttr("selected", "selected")
+			} else if jq(elem).Attr("selected") == "selected" {
+				jq(elem).RemoveAttr("selected")
+			}
+		})
+	})
+}
+
 func main() {
 
 	jq("#form").Ready(initializeForm)
+
+	jq("#fkey").On(jquery.CHANGE, billFill)
 
 	jq("#sstate").On(jquery.CHANGE, func(e jquery.Event) {
 		country := jq("#fcountry").Val()

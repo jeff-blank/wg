@@ -22,6 +22,7 @@ GET     /util/GetHomeCounty                     Util.GetHomeCounty
 GET     /util/Counties                          Util.GetCounties
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
+GET     /entries/:key                           Entries.GetEntryByKey
 GET     /bingos                                 Bingos.Index
 POST    /bingos                                 Bingos.Create
 GET     /bingos/new                             Bingos.New

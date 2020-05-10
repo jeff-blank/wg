@@ -60,6 +60,16 @@ type NewHitInfo struct {
 	CountyBingoNames []string
 }
 
+type Bill struct {
+	Id           int
+	Serial       string
+	Series       string
+	Denomination int
+	Rptkey       string
+	Residence    string
+	Message      string
+}
+
 const (
 	SQL_ERR_NO_ROWS = `sql: no rows in result set`
 	DATE_LAYOUT     = `2006-01-02`
