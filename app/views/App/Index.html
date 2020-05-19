@@ -13,17 +13,17 @@
 {{ if .resPrefix }}
   {{ printf "%c%c%c" (index .resPrefix 0) (index .resPrefix 1) (index .resPrefix 2) }}
 {{ else }}
-  <a onclick="window.open(this.href); return false" href="{{index .links "hitAdd"}}">Add Hit</a> |
-  <a onclick="window.open(this.href); return false" href="{{index .links "hits"}}">Hits</a> |
-  <a onclick="window.open(this.href); return false" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
-  <a onclick="window.open(this.href); return false" href="{{index .links "reports"}}">Reports</a> |
-  <a onclick="window.open(this.href); return false" href="{{index .links "bingos"}}">Bingos</a> ||
-  <a onclick="window.open(this.href); return false" href="https://www.wheresgeorge.com/ybs.php">Your Bills</a> |
-  <a onclick="window.open(this.href); return false" href="https://www.wheresgeorge.com/u:USBUOywJ">Profile</a> |
-  <a onclick="window.open(this.href); return false" href="{{index .links "newrelic"}}">APM</a> |
-  <a onclick="window.open(this.href); return false" href="/?res=cmx">CMX charts</a> |
-  <a onclick="window.open(this.href); return false" href="/?res=pdx">PDX charts</a> ||
-  <a onclick="window.open(this.href); return false" href="https://wg-dev.mr-happy.com/">Dev</a> | <a onclick="window.open(this.href); return false" href="https://wg.mr-happy.com/">Prod</a>
+  <a class="newWin" href="{{index .links "hitAdd"}}">Add Hit</a> |
+  <a class="newWin" href="{{index .links "hits"}}">Hits</a> |
+  <a class="newWin" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
+  <a class="newWin" href="{{index .links "reports"}}">Reports</a> |
+  <a class="newWin" href="{{index .links "bingos"}}">Bingos</a> ||
+  <a class="newWin" href="https://www.wheresgeorge.com/ybs.php">Your Bills</a> |
+  <a class="newWin" href="https://www.wheresgeorge.com/u:USBUOywJ">Profile</a> |
+  <a class="newWin" href="{{index .links "newrelic"}}">APM</a> |
+  <a class="newWin" href="/?res=cmx">CMX charts</a> |
+  <a class="newWin" href="/?res=pdx">PDX charts</a> ||
+  <a class="newWin" href="https://wg-dev.mr-happy.com/">Dev</a> | <a class="newWin" href="https://wg.mr-happy.com/">Prod</a>
 {{ end }}
 </div>
 
@@ -58,11 +58,12 @@
 <div><img src="https://home.mr-happy.com/{{.resPrefix}}wgfrb.png" alt="FRB" /></div>
 <hr />
 {{ end }}
-<div class="indexUSCounty"><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc.png" alt="USHBC" /></a></div>
+<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc.png" alt="USHBC" /></a></div>
 <hr />
-<div class="indexUSCounty"><a onclick="window.open(this.href); return false" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.png" alt="USHBC globs" /></a></div>
+<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.png" alt="USHBC globs" /></a></div>
 
 <script src="/public/js/app-index-g.js"></script>
+<script src="/public/js/newWin-g.js"></script>
 
 </body></html>
 {{template "footer.html" .}}

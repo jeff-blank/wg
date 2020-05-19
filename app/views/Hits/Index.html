@@ -71,12 +71,14 @@
         <td class="bordered aright">{{.Index}}</td>
         <td class="bordered aright">{{.Denom}}</td>
         <td class="bordered mono"><a href="hits/edit/{{.Id}}">{{.Serial}}/{{.Series}} ({{.Count}})</a></td>
-        <td class="bordered"><a href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
+        <td class="bordered"><a class="newWin" href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
         <td class="bordered"><a href="hits?country={{.Country}}{{if .State}}&amp;state={{.State}}{{end}}">{{if ne .State "--"}}{{.State}}{{if ne .Country "US"}}, {{.Country}}{{end}}{{else}}{{.Country}}{{end}}</a></td>
         <td class="bordered">{{if eq .Country "US"}}<a href="hits?country={{.Country}}&amp;state={{.State}}&amp;county={{.CountyCity}}">{{end}}{{.CountyCity}}{{if eq .Country "US"}}</a>{{end}}</td>
       </tr>
       {{ end }}
   </table>
 </div>
+
+<script src="/public/js/newWin-g.js"></script>
 
 {{template "footer.html" .}}
