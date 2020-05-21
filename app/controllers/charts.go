@@ -78,6 +78,9 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				XValues: xValLine,
 				YValues: yValScore,
 				YAxis:   chart.YAxisSecondary,
+				Style: chart.Style{
+					StrokeWidth: 2,
+				},
 			},
 		}
 		yMaxR = float64(int(yMaxR/100)*100 + 100)
@@ -128,6 +131,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				YValues: yValCumulative,
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("db4537"),
+					StrokeWidth: 2,
 				},
 			},
 			chart.TimeSeries{
@@ -135,6 +139,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				YValues: yValAvgLine,
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("f5b401"),
+					StrokeWidth: 2,
 				},
 			},
 			chart.TimeSeries{
@@ -142,6 +147,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				YValues: yValMonthly,
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("ff00ff"),
+					StrokeWidth: 2,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -150,6 +156,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				YValues: yValAvgMonth,
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("000000"),
+					StrokeWidth: 2,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
