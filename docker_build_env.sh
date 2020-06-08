@@ -7,7 +7,7 @@ fi
 
 i=0
 while [ ${#REVEL_SECRET} -lt 64 ]; do
-	char=$(dd if=/dev/random bs=1 count=1 2> /dev/null)
+	char=$(dd if=/dev/urandom bs=1 count=1 2> /dev/null)
 	case "$char" in
 		[A-Za-z]) REVEL_SECRET="${REVEL_SECRET}${char}";;
 		*) continue;;
