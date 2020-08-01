@@ -1,0 +1,25 @@
+# /etc/systemd/system/wg.service
+[Unit]
+Description=WG Prod
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutSec=0
+Restart=always
+Environment=IMAGE=wg:latest
+StandardOutput=null
+StandardError=null
+
+ExecStartPre=-/usr/bin/docker kill %p
+ExecStartPre=-/usr/bin/docker rm %p
+ExecStart=/usr/bin/docker run \
+    --net=host \
+    -p 9000:9000 \
+    --name=%p \
+    $IMAGE
+ExecStop=/usr/bin/docker stop %p
+ExecStopPost=-/usr/bin/docker rm %p
+
+[Install]
+WantedBy=multi-user.target
