@@ -56,7 +56,7 @@
       $mw = 0;
       $className = $(this).attr('id');
       $cells = $('.' + $className).each(function() {
-        $mw = Math.max($mw, $(this).width());
+        $mw = Math.max($mw, $(this).width() + 1);
       });
       $cells = $('.' + $className).each(function() {
         $(this).width($mw);
