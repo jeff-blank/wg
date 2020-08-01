@@ -317,7 +317,6 @@ func (c Hits) ShowBrk() revel.Result {
 
 	rows, err := app.DB.Query(Q_REGION_BREAKDOWN, country, state)
 	if err != nil {
-		// TODO(?): render an error in JSON
 		msg := fmt.Sprintf("query breakdown: %#v", err)
 		revel.AppLog.Error(msg)
 		return c.RenderText(msg)
@@ -331,7 +330,6 @@ func (c Hits) ShowBrk() revel.Result {
 		)
 		err = rows.Scan(&county, &count)
 		if err != nil {
-			// TODO(?): render an error in JSON
 			msg := fmt.Sprintf("read breakdown: %#v", err)
 			revel.AppLog.Error(msg)
 			return c.RenderText(msg)
@@ -489,7 +487,10 @@ func (c Hits) New() revel.Result {
 		days[d] = fmt.Sprintf("%02d", d+1)
 	}
 
-	states := util.GetStates("US")
+	states, err := util.GetStates("US")
+	if err != nil {
+		return c.RenderError(err)
+	}
 	homeState := util.GetHomeRegion("state")
 	return c.Render(states, homeState, years, year, months, month, days, day)
 }

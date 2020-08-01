@@ -36,7 +36,7 @@ const (
 	STATS_START_MONTH = time.November
 )
 
-func GetStates(country string) []string {
+func GetStates(country string) ([]string, error) {
 	var stateColumn, table string
 
 	if country == "US" {
@@ -46,7 +46,7 @@ func GetStates(country string) []string {
 		stateColumn = "abbr"
 		table = "provinces"
 	} else {
-		return nil
+		return nil, nil
 	}
 
 	query := fmt.Sprintf(Q_REGIONS, stateColumn, "", table, stateColumn)
@@ -54,9 +54,8 @@ func GetStates(country string) []string {
 	states := make([]string, 0)
 	rows, err := app.DB.Query(query)
 	if err != nil {
-		// TODO: render an error
-		revel.AppLog.Error(err.Error())
-		return nil
+		revel.AppLog.Errorf("%v", err)
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -64,22 +63,21 @@ func GetStates(country string) []string {
 		err := rows.Scan(&state)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)
-			return nil
+			return nil, err
 		} else {
 			states = append(states, state)
 		}
 	}
-	return states
+	return states, nil
 }
 
-func GetCounties(state string) []app.Region {
+func GetCounties(state string) ([]app.Region, error) {
 	query := fmt.Sprintf(Q_REGIONS, "id,", "county", "counties_master where state='"+state+"'", "county")
 	counties := make([]app.Region, 0)
 	rows, err := app.DB.Query(query)
 	if err != nil {
-		// TODO: render an error
-		revel.AppLog.Error(err.Error())
-		return nil
+		revel.AppLog.Errorf("%v", err)
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -90,12 +88,12 @@ func GetCounties(state string) []app.Region {
 		err := rows.Scan(&id, &county)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)
-			return nil
+			return nil, err
 		} else {
 			counties = append(counties, app.Region{Id: id, Region: county})
 		}
 	}
-	return counties
+	return counties, nil
 }
 
 func GetHomeRegion(regionColumn string) string {

@@ -10,7 +10,7 @@ type Util struct {
 }
 
 func (c Util) GetStatesProvinces() revel.Result {
-	states := util.GetStates(c.Params.Get("country"))
+	states, _ := util.GetStates(c.Params.Get("country"))
 	return c.RenderJSON(states)
 }
 
@@ -19,7 +19,7 @@ func (c Util) GetHomeState() revel.Result {
 }
 
 func (c Util) GetCounties() revel.Result {
-	counties := util.GetCounties(c.Params.Get("state"))
+	counties, _ := util.GetCounties(c.Params.Get("state"))
 	return c.RenderJSON(counties)
 }
 
