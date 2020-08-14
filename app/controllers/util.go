@@ -27,4 +27,9 @@ func (c Util) GetHomeCounty() revel.Result {
 	return c.RenderText(util.GetHomeRegion("county"))
 }
 
+func (c Util) GetFirstHits() revel.Result {
+	regionType, _ := util.GetFirstHits(c.Params.Get("type"))
+	return c.RenderJSON(regionType)
+}
+
 // vim:foldmethod=marker:

@@ -241,4 +241,43 @@ func wgScore(ents, hits int) float64 {
 	return 100 * (math.Sqrt(math.Log(float64(ents))) + math.Log(float64(hits+1)))
 }
 
+func GetFirstHits(regionType string) ([]app.Hit, error) {
+	if regionType == "county" {
+		return GetHits(`and h.id IN (SELECT h2.id
+          FROM hits h2
+          WHERE h2.country='US' AND h.county=h2.county AND h.state=h2.state AND h2.state <> 'DC'
+          ORDER BY h2.entdate LIMIT 1) ORDER BY h.entdate desc`)
+	} else if regionType == "state" {
+		return GetHits(`and h.id IN (SELECT h2.id
+          FROM hits h2
+          WHERE h.state=h2.state AND h2.country='US'
+          ORDER BY h2.entdate LIMIT 1) ORDER BY h.entdate desc`)
+	} else {
+		return nil, nil
+	}
+}
+
+func GetHits(whereGroupOrder string) ([]app.Hit, error) {
+	var newHit app.Hit
+	hits := make([]app.Hit, 0)
+
+	rows, err := app.DB.Query(app.Q_HITS + whereGroupOrder)
+	if err != nil {
+		revel.AppLog.Error(err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
+		if err != nil {
+			revel.AppLog.Errorf("%v", err)
+			return nil, err
+		} else {
+			newHit.EntDate = newHit.EntDate[0:10]
+			hits = append(hits, newHit)
+		}
+	}
+	return hits, nil
+}
+
 // vim:foldmethod=marker:

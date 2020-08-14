@@ -75,6 +75,24 @@ const (
 	DATE_LAYOUT     = `2006-01-02`
 	START_YEAR      = 2003
 	START_MONTH     = time.November
+	Q_HITS          = `
+		select
+			h.id,
+			b.denomination,
+			b.serial,
+			b.series,
+			b.rptkey,
+			h.entdate,
+			h.country,
+			h.state,
+			h.county,
+			(select count(*) from hits where bill_id = b.id)
+		from
+			bills b,
+			hits h
+		where
+			h.bill_id = b.id
+	`
 )
 
 var (
