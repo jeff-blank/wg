@@ -35,6 +35,7 @@ func (c Reports) Index() revel.Result {
 	links := make(map[string]string)
 	links["master"] = routes.Reports.MasterStats()
 	links["calendar"] = routes.Reports.HitsCalendar()
+	links["first"] = routes.Reports.FirstHits()
 	return c.Render(links)
 }
 
@@ -137,6 +138,10 @@ func (c Reports) MasterStats() revel.Result {
 	graphLinks["hits"] = routes.Charts.Grapher("hits")
 	graphLinks["bills"] = routes.Charts.Grapher("bills")
 	return c.Render(tableOut, entsLink, graphLinks)
+}
+
+func (c Reports) FirstHits() revel.Result {
+	return c.Render()
 }
 
 // vim:foldmethod=marker:

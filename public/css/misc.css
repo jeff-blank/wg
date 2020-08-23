@@ -40,6 +40,11 @@ div.indexUSCounty {
   padding-right: 10%;
 }
 
+#throbber {
+  display: none;
+  position: fixed;
+}
+
 #dimmer {
   display: none;
   width: 100%;
@@ -95,4 +100,32 @@ div.firsts {
   color: #0a0;
   display: inline-block;
   padding-right: 2em;
+}
+
+td.tab-active {
+  border-right: outset 1px;
+  border-bottom: outset 3px;
+  padding-right: 6px;
+  padding-left: 6px;
+  padding-top: 6px;
+  padding-bottom: 3px;
+}
+
+div.tab-active {
+  font-weight: bold;
+}
+
+td.tab-inactive {
+  border-right: outset 1px;
+  border-bottom: outset 1px;
+  padding: 6px;
+}
+
+div.tab-inactive {
+  font-weight: normal;
+}
+
+#states, #counties {
+  width: 5em;
+  cursor: pointer;
 }

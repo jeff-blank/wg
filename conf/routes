@@ -16,10 +16,12 @@ GET     /showbrk                                Hits.ShowBrk
 GET     /reports                                Reports.Index
 GET     /reports/HitsCalendar                   Reports.HitsCalendar
 GET     /reports/MasterStats                    Reports.MasterStats
+GET     /reports/FirstHits                      Reports.FirstHits
 GET     /util/StatesProvinces                   Util.GetStatesProvinces
 GET     /util/GetHomeState                      Util.GetHomeState
 GET     /util/GetHomeCounty                     Util.GetHomeCounty
 GET     /util/Counties                          Util.GetCounties
+GET     /util/GetFirstHits                      Util.GetFirstHits
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
 GET     /entries/:key                           Entries.GetEntryByKey
