@@ -55,7 +55,7 @@ const (
 		from
 			bills
 		where
-			serial = $1 and
+			rptkey = $1 and
 			denomination = $2 and
 			series = $3
 	`
@@ -377,7 +377,7 @@ func (c Hits) Create() revel.Result {
 	}
 
 	bId = -1
-	err = app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
+	err = app.DB.QueryRow(Q_BILL, rptkey, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {
 			revel.AppLog.Errorf("search for existing bill: %#v", err)
@@ -400,7 +400,7 @@ func (c Hits) Create() revel.Result {
 			revel.AppLog.Errorf("insert bill failed: %d rows affected", n)
 			return c.RenderText(fmt.Sprintf("insert bill failed: %d rows affected", n))
 		}
-		err = app.DB.QueryRow(Q_BILL, serial, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
+		err = app.DB.QueryRow(Q_BILL, rptkey, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 		if err != nil {
 			revel.AppLog.Errorf("get bill after insert: %#v", err)
 			return c.RenderText(err.Error())
