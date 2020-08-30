@@ -1,0 +1,78 @@
+{{set . "title" "WG Utils 2.0: Reports: Stats Table"}}
+{{template "header.html" .}}
+
+<h1 id="h1">First Hits in States/Counties</h1>
+
+<div id="dimmer"></div>
+<div id="throbber"><img src="/public/img/throbber.gif" /></div>
+<table id="tabsTable">
+  <tr>
+    <td id="c_states" class="tab-active">
+      <div id="states" class="tab-click tab-active">States</div>
+    </td>
+    <td id="c_counties" class="tab-inactive">
+      <div id="counties" class="tab-click tab-inactive">Counties</div>
+    </td>
+  </tr>
+</table>
+<p id="pSpace">
+<table id="hTable" class="bordered">
+  <tr id="headRow">
+    <th id="c_hit" class="c_hit bordered">Hit</th>
+    <th id="c_denom" class="c_denom bordered">$</th>
+    <th id="c_bill" class="c_bill bordered">Bill</th>
+    <th id="c_date" class="c_date bordered">Hit Date</th>
+    <th id="c_state" class="c_state bordered">State</th>
+    <th id="c_county" class="c_county bordered">County</th>
+  </tr>
+</table>
+<div id="scroller" class="bordered scrollable"></div>
+
+<script src="/public/js/scrollBar.js"></script>
+<script type="application/javascript">
+  var tableFix = {
+    tf: function(lastColumnId) {
+      lastColumnId = '#'+ lastColumnId;
+
+      $wh = $(window).innerHeight();
+      $h1h = $('#h1').outerHeight();
+      $tabh = $('#tabsTable').outerHeight();
+      $sh = $('#pSpace').outerHeight();
+      $thh = $('#hTable').outerHeight();
+      $maxHeight = 0.9 * $wh - ($h1h + $thh + $sh + $tabh)
+
+      if ( $('#scroller').height() > $maxHeight ) {
+        $('#scroller').height($maxHeight);
+        $sw = getScrollBarWidth();
+      } else {
+        $sw = 0;
+      }
+
+      $('#headRow').children('th').each(function() {
+        $className = $(this).attr('id');
+        $mw = 0;
+        $cells = $('.' + $className).each(function() {
+          $(this).css('width', '');
+          $mw = Math.max($mw, $(this).width()+1);
+        });
+        $cells = $('.' + $className).each(function() {
+          $(this).width($mw);
+        });
+      });
+
+      if ( lastColumnId != '#' ) {
+        $tw = 0;
+        $('#headRow').children('th').each(function() {
+          $tw += $(this).outerWidth();
+        });
+        $('#scroller').width($tw+$sw);
+        $(lastColumnId).width($(lastColumnId).width() + $sw);
+        $(lastColumnId).attr('margin-right', $sw);
+      }
+    }
+  }
+</script>
+<script src="/public/js/newWin-g.js"></script>
+<script src="/public/js/reports-firstHits-g.js"></script>
+
+{{template "footer.html" .}}

@@ -7,7 +7,8 @@ JQSRC=          \
 		${JSDIR}/entries-edit-g.js \
 		${JSDIR}/hits-breakdown-g.js \
 		${JSDIR}/hits-edit-g.js \
-		${JSDIR}/masterStats-g.js
+		${JSDIR}/masterStats-g.js \
+		${JSDIR}/reports-firstHits-g.js
 
 all:  ${JQSRC}
 
