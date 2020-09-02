@@ -58,6 +58,7 @@ type NewHitInfo struct {
 	FirstOnDate      string
 	FirstInCounty    string
 	CountyBingoNames []string
+	AdjacentCounties []string
 }
 
 type Bill struct {

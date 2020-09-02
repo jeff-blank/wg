@@ -261,6 +261,7 @@ func GetHits(whereGroupOrder string) ([]app.Hit, error) {
 	var newHit app.Hit
 	hits := make([]app.Hit, 0)
 
+	revel.AppLog.Debugf(app.Q_HITS + whereGroupOrder)
 	rows, err := app.DB.Query(app.Q_HITS + whereGroupOrder)
 	if err != nil {
 		revel.AppLog.Error(err.Error())
@@ -278,6 +279,35 @@ func GetHits(whereGroupOrder string) ([]app.Hit, error) {
 		}
 	}
 	return hits, nil
+}
+
+func GetAdjacentWithHits(state, county string) ([]string, error) {
+	var (
+		hitState  string
+		hitCounty string
+	)
+	counties := make([]string, 0)
+
+	rows, err := app.DB.Query(app.Q_ADJACENT_COUNTIES, state, county)
+	if err != nil {
+		if err.Error() == app.SQL_ERR_NO_ROWS {
+			return counties, nil
+		}
+		return nil, err
+	}
+	for rows.Next() {
+		err := rows.Scan(&hitState, &hitCounty)
+		if err != nil {
+			return nil, err
+		}
+		revel.AppLog.Debugf("checking %s, %s", county, state)
+		hits, _ := GetHits("and h.state='" + hitState + "' and h.county='" + hitCounty + "'")
+		if len(hits) > 0 {
+			counties = append(counties, fmt.Sprintf("%s, %s", hitCounty, hitState))
+		}
+	}
+
+	return counties, nil
 }
 
 // vim:foldmethod=marker:

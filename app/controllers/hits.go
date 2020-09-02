@@ -361,6 +361,12 @@ func (c Hits) Create() revel.Result {
 			} else if err != nil {
 				revel.AppLog.Errorf("county in bingos err=%#v", err)
 			}
+			borderCounties, err := util.GetAdjacentWithHits(state, county)
+			if err != nil {
+				revel.AppLog.Errorf("adjacent counties err=%#v", err)
+			} else {
+				infoFlash.AdjacentCounties = borderCounties
+			}
 		} else if err != nil {
 			revel.AppLog.Errorf("is first county hit? err=%#v", err)
 		}

@@ -20,6 +20,13 @@
       <ul>{{ range .newHitFlash.CountyBingoNames }}<li>{{.}}</li>{{ end }}</ul>
     </li>
     {{ end }}
+    {{ if gt (len .newHitFlash.AdjacentCounties) 0 }}
+    <li>County is adjacent to the following other counties with hits:
+      <ul>{{ range .newHitFlash.AdjacentCounties }}<li>{{.}}</li>{{ end }}</ul>
+    </li>
+    {{ else }}
+    <li>County is adjacent to no other counties with hits.</li>
+    {{ end }}
   {{ end }}
 </ul>
 </div>
