@@ -347,7 +347,7 @@ func (c Hits) Create() revel.Result {
 		err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
 		if err == nil && countyHits == 0 {
 			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
-			rows, err := app.DB.Query(`select b.name from bingos b, bingo_counties bc, counties_master cm where cm.state=$1 and cm.county=$2 and bc.county_id=cm.id and b.id=bc.bingo_id order by b.name`, state, county)
+			rows, err := app.DB.Query(app.Q_BINGOS, state, county)
 			if err == nil {
 				infoFlash.CountyBingoNames = make([]string, 0)
 				defer rows.Close()

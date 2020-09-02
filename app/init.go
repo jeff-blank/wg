@@ -93,6 +93,36 @@ const (
 		where
 			h.bill_id = b.id
 	`
+
+	Q_BINGOS = `
+		select
+			b.name
+		from
+			bingos b,
+			bingo_counties bc,
+			counties_master cm
+		where
+			cm.state=$1 and
+			cm.county=$2 and
+			bc.county_id=cm.id and
+			b.id=bc.bingo_id
+		order by b.name
+	`
+
+	Q_ADJACENT_COUNTIES = `
+		select
+			cm.state,
+			cm.county
+		from
+			counties_master cm_in,
+			counties_master cm,
+			counties_graph cg
+		where
+			cm_in.state = $1 and
+			cm_in.county = $2 and
+			((cg.a=cm_in.id and cg.b=cm.id)
+			 or (cg.b=cm_in.id and cg.a=cm.id))
+	`
 )
 
 var (
