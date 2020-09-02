@@ -337,12 +337,6 @@ func (c Hits) Create() revel.Result {
 	denom, _ := strconv.Atoi(dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["denom"][0], "")))
 	entdate := dbSanitize(c.Params.Form["year"][0]) + "-" + dbSanitize(c.Params.Form["month"][0]) + "-" + dbSanitize(c.Params.Form["day"][0])
 
-	// if new county:
-	//   flash new county
-	//   check bingos
-	// if open date:
-	//   flash date hit
-
 	err := app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
 	if err == nil && dateHits == 0 {
 		infoFlash.FirstOnDate = entdate[5:]
