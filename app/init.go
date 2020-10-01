@@ -124,6 +124,8 @@ const (
 			((cg.a=cm_in.id and cg.b=cm.id)
 			 or (cg.b=cm_in.id and cg.a=cm.id))
 	`
+
+	SERIAL_RE_BASE = `[A-L][0-9\-]{8}[A-NP-Y\*]$`
 )
 
 var (
@@ -161,6 +163,8 @@ var (
 	RE_leadingWhitespace  *re.Regexp
 	RE_trailingWhitespace *re.Regexp
 	RE_serial             *re.Regexp
+	RE_serial_10          *re.Regexp
+	RE_serial_11          *re.Regexp
 	RE_trailingCommas     *re.Regexp
 )
 
@@ -182,7 +186,9 @@ func InitRE() {
 	RE_whitespace = re.MustCompile(`\s+`)
 	RE_leadingWhitespace = re.MustCompile(`^\s+`)
 	RE_trailingWhitespace = re.MustCompile(`\s+$`)
-	RE_serial = re.MustCompile(`^[A-NP-Y]?[A-L][0-9\-]{8}[A-NP-Y\*]$`)
+	RE_serial = re.MustCompile(`^[A-NP-Y]?` + SERIAL_RE_BASE)
+	RE_serial_10 = re.MustCompile(`^` + SERIAL_RE_BASE)
+	RE_serial_11 = re.MustCompile(`^[A-NP-Y]` + SERIAL_RE_BASE)
 	RE_trailingCommas = re.MustCompile(`,*$`)
 }
 

@@ -327,9 +327,13 @@ func (c Hits) Create() revel.Result {
 	if !app.RE_serial.MatchString(serial) {
 		return c.RenderText("invalid serial number")
 	}
-	if s, ok := c.Params.Form["series"]; ok {
+
+	isSerial10 := app.RE_serial_10.MatchString(serial)
+	isSerial11 := app.RE_serial_11.MatchString(serial)
+
+	if s, ok := c.Params.Form["series"]; ok && s[0] != "" && isSerial10 {
 		series = dbSanitize(app.RE_whitespace.ReplaceAllString(s[0], ""))
-	} else if s, ok := app.SeriesByLetter[serial[:1]]; ok {
+	} else if s, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 {
 		series = s
 	} else {
 		return c.RenderText("missing bill series")
