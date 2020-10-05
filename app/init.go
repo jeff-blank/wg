@@ -160,6 +160,17 @@ const (
 		group by state, county
 		order by count desc, state asc, county asc
 	`
+
+	Q_HITS_CALENDAR = `
+		select
+			substr(entdate::text, 6) as date,
+			count(1)
+		from
+			hits
+		group by
+			date
+	`
+
 	// }}}
 
 	SERIAL_RE_BASE = `[A-L][0-9\-]{8}[A-NP-Y\*]$`

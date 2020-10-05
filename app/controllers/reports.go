@@ -12,18 +12,6 @@ import (
 )
 
 const (
-	// SQL queries {{{
-	Q_HITS_CALENDAR = `
-		select
-			substr(entdate::text, 6) as date,
-			count(1)
-		from
-			hits
-		group by
-			date
-	`
-	// }}}
-
 	DATE_LIST_YEAR   = 2000
 	DATE_LIST_LAYOUT = `2006-01-02`
 )
@@ -54,7 +42,7 @@ func (c Reports) HitsCalendar() revel.Result {
 
 	dates := make(map[string]int)
 
-	rows, err := app.DB.Query(Q_HITS_CALENDAR)
+	rows, err := app.DB.Query(app.Q_HITS_CALENDAR)
 	if err != nil {
 		revel.AppLog.Errorf("query hits calendar: %#v", err)
 		return c.RenderError(err)
