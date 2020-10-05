@@ -6,3 +6,5 @@ public/js/*-g.js*
 revel.log
 revel.pid
 *.sw?
+none
+target/
