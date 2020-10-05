@@ -129,3 +129,8 @@ div.tab-inactive {
   width: 5em;
   cursor: pointer;
 }
+
+td.innerTable {
+  vertical-align: top;
+  padding: 5px;
+}

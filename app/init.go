@@ -76,7 +76,9 @@ const (
 	DATE_LAYOUT     = `2006-01-02`
 	START_YEAR      = 2003
 	START_MONTH     = time.November
-	Q_HITS          = `
+
+	// SQL queries {{{
+	Q_HITS = `
 		select
 			h.id,
 			b.denomination,
@@ -124,6 +126,41 @@ const (
 			((cg.a=cm_in.id and cg.b=cm.id)
 			 or (cg.b=cm_in.id and cg.a=cm.id))
 	`
+
+	Q_LAST_50_HIT_IDS = `select id from hits order by entdate desc limit 50`
+
+	Q_LAST_50_DENOM_SERIES = `
+		select
+			b.%s,
+			count(1)
+		from
+			bills b,
+			hits h
+		where
+			b.id=h.bill_id and h.id in
+				(` + Q_LAST_50_HIT_IDS + `)
+		group by
+			b.%s
+		order by
+			b.%s
+	`
+
+	Q_LAST_50_STATES = `
+		select state, count(1)
+		from hits
+		where id in (` + Q_LAST_50_HIT_IDS + `)
+		group by state
+		order by count desc, state asc
+	`
+
+	Q_LAST_50_COUNTIES = `
+		select state, county, count(1)
+		from hits
+		where id in (` + Q_LAST_50_HIT_IDS + `)
+		group by state, county
+		order by count desc, state asc, county asc
+	`
+	// }}}
 
 	SERIAL_RE_BASE = `[A-L][0-9\-]{8}[A-NP-Y\*]$`
 )
@@ -238,3 +275,5 @@ var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
 //		// Dev mode
 //	}
 //}
+
+// vim:foldmethod=marker:

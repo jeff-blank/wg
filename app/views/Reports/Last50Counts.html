@@ -1,0 +1,81 @@
+{{set . "title" "WG Utils 2.0: Reports: Last 50 Hits"}}
+{{template "header.html" .}}
+
+<h1>Last 50 Hits</h1>
+
+<table>
+  <tr>
+    <td class="innerTable">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">Denominations</th>
+        </tr>
+        <tr>
+          <th class="bordered">$</th>
+          <th class="bordered">Count</th>
+        </tr>
+
+        {{ range .denomData }}
+        <tr>
+          <td class="bordered aright">{{ index . 0 }}</td>
+          <td class="bordered aright">{{ index . 1 }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </td>
+    <td class="innerTable">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">Series</th>
+        </tr>
+        <tr>
+          <th class="bordered">Series</th>
+          <th class="bordered">Count</th>
+        </tr>
+        {{ range .seriesData }}
+        <tr>
+          <td class="bordered">{{ index . 0 }}</td>
+          <td class="bordered aright">{{ index . 1 }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </td>
+
+    <td class="innerTable">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">States</th>
+        </tr>
+        <tr>
+          <th class="bordered">State</th>
+          <th class="bordered">Count</th>
+        </tr>
+        {{ range .stateData }}
+        <tr>
+          <td class="bordered">{{ index . 0 }}</td>
+          <td class="bordered aright">{{ index . 1 }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </td>
+    <td class="innerTable">
+      <table class="bordered">
+        <tr>
+          <th class="bordered" colspan="2">Counties</th>
+        </tr>
+        <tr>
+          <th class="bordered">County</th>
+          <th class="bordered">Count</th>
+        </tr>
+        {{ range .countyData }}
+        <tr>
+          <td class="bordered">{{ index . 0 }}/{{ index . 1 }}</td>
+          <td class="bordered aright">{{ index . 2 }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </td>
+  </tr>
+</table>
+
+{{template "footer.html" .}}
