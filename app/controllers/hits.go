@@ -124,7 +124,7 @@ const (
 			county
 	`
 
-	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey)values($1, $2, $3, $4)`
+	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
 	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, entdate) values ($1, $2, $3, $4, $5)`
 
 	// }}}
@@ -341,6 +341,23 @@ func (c Hits) Create() revel.Result {
 	denom, _ := strconv.Atoi(dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["denom"][0], "")))
 	entdate := dbSanitize(c.Params.Form["year"][0]) + "-" + dbSanitize(c.Params.Form["month"][0]) + "-" + dbSanitize(c.Params.Form["day"][0])
 
+	residence := ""
+	if r, ok := c.Params.Form["residence"]; ok {
+		residences, err := util.GetResidences()
+		if err != nil {
+			return c.RenderText("error retrieving list of residences")
+		}
+		for _, res := range residences {
+			if res == r[0] {
+				residence = res
+				break
+			}
+		}
+		if residence == "" {
+			return c.RenderText(fmt.Sprintf("residence \"%s\" not found", r[0]))
+		}
+	}
+
 	err := app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
 	if err == nil && dateHits == 0 {
 		infoFlash.FirstOnDate = entdate[5:]
@@ -390,7 +407,7 @@ func (c Hits) Create() revel.Result {
 	}
 
 	if bId == -1 {
-		res, err := app.DB.Exec(S_INSERT_BILL, serial, series, denom, rptkey)
+		res, err := app.DB.Exec(S_INSERT_BILL, serial, series, denom, rptkey, residence)
 		if err != nil {
 			revel.AppLog.Errorf("insert new bill: %#v", err)
 			return c.RenderText(err.Error())
