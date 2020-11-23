@@ -439,22 +439,17 @@ func (c Hits) New() revel.Result {
 	day := now[8:]
 
 	years := make([]int, (year+1)-(START_YEAR-1))
-	for y, _ := range years {
+	for y := range years {
 		years[y] = START_YEAR + y
 	}
-	for m, _ := range months {
+	for m := range months {
 		months[m] = fmt.Sprintf("%02d", m+1)
 	}
-	for d, _ := range days {
+	for d := range days {
 		days[d] = fmt.Sprintf("%02d", d+1)
 	}
 
-	states, err := util.GetStates("US")
-	if err != nil {
-		return c.RenderError(err)
-	}
-	homeState := util.GetHomeRegion("state")
-	return c.Render(states, homeState, years, year, months, month, days, day)
+	return c.Render(years, year, months, month, days, day)
 }
 
 // vim:foldmethod=marker:
