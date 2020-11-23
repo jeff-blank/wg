@@ -32,4 +32,14 @@ func (c Util) GetFirstHits() revel.Result {
 	return c.RenderJSON(regionType)
 }
 
+func (c Util) GetCurrentResidence() revel.Result {
+	r, _ := util.GetCurrentResidence()
+	return c.RenderText(r)
+}
+
+func (c Util) GetResidences() revel.Result {
+	residences, _ := util.GetResidences()
+	return c.RenderJSON(residences)
+}
+
 // vim:foldmethod=marker:

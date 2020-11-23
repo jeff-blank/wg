@@ -31,6 +31,29 @@ const (
 			r.home = cm.id
 	`
 
+	Q_RESLIST = `
+		select
+			label
+		from
+			residences
+		where
+			label <> '_all'
+		order by
+			label
+	`
+
+	Q_CURRENT_RESIDENCE = `
+		select
+			cr.label
+		from
+			residences cr,
+			residences ar
+		where
+			ar.label = '_all' and
+			cr.label <> '_all' and
+			ar.home = cr.home
+	`
+
 	DATE_LIST_LAYOUT  = `2006-01-02`
 	STATS_START_YEAR  = 2003
 	STATS_START_MONTH = time.November
@@ -183,7 +206,7 @@ func StatsData(returnType string) interface{} {
 	prevYear := ""
 	monthsInYear := 0
 	yearHits := 0
-	for m, _ := range months {
+	for m := range months {
 		year := allData[m]["month"].(string)[:4]
 		if (prevYear != year && prevYear != "") || m == len(months)-1 {
 			// new year
@@ -308,6 +331,43 @@ func GetAdjacentWithHits(state, county string) ([]string, error) {
 	}
 
 	return counties, nil
+}
+
+func GetCurrentResidence() (string, error) {
+	var residence string
+
+	err := app.DB.QueryRow(Q_CURRENT_RESIDENCE).Scan(&residence)
+	if err != nil {
+		if err.Error() != app.SQL_ERR_NO_ROWS {
+			revel.AppLog.Errorf("GetCurrentResidence(): query current residence: %#v", err)
+		}
+		return "", err
+	} else {
+		return residence, nil
+	}
+}
+
+func GetResidences() ([]string, error) {
+	rows, err := app.DB.Query(Q_RESLIST)
+	if err != nil {
+		if err.Error() != app.SQL_ERR_NO_ROWS {
+			revel.AppLog.Errorf("GetResidences(): query residence list: %#v", err)
+		}
+		return nil, err
+	} else {
+		resList := make([]string, 0)
+		for rows.Next() {
+			var residence string
+			err := rows.Scan(&residence)
+			if err != nil {
+				revel.AppLog.Errorf("GetResidences(): scan residence: %#v", err)
+				resList = nil
+				break
+			}
+			resList = append(resList, residence)
+		}
+		return resList, nil
+	}
 }
 
 // vim:foldmethod=marker:

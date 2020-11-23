@@ -111,10 +111,28 @@ func datesOfMonth() {
 	}
 }
 
+func residenceSelect() {
+	var currentResidence string
+
+	sel := jq("#sresidence")
+	jquery.Get("/util/GetResidences", func(rlData interface{}) {
+		jquery.Get("/util/GetCurrentResidence", func(crData interface{}) {
+			currentResidence = crData.(string)
+			for _, residence := range rlData.([]interface{}) {
+				sel.Append(jq("<option>").SetText(residence.(string)))
+				if residence == currentResidence {
+					sel.Children("option").Last().SetAttr("selected", "selected")
+				}
+			}
+		})
+	})
+}
+
 func initializeForm() {
 	stateProvinceSelect("US")
 	usCounty()
 	datesOfMonth()
+	residenceSelect()
 	jq("#fkey").Focus()
 }
 
