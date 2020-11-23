@@ -171,13 +171,6 @@ func denomSeries(e jquery.Event) {
 		jq("#fseries").RemoveAttr("disabled")
 		denom1.RemoveAttr("disabled")
 		denom2.RemoveAttr("disabled")
-		/*
-			for _, opt := range opts {
-				if opt.Val() == "1" || opt.Val() == "2" {
-					opt.RemoveAttr("disabled")
-				}
-			}
-		*/
 	}
 }
 
