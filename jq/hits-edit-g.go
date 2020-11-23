@@ -207,6 +207,13 @@ func billFill(e jquery.Event) {
 				jq(elem).RemoveAttr("selected")
 			}
 		})
+		jq("#sresidence").Children("option").Each(func(i int, elem interface{}) {
+			if jq(elem).Val() == billData["Residence"] {
+				jq(elem).SetAttr("selected", "selected")
+			} else if jq(elem).Attr("selected") == "selected" {
+				jq(elem).RemoveAttr("selected")
+			}
+		})
 	})
 }
 
