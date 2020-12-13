@@ -3,12 +3,33 @@
 
 <h1 id="h1">Reports</h1>
 
-<ul>
-  <li><a href="{{ index .links "master"}}">Stats table</a></li>
-  <li><a href="{{ index .links "calendar"}}">Calendar of hits</a></li>
-  <li>First hits for <a href="{{ index .links "first"}}#states">states</a>
-    | <a href="{{ index .links "first"}}#counties">counties</a></li>
-  <li><a href="{{ index .links "last50"}}">Last 50 hits</a></li>
-</ul>
+<div class="tableCell floatleft">
+  <span class="large">&#128200;</span> <a href="{{ index .links "master"}}">Stats table</a>
+</div>
+<div class="tableCell floatleft">
+  <span class="large">&#128197;</span> <a href="{{ index .links "calendar"}}">Calendar of hits</a>
+</div>
+<div class="tableCell floatleft">
+  <span class="large">&#129351;</span> First hits for <a href="{{ index .links "first"}}#states">states</a>
+    | <a href="{{ index .links "first"}}#counties">counties</a>
+</div>
+<div class="tableCell floatleft">
+  <span class="large">&#10226;</span> <a href="{{ index .links "last50"}}">Last 50 hits</a>
+</div>
+
+<script type="application/javascript">
+  $(document).ready(function() {
+    $mh = 0;
+    $mw = 0;
+    $('.tableCell').each(function() {
+      $mw = Math.max($mw, $(this).width() + 1);
+      $mh = Math.max($mh, $(this).height() + 1);
+    });
+    $('.tableCell').each(function() {
+      $(this).width($mw);
+      $(this).height($mh);
+    });
+  });
+</script>
 
 {{template "footer.html" .}}

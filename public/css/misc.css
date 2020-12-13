@@ -134,3 +134,13 @@ td.innerTable {
   vertical-align: top;
   padding: 5px;
 }
+
+div.tableCell {
+  text-align: center;
+  border: 1px;
+  border-style: solid;
+  padding: 4px;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin: 1px;
+}
