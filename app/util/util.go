@@ -145,19 +145,17 @@ func StatsData(returnType string) interface{} {
 
 	q_hitCount, err := app.DB.Prepare(`select count(1) from hits where substr(entdate::text, 1, 7) = $1`)
 	if err != nil {
-		// TODO: render an error
+		// TODO: return an error
 		revel.AppLog.Errorf("prepare q_hitCount: %v", err)
 		return nil
 	}
 	q_entCount, err := PrepMonthEnts()
 	if err != nil {
-		// TODO: render an error
-		revel.AppLog.Errorf("%v", err)
+		// TODO: return an error
 		revel.AppLog.Errorf("prepare q_entCount: %v", err)
 		return nil
 	}
 
-	//m := len(months) - 1
 	totalHits := 0
 	totalBills := 0
 	for m, monthStr := range months {
@@ -165,7 +163,7 @@ func StatsData(returnType string) interface{} {
 		err := q_hitCount.QueryRow(monthStr[:7]).Scan(&hitCount)
 		//revel.AppLog.Debugf("%s: %d hits", monthStr[:7], hitCount)
 		if err != nil {
-			// TODO: render an error
+			// TODO: return an error
 			revel.AppLog.Errorf("query q_hitCount: %v", err)
 			return nil
 		}
@@ -184,7 +182,7 @@ func StatsData(returnType string) interface{} {
 
 		err = q_entCount.QueryRow(monthStr).Scan(&billCount)
 		if err != nil && err.Error() != "sql: no rows in result set" {
-			// TODO: render an error
+			// TODO: return an error
 			revel.AppLog.Errorf("query q_entCount: %v", err)
 			return nil
 		}
@@ -198,8 +196,6 @@ func StatsData(returnType string) interface{} {
 		allData[m]["oneYrAvgMonthlyBills"] = avgVal(oneYrBills)
 
 		allData[m]["score"] = wgScore(totalBills, totalHits)
-
-		//m--
 	}
 
 	avgHitsPerMonth := float64(totalHits) / float64(len(months))
@@ -207,29 +203,27 @@ func StatsData(returnType string) interface{} {
 	monthsInYear := 0
 	yearHits := 0
 	for m := range months {
+		var statsMonthInd int
+
 		year := allData[m]["month"].(string)[:4]
-		if (prevYear != year && prevYear != "") || m == len(months)-1 {
+		if prevYear != year && prevYear != "" {
 			// new year
-			firstMonthInd := m - 1 // - monthsInYear
-			if m == len(months)-1 {
-				firstMonthInd++
-				monthsInYear++
-				yearHits += allData[m]["monthHits"].(int)
-			}
-			allData[firstMonthInd]["monthsInYear"] = monthsInYear
-			allData[firstMonthInd]["yearHits"] = yearHits
+			// store year-total stats (entry and hit counters) in final month of previous year
+			statsMonthInd = m - 1
+			allData[statsMonthInd]["monthsInYear"] = monthsInYear
+			allData[statsMonthInd]["yearHits"] = yearHits
 			monthsInYear = 0
 			yearHits = 0
 		}
-		if m != len(months)-1 {
-			monthsInYear++
-			yearHits += allData[m]["monthHits"].(int)
-		}
+		monthsInYear++
+		yearHits += allData[m]["monthHits"].(int)
 		allData[m]["straightLineAvgHits"] = float64(m+1) * avgHitsPerMonth
+		if m == len(months)-1 {
+			allData[m]["monthsInYear"] = monthsInYear
+			allData[m]["yearHits"] = yearHits
+		}
 		prevYear = allData[m]["month"].(string)[:4]
 	}
-
-	//revel.AppLog.Debugf("%#v", allData[0])
 
 	if returnType == "table" {
 		return allData
