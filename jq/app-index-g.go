@@ -22,7 +22,7 @@ func main() {
 		imgFile := newImg[lastSlash+1:]
 
 		if imgFile != "wghbs.svg" {
-			newHtml = `<a onclick="window.open(this.href); return false" href="` + imgPath + s.ReplaceAll(s.ReplaceAll(imgFile, "wghbs", "wgushbc"), ".svg", ".png") + `">`
+			newHtml = `<a onclick="window.open(this.href); return false" href="` + imgPath + s.ReplaceAll(imgFile, "wghbs", "wgushbc") + `">`
 		}
 		newHtml += `<img src="` + newImg + `" alt="` + newAlt + `" width="720" height="465">`
 		if imgFile != "wghbs.png" {

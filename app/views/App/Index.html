@@ -50,7 +50,13 @@
   <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs.svg" alt="HBS" /> All
 </div>
 <hr class="clearleft" />
-<div><img src="https://home.mr-happy.com/{{.resPrefix}}wghbcreg.svg" alt="RHBC" width="720" height="603" /></div>
+<div><img src="https://home.mr-happy.com/{{.resPrefix}}wghbcreg.svg" alt="RHBC"
+{{ if eq .resPrefix "pdx_" }}
+  width="414" height="650"
+{{ else }}
+  width="720" height="603"
+{{ end }}
+  /></div>
 <hr />
 <div><img src="https://home.mr-happy.com/{{.resPrefix}}wgmhb.svg" alt="MHB" width="720" height="465" /></div>
 <hr />
@@ -58,9 +64,9 @@
 <div><img src="https://home.mr-happy.com/{{.resPrefix}}wgfrb.png" alt="FRB" /></div>
 <hr />
 {{ end }}
-<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc.png" alt="USHBC" /></a></div>
+<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc.svg" alt="USHBC" width="1500" height="950" /></a></div>
 <hr />
-<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.png" alt="USHBC globs" /></a></div>
+<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.resPrefix}}wgushbc_glob.svg" alt="USHBC globs" width="1500" height="950" /></a></div>
 
 <script src="/public/js/app-index-g.js"></script>
 <script src="/public/js/newWin-g.js"></script>
