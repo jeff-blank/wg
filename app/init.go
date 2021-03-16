@@ -127,7 +127,7 @@ const (
 			 or (cg.b=cm_in.id and cg.a=cm.id))
 	`
 
-	Q_LAST_50_HIT_IDS = `select id from hits order by entdate desc limit 50`
+	Q_LAST_50_HIT_IDS = `select id from hits order by entdate desc, id desc limit 50`
 
 	Q_LAST_50_DENOM_SERIES = `
 		select
