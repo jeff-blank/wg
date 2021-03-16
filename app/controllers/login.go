@@ -63,7 +63,7 @@ func (c Login) Login() revel.Result {
 		if err.Error() == app.SQL_ERR_NO_ROWS {
 			errStr = ERR_BAD_USER_PASS
 		} else {
-			revel.AppLog.Errorf("%#v", err)
+			revel.AppLog.Errorf("look up user '%s' in database: %#v", user, err)
 			errStr = ERR_SYSTEM_ERROR
 		}
 	} else if pwHash != dbPass {
@@ -80,6 +80,7 @@ func (c Login) Login() revel.Result {
 	if backURL == "" {
 		return c.Redirect(App.Index)
 	}
+	revel.AppLog.Debugf("successful login for %s", user)
 	return c.Redirect(backURL)
 }
 
