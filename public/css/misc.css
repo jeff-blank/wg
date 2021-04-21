@@ -25,7 +25,7 @@ div.scrollable {
     overflow-y: auto;
 }
 
-div.indexUSCounty {
+div.indexUSCounty, div.worldMap {
     overflow-x: auto;
 }
 
