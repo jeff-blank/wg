@@ -148,16 +148,26 @@ const (
 	Q_LAST_50_STATES = `
 		select state, count(1)
 		from hits
-		where id in (` + Q_LAST_50_HIT_IDS + `)
+		where id in (` + Q_LAST_50_HIT_IDS + `) and state <> '--'
 		group by state
+		union
+		  select country, count(1)
+		  from hits
+		  where id in (` + Q_LAST_50_HIT_IDS + `) and state = '--'
+		  group by country
 		order by count desc, state asc
 	`
 
 	Q_LAST_50_COUNTIES = `
 		select state, county, count(1)
 		from hits
-		where id in (` + Q_LAST_50_HIT_IDS + `)
+		where id in (` + Q_LAST_50_HIT_IDS + `) and state <> '--'
 		group by state, county
+		union
+		  select country, county, count(1)
+		  from hits
+		  where id in (` + Q_LAST_50_HIT_IDS + `) and state = '--'
+		  group by country, county
 		order by count desc, state asc, county asc
 	`
 
