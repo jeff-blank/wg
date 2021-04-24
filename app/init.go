@@ -223,6 +223,7 @@ var (
 	RE_serial             *re.Regexp
 	RE_serial_10          *re.Regexp
 	RE_serial_11          *re.Regexp
+	RE_series             *re.Regexp
 	RE_trailingCommas     *re.Regexp
 )
 
@@ -247,6 +248,7 @@ func InitRE() {
 	RE_serial = re.MustCompile(`^[A-NP-Y]?` + SERIAL_RE_BASE)
 	RE_serial_10 = re.MustCompile(`^` + SERIAL_RE_BASE)
 	RE_serial_11 = re.MustCompile(`^[A-NP-Y]` + SERIAL_RE_BASE)
+	RE_series = re.MustCompile(`^(19|2[0-3])[0-9]{2}[A-NP-Y]?$`)
 	RE_trailingCommas = re.MustCompile(`,*$`)
 }
 

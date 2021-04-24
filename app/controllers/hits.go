@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"database/sql"
@@ -332,7 +333,12 @@ func (c Hits) Create() revel.Result {
 	isSerial11 := app.RE_serial_11.MatchString(serial)
 
 	if s, ok := c.Params.Form["series"]; ok && s[0] != "" && isSerial10 {
-		series = dbSanitize(app.RE_whitespace.ReplaceAllString(s[0], ""))
+		series = strings.ToUpper(s[0])
+		if app.RE_series.MatchString(series) {
+			series = dbSanitize(app.RE_whitespace.ReplaceAllString(series, ""))
+		} else {
+			return c.RenderText("invalid bill series")
+		}
 	} else if s, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 {
 		series = s
 	} else {
