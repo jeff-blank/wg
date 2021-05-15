@@ -42,35 +42,16 @@
 </div>
 
 <script src="/public/js/masterStats-g.js"></script>
-<script src="/public/js/scrollBar.js"></script>
 <script type="application/javascript">
-  $(document).ready(function() {
-    var lastColumnId = '#c_yearHits';
-
-    $wh = $(window).innerHeight();
-    $h1h = $('#h1').outerHeight();
-    $thh = $('#hTable').outerHeight();
-    $('#scroller').height(0.9 * $wh - ($h1h + $thh));
-
-    $('#headRow').children('th').each(function() {
-      $mw = 0;
-      $className = $(this).attr('id');
-      $cells = $('.' + $className).each(function() {
-        $mw = Math.max($mw, $(this).width() + 1);
-      });
-      $cells = $('.' + $className).each(function() {
-        $(this).width($mw);
-      });
-    });
-    $tw = 0
-    $('#headRow').children('th').each(function() {
-      $tw += $(this).outerWidth();
-    });
-    $sw = getScrollBarWidth();
-    $('#scroller').width($tw+$sw);
-    $(lastColumnId).width($(lastColumnId).width() + $sw);
-    $(lastColumnId).attr('margin-right', $sw);
-  });
+  var page_pct = 0.94;
+  var top_elements = Array("#h1");
+  var top_extra = 0;
+  var head_row_id = "#headRow";
+  var head_table_id = "#hTable";
+  var scroller_id = "#scroller";
+  var last_col_id = "#c_yearHits";
 </script>
+<script src="/public/js/scrollBar.js"></script>
+<script src="/public/js/tableWidth.js"></script>
 
 {{template "footer.html" .}}
