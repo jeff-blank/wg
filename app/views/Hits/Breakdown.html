@@ -1,40 +1,46 @@
 {{set . "title" "WG Utils 2.0: Hits Breakdown"}}
 {{template "header.html" .}}
 
-<p>
+<p id="topNav">
   <a href="{{ index .links "currentYearHits" }}">Current year's hits</a> |
   <a href="{{ index .links "allHits" }}">All hits</a>
 </p>
 
-<hr>
-<h1>Hits Breakdown</h1>
+<hr id="topHr">
+<h1 id="h1">Hits Breakdown</h1>
 
 <table id="main" style="width: 100%">
   <tr>
     <td id="us" class="vtop">
-      <table class="bordered">
+      <table class="bordered" id="t_usHead">
         <tr>
           <th class="bordered" colspan="2">United States</th>
         </tr>
-          <th class="bordered">State</th>
-          <th class="bordered">Hits</th>
-        <tr>
-      {{ range index .breakdowns "US" }}
-        <tr>
-          <td class="bordered"><a href="#" class="brklnk" id="US_{{.Region}}">{{.Region}}</a></td>
-          <td class="bordered aright">{{.Count}}</td>
+        <tr id="r_usHeadRow">
+          <th class="bordered c_state" id="c_state">State</th>
+          <th class="bordered c_stateHits" id="c_stateHits">Hits</th>
         </tr>
-      {{ end }}
       </table>
+      <div class="scrollable bordered" id="d_usHits">
+        <table id="t_usBody">
+        {{ range index .breakdowns "US" }}
+          <tr>
+            <td class="bordered c_state" id="c_US_{{.Region}}"><a href="#" class="brklnk" id="US_{{.Region}}">{{.Region}}</a></td>
+            <td class="bordered aright c_stateHits" id="c_US_{{.Region}}_hits">{{.Count}}</td>
+          </tr>
+        {{ end }}
+        </table>
+      </div>
     </td>
     <td id="ca" class="vtop">
       <table class="bordered">
         <tr>
           <th class="bordered" colspan="2">Canada</th>
         </tr>
+        <tr>
           <th class="bordered">Province</th>
           <th class="bordered">Hits</th>
-        <tr>
+        </tr>
       {{ range index .breakdowns "Canada" }}
         <tr>
           <td class="bordered"><a href="#" class="brklnk" id="Canada_{{.Region}}">{{.Region}}</a></td>
@@ -48,9 +54,10 @@
         <tr>
           <th class="bordered" colspan="2">Other</th>
         </tr>
+        <tr>
           <th class="bordered">Country</th>
           <th class="bordered">Hits</th>
-        <tr>
+        </tr>
       {{ range index .breakdowns "Other" }}
         <tr>
           <td class="bordered"><a href="#" class="brklnk" id="{{.Region}}_--">{{.Region}}</a></td>
@@ -64,5 +71,16 @@
 </table>
 
 <script src="/public/js/hits-breakdown-g.js"></script>
+<script type="application/javascript">
+  var top_elements = Array("#topNav", "#topHr", "#h1");
+  var top_extra = 0;
+  var last_col_id = "#c_stateHits";
+  var head_table_id = "#t_usHead";
+  var scroller_id = "#d_usHits";
+  var head_row_id = "#r_usHeadRow";
+  var page_pct = 0.92;
+</script>
+<script src="/public/js/scrollBar.js"></script>
+<script src="/public/js/tableWidth.js"></script>
 
 {{template "footer.html" .}}
