@@ -14,6 +14,18 @@ var jq = jquery.NewJQuery
 
 func main() {
 
+	pagePct := 0.94
+	topElements := [1]string{"#h1"}
+	topExtra := 0
+	headRowId := "#headRow"
+	headTableId := "#hTable"
+	scrollerId := "#scroller"
+	lastColId := "#c_yearHits"
+
+	jq(js.Global.Get("document")).Ready(func() {
+		js.Global.Get("tableAdjust").Call("ta", pagePct, topElements, topExtra, headRowId, headTableId, scrollerId, lastColId)
+	})
+
 	jq(".graphLink").On(jquery.CLICK, func(e jquery.Event) {
 		e.PreventDefault()
 		imgHref := jq(e.Target).Attr("href")
