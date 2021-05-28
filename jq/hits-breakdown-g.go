@@ -63,24 +63,28 @@ func main() {
 		jq("#t_detailHead").Remove()
 		jq("#d_dtlScroll").Remove()
 		topHdrTxt := fmt.Sprintf(`<a href="%s">%s</a> Breakdown`, regionHitsFilterPath, tableRegionName)
-		topHdrRow := jq("<tr/>").Append(jq("<th/>").SetAttr("colspan", "2").AddClass("bordered").SetHtml(topHdrTxt))
+		topHdrRow := jq("<tr/>").Append(jq("<th/>").SetAttr("colspan", "3").AddClass("bordered").SetHtml(topHdrTxt))
+		rankHdr := jq("<th/>").AddClass("bordered c_dtlRank").SetAttr("id", "c_dtlRank").SetHtml("#")
 		regionHdr := jq("<th/>").AddClass("bordered c_dtlRegion").SetAttr("id", "c_dtlRegion").SetHtml(subRegionType)
 		countHdr := jq("<th/>").AddClass("bordered c_dtlHits").SetAttr("id", "c_dtlHits").SetHtml("Hits")
 		brkHeadTable.Append(topHdrRow)
-		brkHeadTable.Append(jq("<tr/>").SetAttr("id", headRowId[1:]).Append(regionHdr, countHdr))
+		brkHeadTable.Append(jq("<tr/>").SetAttr("id", headRowId[1:]).Append(rankHdr, regionHdr, countHdr))
 		jq("div#showbrk").Append(brkHeadTable)
 
 		dtlScroller := jq("<div/>").SetAttr("id", "d_dtlScroll").AddClass("scrollable bordered")
 		dtlTable := jq("<table/>")
 
 		jquery.Get(brkPath, func(data interface{}) {
+			rank := 1
 			for _, ent := range data.([]interface{}) {
 				region := ent.(map[string]interface{})["Region"].(string)
 				count := int(ent.(map[string]interface{})["Count"].(float64))
 				uri := hitsFilterPath + `&county=` + region
+				rankCell := jq("<td/>").AddClass("bordered aright c_dtlRank").SetHtml(fmt.Sprintf(`%d.`, rank))
+				rank++
 				regionCell := jq("<td/>").AddClass("bordered c_dtlRegion").SetHtml(fmt.Sprintf(`<a href="%s">%s</a>`, uri, region))
 				countCell := jq("<td/>").AddClass("bordered aright c_dtlHits").SetHtml(fmt.Sprintf(`%d`, count))
-				dtlTable.Append(jq("<tr/>").Append(regionCell, countCell))
+				dtlTable.Append(jq("<tr/>").Append(rankCell, regionCell, countCell))
 			}
 			jquery.When(jq("div#showbrk").Append(dtlScroller.Append(dtlTable))).Done(func() {
 				js.Global.Get("tableAdjust").Call("ta", pagePct, topElements, topExtra, headRowId, headTableId, scrollerId, lastColId)
