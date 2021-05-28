@@ -10,6 +10,13 @@ import (
 
 var jq = jquery.NewJQuery
 
+func numberStates() {
+	jq("#t_usBody").Children("tbody").Children("tr").Each(func(i int, row interface{}) {
+		jq(row).Children("td").First().SetHtml(fmt.Sprintf("%d.", i+1))
+	})
+
+}
+
 func main() {
 
 	pagePct := 0.92
@@ -21,6 +28,7 @@ func main() {
 	topExtra := 0
 
 	jq(js.Global.Get("document")).Ready(func() {
+		numberStates()
 		headRowId := "#r_usHeadRow"
 		headTableId := "#t_usHead"
 		scrollerId := "#d_usHits"

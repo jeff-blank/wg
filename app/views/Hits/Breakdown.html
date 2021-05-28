@@ -14,9 +14,10 @@
     <td id="us" class="vtop">
       <table class="bordered" id="t_usHead">
         <tr>
-          <th class="bordered" colspan="2">United States</th>
+          <th class="bordered" colspan="3">United States</th>
         </tr>
         <tr id="r_usHeadRow">
+          <th class="bordered c_stateRank" id="c_stateRank">#</th>
           <th class="bordered c_state" id="c_state">State</th>
           <th class="bordered c_stateHits" id="c_stateHits">Hits</th>
         </tr>
@@ -25,6 +26,7 @@
         <table id="t_usBody">
         {{ range index .breakdowns "US" }}
           <tr>
+            <td class="bordered aright c_stateRank" id="c_US_{{.Region}}_rank">&nbsp;</td>
             <td class="bordered c_state" id="c_US_{{.Region}}"><a href="#" class="brklnk" id="US_{{.Region}}">{{.Region}}</a></td>
             <td class="bordered aright c_stateHits" id="c_US_{{.Region}}_hits">{{.Count}}</td>
           </tr>
