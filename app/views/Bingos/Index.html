@@ -3,7 +3,7 @@
 
 <h1 id="h1">Bingos</h1>
 
-<p id="add"><a href="{{.newLink}}">Add a custom bingo</a></p>
+<p id="p_add"><a href="{{.newLink}}">Add a custom bingo</a></p>
 
 {{ if .foundBingos }}
 <table id="main">
@@ -26,19 +26,13 @@
       </table>
     </td>
     <td style="width: 10em"></td>
-    <td id="breakdown" class="vtop"><div id="showbrk" class="scrollable"></div></td>
+    <td class="vtop"><div id="d_bingoDtl"></div></td>
   </tr>
 </table>
 {{ end }}
 
+<script src="/public/js/scrollBar.js"></script>
+<script src="/public/js/tableWidth.js"></script>
 <script src="/public/js/bingos-index-g.js"></script>
-
-<script type="application/javascript">
-  $( document ).ready(function() {
-    $wh = $(window).innerHeight();
-    $hgts = $('#h1').outerHeight() + $('#add').outerHeight() + $('#th1').outerHeight() + $('#th2').outerHeight();
-    $('#showbrk').height(0.95 * $wh - $hgts );
-  });
-</script>
 
 {{template "footer.html" .}}
