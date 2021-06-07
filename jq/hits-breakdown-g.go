@@ -39,10 +39,14 @@ func main() {
 	jq(".brklnk").On(jquery.CLICK, func(e jquery.Event) {
 		var subRegionType string
 
+		rankColumn := "c_dtlRank"
+		regionColumn := "c_dtlRegion"
+		hitsColumn := "c_dtlHits"
+
 		headRowId := "#r_detailHeadRow"
 		headTableId := "#t_detailHead"
 		scrollerId := "#d_dtlScroll"
-		lastColId := "#c_dtlHits"
+		lastColId := "#" + hitsColumn
 
 		e.PreventDefault()
 		cs := jq(e.Target).Attr("id")
@@ -67,19 +71,19 @@ func main() {
 			subRegionType = "City"
 		}
 
-		brkHeadTable := jq("<table/>").SetAttr("id", "t_detailHead").AddClass("bordered")
-		jq("#t_detailHead").Remove()
-		jq("#d_dtlScroll").Remove()
+		brkHeadTable := jq("<table/>").SetAttr("id", headTableId[1:]).AddClass("bordered")
+		jq(headTableId).Remove()
+		jq(scrollerId).Remove()
 		topHdrTxt := fmt.Sprintf(`<a href="%s">%s</a> Breakdown`, regionHitsFilterPath, tableRegionName)
 		topHdrRow := jq("<tr/>").Append(jq("<th/>").SetAttr("colspan", "3").AddClass("bordered").SetHtml(topHdrTxt))
-		rankHdr := jq("<th/>").AddClass("bordered c_dtlRank").SetAttr("id", "c_dtlRank").SetHtml("#")
-		regionHdr := jq("<th/>").AddClass("bordered c_dtlRegion").SetAttr("id", "c_dtlRegion").SetHtml(subRegionType)
-		countHdr := jq("<th/>").AddClass("bordered c_dtlHits").SetAttr("id", "c_dtlHits").SetHtml("Hits")
+		rankHdr := jq("<th/>").AddClass("bordered "+rankColumn).SetAttr("id", rankColumn).SetHtml("#")
+		regionHdr := jq("<th/>").AddClass("bordered "+regionColumn).SetAttr("id", regionColumn).SetHtml(subRegionType)
+		countHdr := jq("<th/>").AddClass("bordered "+hitsColumn).SetAttr("id", hitsColumn).SetHtml("Hits")
 		brkHeadTable.Append(topHdrRow)
 		brkHeadTable.Append(jq("<tr/>").SetAttr("id", headRowId[1:]).Append(rankHdr, regionHdr, countHdr))
 		jq("div#showbrk").Append(brkHeadTable)
 
-		dtlScroller := jq("<div/>").SetAttr("id", "d_dtlScroll").AddClass("scrollable bordered")
+		dtlScroller := jq("<div/>").SetAttr("id", scrollerId[1:]).AddClass("scrollable bordered")
 		dtlTable := jq("<table/>")
 
 		jquery.Get(brkPath, func(data interface{}) {
@@ -88,10 +92,10 @@ func main() {
 				region := ent.(map[string]interface{})["Region"].(string)
 				count := int(ent.(map[string]interface{})["Count"].(float64))
 				uri := hitsFilterPath + `&county=` + region
-				rankCell := jq("<td/>").AddClass("bordered aright c_dtlRank").SetHtml(fmt.Sprintf(`%d.`, rank))
+				rankCell := jq("<td/>").AddClass("bordered aright " + rankColumn).SetHtml(fmt.Sprintf(`%d.`, rank))
 				rank++
-				regionCell := jq("<td/>").AddClass("bordered c_dtlRegion").SetHtml(fmt.Sprintf(`<a href="%s">%s</a>`, uri, region))
-				countCell := jq("<td/>").AddClass("bordered aright c_dtlHits").SetHtml(fmt.Sprintf(`%d`, count))
+				regionCell := jq("<td/>").AddClass("bordered " + regionColumn).SetHtml(fmt.Sprintf(`<a href="%s">%s</a>`, uri, region))
+				countCell := jq("<td/>").AddClass("bordered aright " + hitsColumn).SetHtml(fmt.Sprintf(`%d`, count))
 				dtlTable.Append(jq("<tr/>").Append(rankCell, regionCell, countCell))
 			}
 			jquery.When(jq("div#showbrk").Append(dtlScroller.Append(dtlTable))).Done(func() {
