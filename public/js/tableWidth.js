@@ -22,10 +22,10 @@ var tableAdjust = {
       $(headRowId).children('th').each(function() {
         $mw = 0;
         $className = $(this).attr('id');
-        $cells = $('.' + $className).each(function() {
+        $('.' + $className).each(function() {
           $mw = Math.max($mw, $(this).width() + 1);
         });
-        $cells = $('.' + $className).each(function() {
+        $('.' + $className).each(function() {
           $(this).width($mw);
         });
       });
