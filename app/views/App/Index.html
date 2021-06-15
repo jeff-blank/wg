@@ -50,15 +50,22 @@
   <img class="mapThumb" src="https://home.mr-happy.com/{{.resPrefix}}wghbs.svg" alt="HBS" /> All
 </div>
 <hr class="clearleft" />
-<div><img src="https://home.mr-happy.com/{{.resPrefix}}wghbcreg.svg" alt="RHBC"
+<div class="indexUSCounty">
+  <table>
+    <tr>
+      <td><img src="https://home.mr-happy.com/{{.resPrefix}}wghbcreg.svg" alt="RHBC" style="margin-right: 2em"
 {{ if eq .resPrefix "cmx_" }}
   width="720" height="603"
 {{ else }}
   width="414" height="650"
-{{ end }}
-  /></div>
-<hr />
+{{ end }} /></td>
+      {{ if ne .resPrefix "cmx_" }}<td><img src="https://home.mr-happy.com/wghbcreg-2.svg" alt="RHBC" width="414" height="650" /></td>{{ end }}
+    </tr>
+  </table>
+</div>
+<hr class="clearleft" />
 <div><img src="https://home.mr-happy.com/{{.resPrefix}}wgmhb.svg" alt="MHB" width="720" height="465" /></div>
+</div>
 <hr />
 {{ if ne .resPrefix "pdx_" }}
 <div><img src="https://home.mr-happy.com/{{.resPrefix}}wgfrb.png" alt="FRB" /></div>
