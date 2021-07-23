@@ -15,8 +15,6 @@ const HITS_PATH = "/util/GetFirstHits?type="
 var jq = jquery.NewJQuery
 
 func getShowHits(data interface{}) {
-	//log.Printf("%#v", data)
-	//table := `<table id="dataTable">`
 	table := jq("<table/>").SetAttr("id", "dataTable")
 	i := len(data.([]interface{}))
 	cellNum := 0
@@ -43,7 +41,6 @@ func getShowHits(data interface{}) {
 		i--
 		cellNum++
 	}
-	//table += "</table>"
 	jq("#dataTable").Remove()
 	jq("#scroller").RemoveAttr("style")
 	jquery.When(jq("#scroller").Append(table)).Done(func() {
