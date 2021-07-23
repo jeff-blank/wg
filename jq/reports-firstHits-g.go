@@ -16,7 +16,8 @@ var jq = jquery.NewJQuery
 
 func getShowHits(data interface{}) {
 	//log.Printf("%#v", data)
-	table := `<table id="dataTable">`
+	//table := `<table id="dataTable">`
+	table := jq("<table/>").SetAttr("id", "dataTable")
 	i := len(data.([]interface{}))
 	cellNum := 0
 	for _, ent := range data.([]interface{}) {
@@ -26,30 +27,32 @@ func getShowHits(data interface{}) {
 		if len(serial) == 10 {
 			serial += "&nbsp;"
 		}
-		row := `<tr>`
-		row += `<td class="c_hit bordered" id="h_` + strconv.Itoa(cellNum) + `">` + strconv.Itoa(i) + `</td>`
-		row += `<td class="c_denom aright bordered" id="d_` + strconv.Itoa(cellNum) + `">` + denom + `</td>`
-		row += fmt.Sprintf(`<td class="c_bill mono bordered" id="b_`+strconv.Itoa(cellNum)+`">%s&nbsp;/&nbsp;%s</td>`,
-			serial,
-			entry["Series"].(string),
-		)
-		row += `<td class="c_date bordered" id="l_` + strconv.Itoa(cellNum) + `"><a href="https://www.wheresgeorge.com/` +
-			entry["RptKey"].(string) +
-			`" class="newWinHack">` +
-			entry["EntDate"].(string) +
-			`</a></td>`
-		row += `<td class="c_state bordered" id="s_` + strconv.Itoa(cellNum) + `">` + entry["State"].(string) + `</td>`
-		row += `<td class="c_county bordered" id="c_` + strconv.Itoa(cellNum) + `">` + entry["CountyCity"].(string) + `</td>`
-		table += row
+
+		row := jq("<tr/>")
+		jq("<td/>").SetAttr("id", "h_"+strconv.Itoa(cellNum)).AddClass("c_hit bordered").SetHtml(strconv.Itoa(i)).AppendTo(row)
+		jq("<td/>").SetAttr("id", "d_"+strconv.Itoa(cellNum)).AddClass("c_denom aright bordered").SetHtml(denom).AppendTo(row)
+		serialSeries := fmt.Sprintf("%s&nbsp;/&nbsp;%s", serial, entry["Series"].(string))
+		jq("<td/>").SetAttr("id", "b_"+strconv.Itoa(cellNum)).AddClass("c_bill mono bordered").SetHtml(serialSeries).AppendTo(row)
+		billUrl := "https://www.wheresgeorge.com/" + entry["RptKey"].(string)
+		href := jq("<a/>").SetAttr("href", billUrl).AddClass("newWin").SetHtml(entry["EntDate"].(string))
+		jq("<td/>").SetAttr("id", "l_"+strconv.Itoa(cellNum)).AddClass("c_date bordered").Append(href).AppendTo(row)
+		jq("<td/>").SetAttr("id", "s_"+strconv.Itoa(cellNum)).AddClass("c_state bordered").SetHtml(entry["State"].(string)).AppendTo(row)
+		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_county bordered").SetHtml(entry["CountyCity"].(string)).AppendTo(row)
+
+		table.Append(row)
 		i--
 		cellNum++
 	}
-	table += "</table>"
+	//table += "</table>"
 	jq("#dataTable").Remove()
 	jq("#scroller").RemoveAttr("style")
-	jq("#scroller").SetHtml(table)
-	jq(".newWinHack").Each(func(i int, elem interface{}) {
-		jq(elem).RemoveClass("newWinHack").AddClass("newWin")
+	jquery.When(jq("#scroller").Append(table)).Done(func() {
+		jq(".newWin").On(jquery.CLICK, func(e jquery.Event) {
+			linkObj := jq(e.Target)
+			e.PreventDefault()
+			href := linkObj.Attr("href")
+			js.Global.Get("window").Call("open", href, "", "")
+		})
 	})
 }
 
