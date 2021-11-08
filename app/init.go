@@ -29,6 +29,13 @@ type HitsBrkEnt struct {
 	Count  int
 }
 
+type DualRegionBrkEnt struct {
+	Rank   int
+	State  string
+	County string
+	Count  int
+}
+
 type DayOfMonth struct {
 	Label  string
 	Months [12]int

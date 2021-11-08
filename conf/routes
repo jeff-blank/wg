@@ -18,6 +18,7 @@ GET     /reports/HitsCalendar                   Reports.HitsCalendar
 GET     /reports/MasterStats                    Reports.MasterStats
 GET     /reports/FirstHits                      Reports.FirstHits
 GET     /reports/Last50Counts                   Reports.Last50Counts
+GET     /reports/TopCounties                    Reports.TopCounties
 GET     /util/StatesProvinces                   Util.GetStatesProvinces
 GET     /util/GetHomeState                      Util.GetHomeState
 GET     /util/GetHomeCounty                     Util.GetHomeCounty

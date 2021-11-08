@@ -26,6 +26,7 @@ func (c Reports) Index() revel.Result {
 	links["calendar"] = routes.Reports.HitsCalendar()
 	links["first"] = routes.Reports.FirstHits()
 	links["last50"] = routes.Reports.Last50Counts()
+	links["topCounties"] = routes.Reports.TopCounties()
 	return c.Render(links)
 }
 
@@ -132,6 +133,39 @@ func (c Reports) MasterStats() revel.Result {
 
 func (c Reports) FirstHits() revel.Result {
 	return c.Render()
+}
+
+func (c Reports) TopCounties() revel.Result {
+	data := make([]app.DualRegionBrkEnt, 0)
+
+	query := `select state, county, count(1) from hits where country='US' group by state, county order by count desc, state, county limit 20`
+	rows, err := app.DB.Query(query)
+	if err != nil {
+		revel.AppLog.Errorf("query top 50 counties: %#v", err)
+		return c.RenderError(err)
+	}
+	rank := 1
+	for rows.Next() {
+		var (
+			state  string
+			county string
+			count  int
+		)
+		err := rows.Scan(&state, &county, &count)
+		if err != nil {
+			revel.AppLog.Errorf("read top 50 counties: %#v", err)
+			return c.RenderError(err)
+		}
+		data = append(data, app.DualRegionBrkEnt{
+			Rank:   rank,
+			State:  state,
+			County: county,
+			Count:  count,
+		})
+		rank++
+	}
+
+	return c.Render(data)
 }
 
 func (c Reports) Last50Counts() revel.Result {
