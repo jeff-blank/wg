@@ -213,8 +213,8 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				},
 			},
 		}
-		yMaxR = 35
-		yMaxL = 350
+		yMaxR = 40
+		yMaxL = 400
 		yTickSpaceR = 7.0
 
 	} else {
