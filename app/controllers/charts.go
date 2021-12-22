@@ -215,7 +215,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 		}
 		yMaxR = 40
 		yMaxL = 400
-		yTickSpaceR = 7.0
+		yTickSpaceR = 8.0
 
 	} else {
 		return c.RenderText("unknown chart '" + mapName + "'")
