@@ -11,6 +11,8 @@ GET     /                                       App.Index
 GET     /hits                                   Hits.Index
 POST    /hits                                   Hits.Create
 GET     /hits/new                               Hits.New
+GET     /hits/:id/edit                          Hits.Edit
+POST    /hits/:id                               Hits.Update
 GET     /breakdown                              Hits.Breakdown
 GET     /showbrk                                Hits.ShowBrk
 GET     /reports                                Reports.Index
@@ -26,6 +28,7 @@ GET     /util/Counties                          Util.GetCounties
 GET     /util/GetFirstHits                      Util.GetFirstHits
 GET     /util/GetResidences                     Util.GetResidences
 GET     /util/GetCurrentResidence               Util.GetCurrentResidence
+GET     /util/GetHitByKey                       Util.GetHitByKey
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
 GET     /entries/:key                           Entries.GetEntryByKey
