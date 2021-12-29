@@ -1,15 +1,15 @@
 FROM golang:1.13.15 as builder
 
 RUN go get golang.org/dl/go1.12.17 && \
-	/go/bin/go1.12.17 download && \
-	/go/bin/go1.12.17 get github.com/gopherjs/gopherjs \
-		github.com/gopherjs/jquery \
-		honnef.co/go/js/dom
-RUN go get github.com/revel/revel \
-	github.com/revel/cmd/revel \
-	github.com/lib/pq \
-	github.com/revel/modules/server-engine/newrelic \
-	github.com/wcharczuk/go-chart
+	/go/bin/go1.12.17 download
+RUN /go/bin/go1.12.17 get github.com/gopherjs/gopherjs@1.12.3+go1.12 \
+	github.com/gopherjs/jquery \
+	honnef.co/go/js/dom
+#RUN go get github.com/revel/revel \
+#	github.com/revel/cmd/revel \
+#	github.com/lib/pq \
+#	github.com/revel/modules/server-engine/newrelic \
+#	github.com/wcharczuk/go-chart
 
 COPY app /go/src/github.com/jeff-blank/wg/app/
 COPY conf /go/src/github.com/jeff-blank/wg/conf/
