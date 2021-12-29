@@ -18,6 +18,7 @@ type Hit struct {
 	Series     string
 	RptKey     string
 	EntDate    string
+	Residence  string
 	Country    string
 	State      string
 	CountyCity string
@@ -61,11 +62,12 @@ type BingoDetail struct {
 	Hits   bool
 }
 
-type NewHitInfo struct {
+type HitInfo struct {
 	FirstOnDate      string
 	FirstInCounty    string
 	CountyBingoNames []string
 	AdjacentCounties []string
+	GenericMessage   string
 }
 
 type Bill struct {
@@ -76,6 +78,15 @@ type Bill struct {
 	Rptkey       string
 	Residence    string
 	Message      string
+}
+
+type DateSelData struct {
+	Year   int
+	Month  string
+	Day    string
+	Years  []int
+	Months [12]string
+	Days   []string
 }
 
 const (
@@ -92,6 +103,7 @@ const (
 			b.serial,
 			b.series,
 			b.rptkey,
+			b.residence,
 			h.entdate,
 			h.country,
 			h.state,
@@ -232,6 +244,7 @@ var (
 	RE_serial_11          *re.Regexp
 	RE_series             *re.Regexp
 	RE_trailingCommas     *re.Regexp
+	RE_date               *re.Regexp
 )
 
 func InitDB() {
@@ -257,6 +270,7 @@ func InitRE() {
 	RE_serial_11 = re.MustCompile(`^[A-NP-Y]` + SERIAL_RE_BASE)
 	RE_series = re.MustCompile(`^(19|2[0-3])[0-9]{2}[A-NP-Y]?$`)
 	RE_trailingCommas = re.MustCompile(`,*$`)
+	RE_date = re.MustCompile(`^\d{4}-(0\d|1[012])-([012]\d|3[01])$`)
 }
 
 func init() {

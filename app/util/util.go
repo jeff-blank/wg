@@ -281,12 +281,12 @@ func GetHits(whereGroupOrder string) ([]app.Hit, error) {
 	revel.AppLog.Debugf(app.Q_HITS + whereGroupOrder)
 	rows, err := app.DB.Query(app.Q_HITS + whereGroupOrder)
 	if err != nil {
-		revel.AppLog.Error(err.Error())
+		revel.AppLog.Errorf("query:\n%s\nerror: %#v", app.Q_HITS+whereGroupOrder, err)
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
+		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.Residence, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)
 			return nil, err

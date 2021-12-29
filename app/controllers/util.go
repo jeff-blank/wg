@@ -42,4 +42,13 @@ func (c Util) GetResidences() revel.Result {
 	return c.RenderJSON(residences)
 }
 
+func (c Util) GetHitByKey() revel.Result {
+	k := c.Params.Get("rptkey")
+	h, _ := util.GetHits("and rptkey = '" + k + "'")
+	if len(h) != 1 {
+		return c.RenderText("bill with key '" + k + "' not found or too many results")
+	}
+	return c.RenderJSON(h[0])
+}
+
 // vim:foldmethod=marker:

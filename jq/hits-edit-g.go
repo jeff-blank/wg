@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
+	"github.com/gopherjs/gopherjs/js"
 	"github.com/gopherjs/jquery"
 )
 
@@ -15,12 +17,12 @@ const (
 
 var jq = jquery.NewJQuery
 
-func stateProvinceSelect(country string) {
+func stateProvinceSelect(country, defState, defCounty string) {
 	var homeState string
 
 	clearSelect("#sstate", false)
 	if country == "US" {
-		jquery.Get("../util/GetHomeState", func(data interface{}) {
+		jquery.Get("/util/GetHomeState", func(data interface{}) {
 			homeState = data.(string)
 		})
 	} else if country != "Canada" {
@@ -28,35 +30,39 @@ func stateProvinceSelect(country string) {
 		homeState = "--"
 	}
 
-	jquery.When(jquery.Get("../util/StatesProvinces?country="+country, func(data interface{}) {
+	jquery.When(jquery.Get("/util/StatesProvinces?country="+country, func(data interface{}) {
 		sel := jq("#sstate")
 		for _, state := range data.([]interface{}) {
 			sel.Append(jq(`<option>`).SetText(state.(string)))
-			if state == homeState {
+			if state == defState || (defState == "" && state == homeState) {
 				sel.Children("option").Last().SetAttr("selected", "selected")
 			}
 		}
 	})).Done(func() {
 		state := jq("#sstate").Val()
-		countySelect(state)
+		countySelect(state, defCounty)
 	})
 }
 
-func countySelect(state string) {
-	var homeState, homeCounty string
+func countySelect(defState, defCounty string) {
 
 	clearSelect("#scounty", false)
-	jquery.Get("../util/GetHomeState", func(data interface{}) {
-		homeState = data.(string)
-		jquery.When(jquery.Get("../util/GetHomeCounty", func(data interface{}) {
-			homeCounty = data.(string)
+
+	jquery.Get("/util/GetHomeState", func(data interface{}) {
+		if defState == "" {
+			defState = data.(string)
+		}
+		jquery.When(jquery.Get("/util/GetHomeCounty", func(data interface{}) {
+			if defCounty == "" {
+				defCounty = data.(string)
+			}
 		})).Done(func() {
-			jquery.Get("../util/Counties?state="+state, func(data interface{}) {
+			jquery.Get("/util/Counties?state="+defState, func(data interface{}) {
 				sel := jq("#scounty")
 				for _, county := range data.([]interface{}) {
 					countyRec := county.(map[string]interface{})
 					sel.Append(jq(`<option>`).SetText(countyRec["Region"]))
-					if state == homeState && countyRec["Region"] == homeCounty {
+					if countyRec["Region"] == defCounty {
 						sel.Children("option").Last().SetAttr("selected", "selected")
 					}
 				}
@@ -65,7 +71,17 @@ func countySelect(state string) {
 	})
 }
 
-func datesOfMonth() {
+func datesOfMonth(e jquery.Event, date string) {
+	var (
+		year          int
+		yearStr       string
+		day_in        string
+		selectedMonth string
+		monthStr      string
+	)
+
+	log.Printf("%#v", date)
+
 	monthDays := map[time.Month]int{
 		time.January:   31,
 		time.February:  28,
@@ -85,33 +101,57 @@ func datesOfMonth() {
 	mSel := jq("#smonth")
 	dSel := jq("#sday")
 
-	year, _ := strconv.Atoi(ySel.Val())
+	if date != "undefined" {
+		yearStr = date[:4]
+		selectedMonth = date[5:7]
+		day_in = date[8:]
+	} else {
+		yearStr = ySel.Val()
+		selectedMonth = mSel.Val()
+	}
+	year, _ = strconv.Atoi(yearStr)
+
 	if year%4 == 0 && (year%100 != 0 || year%400 == 0) {
 		monthDays[LEAP_DAY_MONTH] += LEAP_DAYS
 	}
 
-	selectedMonth := mSel.Val()
 	if selectedMonth[:1] == "0" {
-		selectedMonth = selectedMonth[1:]
+		monthStr = selectedMonth[1:]
+	} else {
+		monthStr = selectedMonth
 	}
-	month, _ := strconv.Atoi(selectedMonth)
+	month, _ := strconv.Atoi(monthStr)
 
-	for len(dSel.Children("option").ToArray()) > monthDays[time.Month(month)] {
-		// more days in selector than in month
-		dSel.Children("option").Last().Remove()
+	if date != "undefined" {
+		ySel.Children("option").Each(func(i int, elem interface{}) {
+			if jq(elem).Val() == yearStr {
+				jq(elem).SetAttr("selected", "selected")
+			} else {
+				jq(elem).RemoveAttr("selected")
+			}
+		})
+		mSel.Children("option").Each(func(i int, elem interface{}) {
+			if jq(elem).Val() == selectedMonth {
+				jq(elem).SetAttr("selected", "selected")
+			} else {
+				jq(elem).RemoveAttr("selected")
+			}
+		})
 	}
 
-	for len(dSel.Children("option").ToArray()) < monthDays[time.Month(month)] {
-		// fewer days in selector than in month
-		d0, _ := strconv.Atoi(dSel.Children("option").Last().Val())
-		dMax := monthDays[time.Month(month)]
-		for d := d0; d <= dMax; d++ {
-			dSel.Append(jq(`<option>`).SetText(fmt.Sprintf("%02d", d)))
+	clearSelect("#sday", false)
+	dMax := monthDays[time.Month(month)]
+	dSel.Children("option").First().Remove()
+	for d := 1; d <= dMax; d++ {
+		dayStr := fmt.Sprintf("%02d", d)
+		dSel.Append(jq(`<option>`).SetText(dayStr))
+		if dayStr == day_in {
+			dSel.Children("option").Last().SetAttr("selected", "selected")
 		}
 	}
 }
 
-func residenceSelect() {
+func residenceSelect(res string) {
 	var currentResidence string
 
 	sel := jq("#sresidence")
@@ -120,7 +160,7 @@ func residenceSelect() {
 			currentResidence = crData.(string)
 			for _, residence := range rlData.([]interface{}) {
 				sel.Append(jq("<option>").SetText(residence.(string)))
-				if residence == currentResidence {
+				if residence == res || (res == "" && residence == currentResidence) {
 					sel.Children("option").Last().SetAttr("selected", "selected")
 				}
 			}
@@ -129,11 +169,46 @@ func residenceSelect() {
 }
 
 func initializeForm() {
-	stateProvinceSelect("US")
-	usCounty()
-	datesOfMonth()
-	residenceSelect()
-	jq("#fkey").Focus()
+	var (
+		state      string
+		county     string
+		country    string
+		residence  string
+		date       string
+		hitStrings map[string]string
+	)
+
+	rptkey := jq("#fkey").Val()
+	if rptkey != "" {
+		jquery.When(jquery.Get("/util/GetHitByKey?rptkey="+rptkey, func(data interface{}) {
+			var hit map[string]interface{}
+			hit = data.(map[string]interface{})
+			state = hit["State"].(string)
+			county = hit["CountyCity"].(string)
+			country = hit["Country"].(string)
+			residence = hit["Residence"].(string)
+			date = hit["EntDate"].(string)
+			hitStrings = map[string]string{
+				"country":   country,
+				"state":     state,
+				"county":    county,
+				"residence": residence,
+				"entdate":   date,
+			}
+		})).Done(func() {
+			stateProvinceSelect(hitStrings["country"], hitStrings["state"], hitStrings["county"])
+			usCounty(hitStrings["county"])
+			datesOfMonth(jquery.Event{}, hitStrings["entdate"])
+			residenceSelect(hitStrings["residence"])
+			jq("#sresidence").SetAttr("disabled", true)
+			jq("#r_delete").Show()
+		})
+	} else {
+		stateProvinceSelect("US", "", "")
+		usCounty("")
+		residenceSelect("")
+		jq("#fkey").Focus()
+	}
 }
 
 func nonUsCity() {
@@ -144,7 +219,7 @@ func nonUsCity() {
 	jq("#lcounty").SetHtml("Hit City")
 }
 
-func usCounty() {
+func usCounty(county string) {
 	jq("#fcounty").SetAttr("name", "_fcounty")
 	jq("#fcounty").Hide()
 	jq("#scounty").SetAttr("name", "county")
@@ -219,7 +294,7 @@ func billFill(e jquery.Event) {
 
 func main() {
 
-	jq("#form").Ready(initializeForm)
+	jq(js.Global.Get("document")).Ready(initializeForm)
 
 	jq("#fkey").On(jquery.CHANGE, billFill)
 
@@ -227,7 +302,7 @@ func main() {
 		country := jq("#fcountry").Val()
 		if country == "US" {
 			state := jq(e.Target).Val()
-			countySelect(state)
+			countySelect(state, "")
 		}
 	})
 
@@ -237,14 +312,14 @@ func main() {
 			// show state and county pickers
 			jq("#stateProvince").Show()
 			jq("#lstate").SetHtml("Hit State")
-			usCounty()
-			stateProvinceSelect("US")
+			usCounty("")
+			stateProvinceSelect("US", "", "")
 		} else if country == "Canada" {
 			// show province picker and city text-input
 			jq("#stateProvince").Show()
 			jq("#lstate").SetHtml("Hit Province")
 			nonUsCity()
-			stateProvinceSelect("Canada")
+			stateProvinceSelect("Canada", "", "")
 		} else {
 			// hide state/province row; replace all options with single option "--"
 			jq("#stateProvince").Hide()

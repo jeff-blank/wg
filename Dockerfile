@@ -1,4 +1,4 @@
-FROM golang:1.13.8 as builder
+FROM golang:1.13.15 as builder
 
 RUN go get golang.org/dl/go1.12.17 && \
 	/go/bin/go1.12.17 download && \

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -127,6 +128,7 @@ const (
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
 	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, entdate) values ($1, $2, $3, $4, $5)`
+	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, entdate=$4 where id=$5`
 
 	// }}}
 
@@ -139,13 +141,13 @@ type Hits struct {
 
 func (c Hits) Index() revel.Result {
 
-	var newHitFlash app.NewHitInfo
+	var flashData app.HitInfo
 
 	if c.Flash.Data["info"] != "" {
 		revel.AppLog.Debugf("%#v", c.Flash.Data)
-		json.Unmarshal([]byte(c.Flash.Data["info"]), &newHitFlash)
+		json.Unmarshal([]byte(c.Flash.Data["info"]), &flashData)
 	}
-	revel.AppLog.Debugf("%#v", newHitFlash)
+	revel.AppLog.Debugf("%#v", flashData)
 
 	filterCountry := c.Params.Get("country")
 	filterState := c.Params.Get("state")
@@ -216,7 +218,7 @@ func (c Hits) Index() revel.Result {
 		"breakdown":       routes.Hits.Breakdown(),
 		"new":             routes.Hits.New(),
 	}
-	return c.Render(hits, newHitFlash, filters, links)
+	return c.Render(hits, flashData, filters, links)
 }
 
 func (c Hits) Breakdown() revel.Result {
@@ -312,7 +314,7 @@ func (c Hits) Create() revel.Result {
 		bSeries    string
 		bRptkey    string
 		series     string
-		infoFlash  app.NewHitInfo
+		infoFlash  app.HitInfo
 		dateHits   int
 		countyHits int
 	)
@@ -453,26 +455,170 @@ func (c Hits) Create() revel.Result {
 }
 
 func (c Hits) New() revel.Result {
-	var months [12]string
-	var days [31]string
+	dateSelData := dateSelPopulate(true)
+	return c.Render(dateSelData)
+}
+
+func (c Hits) Edit() revel.Result {
+	dateSelData := dateSelPopulate(false)
+
+	id := c.Params.Route.Get("id")
+	hits, err := util.GetHits(fmt.Sprintf("and h.id=%s", id))
+	if err != nil {
+		return c.RenderText(fmt.Sprintf("error retrieving hit with id %s: %s", id, err.Error()))
+	}
+	hit := hits[0]
+	return c.Render(hit, dateSelData)
+}
+
+func (c Hits) Update() revel.Result {
+	var (
+		err         error
+		updateFlash app.HitInfo
+	)
+
+	year := c.Params.Get("year")
+
+	id := c.Params.Route.Get("id")
+	delHit := c.Params.Get("delete")
+	if delHit == "on" {
+		err = del(id)
+	} else {
+		country := c.Params.Get("country")
+		state := c.Params.Get("state")
+		county := c.Params.Get("county")
+		date := fmt.Sprintf("%s-%s-%s", year, c.Params.Get("month"), c.Params.Get("day"))
+		if !app.RE_date.MatchString(date) {
+			return c.RenderText("error in date '" + date + "'")
+		}
+		err = update(id, country, state, county, date)
+	}
+	if err != nil {
+		return c.RenderText(fmt.Sprintf("edit/delete of hit '%s' failed: %s", id, err.Error()))
+	}
+	updateFlash.GenericMessage = "Hit successfully "
+	if delHit == "on" {
+		updateFlash.GenericMessage += "deleted"
+	} else {
+		updateFlash.GenericMessage += "updated"
+	}
+	flashJson, err := json.Marshal(updateFlash)
+	if err == nil {
+		c.Flash.Out["info"] = string(flashJson)
+	}
+	return c.Redirect(routes.Hits.Index() + "?year=" + year)
+}
+
+func dateSelPopulate(populateDays bool) app.DateSelData {
+	var (
+		thisMonthIndex int
+		dateSelData    app.DateSelData
+	)
 
 	now := time.Now().Format("2006-01-02")
-	year, _ := strconv.Atoi(now[0:4])
-	month := now[5:7]
-	day := now[8:]
+	dateSelData.Year, _ = strconv.Atoi(now[0:4])
+	dateSelData.Month = now[5:7]
+	dateSelData.Day = now[8:]
 
-	years := make([]int, (year+1)-(START_YEAR-1))
-	for y := range years {
-		years[y] = START_YEAR + y
+	dateSelData.Years = make([]int, (dateSelData.Year+1)-(START_YEAR-1))
+	for y := range dateSelData.Years {
+		dateSelData.Years[y] = START_YEAR + y
 	}
-	for m := range months {
-		months[m] = fmt.Sprintf("%02d", m+1)
+	for m := range dateSelData.Months {
+		dateSelData.Months[m] = fmt.Sprintf("%02d", m+1)
+		if dateSelData.Months[m] == dateSelData.Month {
+			thisMonthIndex = m
+		}
 	}
-	for d := range days {
-		days[d] = fmt.Sprintf("%02d", d+1)
+	if populateDays {
+		daysInMonth := [12]int{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+		dateSelData.Days = make([]string, daysInMonth[thisMonthIndex])
+		for d := range dateSelData.Days {
+			dateSelData.Days[d] = fmt.Sprintf("%02d", d+1)
+		}
 	}
+	return dateSelData
+}
 
-	return c.Render(years, year, months, month, days, day)
+func del(id string) error {
+	revel.AppLog.Debugf("deleting %s", id)
+	// figure out if this is the only hit on the bill; delete bill if so
+	hits, err := util.GetHits(fmt.Sprintf("and h.id=%s", id))
+	if err != nil {
+		revel.AppLog.Errorf("hits.del(): get record for hit with id %s: %#v", id, err)
+		return err
+	}
+	if len(hits) != 1 {
+		err := errors.New(fmt.Sprintf("hits.del(): found %d records for hit with id %s not found", len(hits), id))
+		revel.AppLog.Errorf("%#v", err)
+		return err
+	}
+	delHit := hits[0]
+	allHitsOnBill, err := util.GetHits(fmt.Sprintf("and b.rptkey='%s'", delHit.RptKey))
+	if err != nil {
+		revel.AppLog.Errorf("get hit count for bill with key %s (via hit id %s): %#v", delHit.RptKey, id, err)
+		return err
+	}
+	if len(allHitsOnBill) < 1 {
+		err := errors.New(fmt.Sprintf("found %d hits on bill with key %s (via hit id %s); cannot delete", len(allHitsOnBill), delHit.RptKey, id))
+		revel.AppLog.Errorf("%#v", err)
+		return err
+	}
+	res, err := app.DB.Exec("delete from hits where id=$1", id)
+	if err != nil {
+		revel.AppLog.Errorf("failed to delete hit with id %s: %#v", id, err)
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		revel.AppLog.Errorf("delete hit with id %s: RowsAffected(): %#v", id, err)
+		return err
+	}
+	if n != 1 {
+		err := errors.New(fmt.Sprintf("delete hit with id %s: deleted %d rows", id, n))
+		revel.AppLog.Errorf("%#v", err)
+		return err
+	}
+	if len(allHitsOnBill) == 1 {
+		res, err := app.DB.Exec("delete from bills where rptkey=$1", delHit.RptKey)
+		if err != nil {
+			revel.AppLog.Errorf("failed to delete bill with key %s: %#v", delHit.RptKey, err)
+			return err
+		}
+		n, err := res.RowsAffected()
+		if err != nil {
+			revel.AppLog.Errorf("delete bill with key %s: RowsAffected(): %#v", delHit.RptKey, err)
+			return err
+		}
+		if n != 1 {
+			err := errors.New(fmt.Sprintf("delete bill with key %s: deleted %d bills instead of 1", delHit.RptKey, n))
+			revel.AppLog.Errorf("%#v", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func update(id, country, state, county, date string) error {
+	revel.AppLog.Debugf("updating hit id '%s'", id)
+	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, date, id)
+	if err != nil {
+		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)
+		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s'",
+			S_UPDATE_HIT, country, state, county, date, id)
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		revel.AppLog.Errorf("hits.update(): hit %s: check rows affected: %#v", id, err)
+	}
+	if n != 1 {
+		errmsg := fmt.Sprintf("%d rows affected (should be 1)", n)
+		revel.AppLog.Errorf("hits.update(): hit %s: %s", id, errmsg)
+		err := errors.New(errmsg)
+		return err
+	}
+	return nil
 }
 
 // vim:foldmethod=marker:
