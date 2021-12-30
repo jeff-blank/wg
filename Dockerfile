@@ -2,8 +2,6 @@ FROM golang:1.17.3 as builder
 
 ENV GO111MODULE=on
 
-RUN sh -c "mkdir -p /go/src/github.com/jeff-blank/wg && cd /go/src/github.com/jeff-blank/wg go get github.com/gopherjs/jquery && go install github.com/gopherjs/gopherjs@1.17.1+go1.17.3 && go install github.com/revel/cmd/revel@latest"
-
 COPY go.mod go.sum /go/src/github.com/jeff-blank/wg/
 COPY app /go/src/github.com/jeff-blank/wg/app/
 COPY conf /go/src/github.com/jeff-blank/wg/conf/

@@ -1,33 +1,40 @@
 module github.com/jeff-blank/wg
 
-go 1.13
+go 1.17
 
 require (
-	github.com/blend/go-sdk v2.0.0+incompatible // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20211228203721-be292294a697
+	github.com/gopherjs/jquery v0.0.0-20191017083323-73f4c7416038
+	github.com/lib/pq v1.10.4
+	github.com/revel/modules v1.0.0
+	github.com/revel/revel v1.0.0
+	github.com/wcharczuk/go-chart v2.0.1+incompatible
+	honnef.co/go/js/dom v0.0.0-20210725211120-f030747120f2
+)
+
+require (
+	github.com/blend/go-sdk v1.20211204.3 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/garyburd/redigo v1.6.3 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe
-	github.com/gopherjs/jquery v0.0.0-20191017083323-73f4c7416038
-	github.com/lib/pq v1.10.4
-	github.com/neelance/astrewrite v0.0.0-20160511093645-99348263ae86 // indirect
-	github.com/neelance/sourcemap v0.0.0-20200213170602-2833bce08e4c // indirect
+	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/newrelic/go-agent v3.15.2+incompatible // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
-	github.com/revel/cmd v1.0.3 // indirect
-	github.com/revel/modules v1.0.0
-	github.com/revel/revel v1.0.0
-	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/shurcooL/go v0.0.0-20200502201357-93f07166e636 // indirect
-	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
-	github.com/spf13/cobra v1.2.1 // indirect
-	github.com/wcharczuk/go-chart v2.0.1+incompatible
-	golang.org/dl v0.0.0-20211214194107-65ed43b8dfff // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
+	github.com/revel/config v1.0.0 // indirect
+	github.com/revel/log15 v2.11.20+incompatible // indirect
+	github.com/revel/pathtree v0.0.0-20140121041023-41257a1839e9 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/twinj/uuid v1.0.0 // indirect
+	github.com/xeonx/timeago v1.0.0-rc4 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	golang.org/x/tools/gopls v0.7.4 // indirect
-	honnef.co/go/js/dom v0.0.0-20210725211120-f030747120f2
-	honnef.co/go/tools v0.2.2 // indirect
-	mvdan.cc/gofumpt v0.2.1 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
+	gopkg.in/stack.v0 v0.0.0-20141108040640-9b43fcefddd0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
