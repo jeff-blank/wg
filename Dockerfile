@@ -1,17 +1,8 @@
 FROM golang:1.17.3 as builder
 
-#RUN go get golang.org/dl/go1.12.17 && \
-#	/go/bin/go1.12.17 download
-#RUN GO111MODULE=on /go/bin/go1.12.17 get github.com/gopherjs/gopherjs@1.12.3+go1.12 \
-#	github.com/gopherjs/jquery \
-#	honnef.co/go/js/dom
-#RUN go get github.com/revel/revel \
-#	github.com/revel/cmd/revel \
-#	github.com/lib/pq \
-#	github.com/revel/modules/server-engine/newrelic \
-#	github.com/wcharczuk/go-chart
-
 ENV GO111MODULE=on
+
+RUN sh -c "mkdir -p /go/src/github.com/jeff-blank/wg && cd /go/src/github.com/jeff-blank/wg go get github.com/gopherjs/jquery && go install github.com/gopherjs/gopherjs@1.17.1+go1.17.3 && go install github.com/revel/cmd/revel@latest"
 
 COPY go.mod go.sum /go/src/github.com/jeff-blank/wg/
 COPY app /go/src/github.com/jeff-blank/wg/app/
@@ -20,10 +11,6 @@ COPY jq /go/src/github.com/jeff-blank/wg/jq/
 COPY public /go/src/github.com/jeff-blank/wg/public/
 COPY Makefile /go/src/github.com/jeff-blank/wg/
 WORKDIR src/github.com/jeff-blank/wg
-
-RUN go get github.com/gopherjs/jquery
-RUN go install github.com/gopherjs/gopherjs@1.17.1+go1.17.3
-RUN go install github.com/revel/cmd/revel
 
 
 ARG NR_LICENSE_B
