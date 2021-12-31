@@ -233,23 +233,35 @@ func (c Charts) Grapher(mapName string) revel.Result {
 	}
 	yTicksR = make([]chart.Tick, int(yMaxR/float64(yTickSpaceR))+1)
 	v := 0
-	for t, _ := range yTicksR {
+	for t := range yTicksR {
 		yTicksR[t] = chart.Tick{Label: fmt.Sprintf("%2d", v), Value: float64(v)}
 		v += yTickSpaceR
 	}
 
 	/*
-		go-chart bug
-		yTicksL = make([]chart.Tick, int(yMaxL/100)+1)
+		// go-chart bug
+		yTicksL := make([]chart.Tick, int(yMaxL/100)+1)
 		v = 0
-		for t, _ := range yTicksL {
+		for t := range yTicksL {
 			yTicksL[t] = chart.Tick{Label: fmt.Sprintf("%3d", v), Value: float64(v)}
 			v += 100
 		}
-		revel.AppLog.Debugf("%#v", yTicksL)
+		revel.AppLog.Debugf("yTicksL: %#v", yTicksL)
 	*/
 
 	graph := chart.Chart{
+		XAxis: chart.XAxis{
+			Style: chart.Style{
+				Show: true,
+			},
+			ValueFormatter: func(v interface{}) string {
+				if vf, isFloat := v.(float64); isFloat {
+					ut := time.Unix(int64(vf/1000000000), int64(vf)%1000000000)
+					return ut.Format("2006-01")
+				}
+				return ""
+			},
+		},
 		YAxis: chart.YAxis{
 			Range: &chart.ContinuousRange{
 				Min: 0,
@@ -271,8 +283,8 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Min: 0,
 				Max: float64(int(yMaxL)),
 			},
-			//Ticks: yTicksL,
 			/*
+				Ticks: yTicksL,
 				ValueFormatter: func(v interface{}) string {
 					if vf, isFloat := v.(float64); isFloat {
 						return fmt.Sprintf("%4d", int(vf))
