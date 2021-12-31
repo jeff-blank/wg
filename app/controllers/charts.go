@@ -64,6 +64,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("f1c233"),
 					FillColor:   drawing.ColorFromHex("f1c233").WithAlpha(128),
+					Show:        true,
 				},
 			},
 			chart.TimeSeries{
@@ -72,6 +73,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("3366cc"),
 					FillColor:   drawing.ColorFromHex("3366cc").WithAlpha(128),
+					Show:        true,
 				},
 			},
 			chart.TimeSeries{
@@ -80,6 +82,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				YAxis:   chart.YAxisSecondary,
 				Style: chart.Style{
 					StrokeWidth: 2,
+					Show:        true,
 				},
 			},
 		}
@@ -123,6 +126,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("3366cc"),
 					FillColor:   drawing.ColorFromHex("3366cc").WithAlpha(128),
+					Show:        true,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -132,6 +136,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("db4537"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 			},
 			chart.TimeSeries{
@@ -140,6 +145,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("f5b401"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 			},
 			chart.TimeSeries{
@@ -148,6 +154,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("ff00ff"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -157,6 +164,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("000000"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -192,6 +200,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("3366cc"),
 					FillColor:   drawing.ColorFromHex("3366cc").WithAlpha(128),
+					Show:        true,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -201,6 +210,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("274e13"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 				YAxis: chart.YAxisSecondary,
 			},
@@ -210,6 +220,7 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				Style: chart.Style{
 					StrokeColor: drawing.ColorFromHex("ff00ff"),
 					StrokeWidth: 2,
+					Show:        true,
 				},
 			},
 		}
@@ -251,6 +262,9 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				}
 				return ""
 			},
+			Style: chart.Style{
+				Show: true,
+			},
 		},
 		YAxisSecondary: chart.YAxis{
 			Range: &chart.ContinuousRange{
@@ -266,6 +280,9 @@ func (c Charts) Grapher(mapName string) revel.Result {
 					return ""
 				},
 			*/
+			Style: chart.Style{
+				Show: true,
+			},
 		},
 		Series: series,
 	}
