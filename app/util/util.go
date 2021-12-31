@@ -286,7 +286,7 @@ func GetHits(whereGroupOrder string) ([]app.Hit, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&newHit.Id, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.Residence, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
+		err := rows.Scan(&newHit.Id, &newHit.BillId, &newHit.Denom, &newHit.Serial, &newHit.Series, &newHit.RptKey, &newHit.Residence, &newHit.EntDate, &newHit.Country, &newHit.State, &newHit.CountyCity, &newHit.Count)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)
 			return nil, err

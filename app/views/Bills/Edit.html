@@ -1,0 +1,71 @@
+{{set . "title" "WG Utils 2.0: Edit Bill"}}
+{{template "header.html" .}}
+
+<h1>Edit Bill</h1>
+{{ if eq .bill.Id 0 }}
+<p>Bill not found</p>
+{{ else }}
+<form id="form" action="../{{ .bill.Id }}" accept-charset="UTF-8" method="post">
+  <table>
+    <tr>
+      <td class="rpad1em">Report Key</td>
+      <td>
+        <input type="text" id="fkey" name="key" size="15" maxlength="255" value="{{ .bill.Rptkey }}">
+      </td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Serial</td>
+      <td><input type="text" name="serial" id="fserial" size="15" maxlength="11" value="{{ .bill.Serial }}"></td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Denomination</td>
+      <td>
+        $<select id="sdenom" name="denom">
+          <option value="1"{{ if eq .bill.Denomination 1 }} selected="selected"{{ end }}>1</option>
+          <option value="2"{{ if eq .bill.Denomination 2 }} selected="selected"{{ end }}>2</option>
+          <option value="5"{{ if eq .bill.Denomination 5 }} selected="selected"{{ end }}>5</option>
+          <option value="10"{{ if eq .bill.Denomination 10 }} selected="selected"{{ end }}>10</option>
+          <option value="20"{{ if eq .bill.Denomination 20 }} selected="selected"{{ end }}>20</option>
+          <option value="50"{{ if eq .bill.Denomination 50 }} selected="selected"{{ end }}>50</option>
+          <option value="100"{{ if eq .bill.Denomination 100 }} selected="selected"{{ end }}>100</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Series</td>
+      <td><input type="text" name="series" id="fseries" size="15" maxlength="5" value="{{ .bill.Series }}"></td>
+    </tr>
+    <tr>
+      <td id="lresidence" class="rpad1em">Residence (entry)</td>
+      <td id="cresidence">
+        <select id="sresidence" name="residence">
+          <option>--</option>{{ $curRes := .currentResidence }}{{ range .residences }}
+          <option{{ if eq . $curRes }} selected="selected"{{ end }}>{{ . }}</option>{{ end }}
+        </select>
+      </td>
+    </tr>
+  </table>
+  <div style="padding-top: 4pt">
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset" id="reset">
+  </div>
+</form>
+
+<p class="tpad12pt">This bill has the following hits:</p>
+<table class="bordered">
+  <tr>
+    <th class="bordered">Date</th><th class="bordered">Location</th>
+  </tr>{{ range .hitList }}
+  <tr>
+    <td class="bordered">{{ .EntDate }}</td>
+    <td class="bordered">{{ .Country }} / {{ if ne .State "--" }}{{ .State }} / {{ end }}{{ .CountyCity }}</td>
+  </tr>{{ end }}
+</table>
+
+<p class="tpad12pt">Link to tracking report: <a class="newWin" href="https://www.wheresgeorge.com/{{ .bill.Rptkey }}">https://www.wheresgeorge.com/{{ .bill.Rptkey }}</a>
+
+<script src="/public/js/newWin-g.js"></script>
+
+{{ end }}
+
+{{template "footer.html" .}}

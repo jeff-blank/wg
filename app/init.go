@@ -12,6 +12,7 @@ import (
 
 type Hit struct {
 	Id         int
+	BillId     int
 	Index      int
 	Denom      int
 	Serial     string
@@ -99,6 +100,7 @@ const (
 	Q_HITS = `
 		select
 			h.id,
+			b.id,
 			b.denomination,
 			b.serial,
 			b.series,

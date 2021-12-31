@@ -180,10 +180,10 @@ func (c Hits) Index() revel.Result {
 
 	order := " "
 	if filterSort == "asc" {
-		order += "order by entdate, id"
+		order += "order by entdate, h.id"
 	} else {
 		filterSort = ""
-		order += "order by entdate desc, id desc"
+		order += "order by entdate desc, h.id desc"
 	}
 
 	hits, err := util.GetHits(where + order)
