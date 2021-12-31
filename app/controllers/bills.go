@@ -37,6 +37,8 @@ func (c Bills) Edit() revel.Result {
 }
 
 func (c Bills) Update() revel.Result {
+	var updateFlash app.HitInfo
+
 	billId := c.Params.Route.Get("id")
 	res, err := app.DB.Exec(
 		`update bills set rptkey=$1, serial=$2, denomination=$3, series=$4, residence=$5 where id=$6`,
@@ -61,7 +63,7 @@ func (c Bills) Update() revel.Result {
 		return c.RenderError(err)
 	}
 
-	updateFlash := app.HitInfo{GenericMessage: "Bill information successfully updated"}
+	updateFlash.GenericMessage = "Bill information successfully updated"
 	flashJson, err := json.Marshal(updateFlash)
 	if err == nil {
 		c.Flash.Out["info"] = string(flashJson)
