@@ -144,10 +144,10 @@ func (c Hits) Index() revel.Result {
 	var flashData app.HitInfo
 
 	if c.Flash.Data["info"] != "" {
-		revel.AppLog.Debugf("%#v", c.Flash.Data)
+		revel.AppLog.Debugf("hits.Index(): flashdatainfo: %#v", c.Flash.Data)
 		json.Unmarshal([]byte(c.Flash.Data["info"]), &flashData)
 	}
-	revel.AppLog.Debugf("%#v", flashData)
+	revel.AppLog.Debugf("hits.Index(): flashData: %#v", flashData)
 
 	filterCountry := c.Params.Get("country")
 	filterState := c.Params.Get("state")
