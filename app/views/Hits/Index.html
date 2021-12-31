@@ -7,29 +7,29 @@
 </p>
 <hr>
 
-{{ if or .newHitFlash.FirstOnDate .newHitFlash.FirstInCounty .newHitFlash.GenericMessage }}
+{{ if or .flashData.FirstOnDate .flashData.FirstInCounty .flashData.GenericMessage }}
 <div class="firsts">
 <ul>
-  {{ if .newHitFlash.FirstOnDate }}
-  <li>&#128467; First hit on {{ .newHitFlash.FirstOnDate }}</li>
+  {{ if .flashData.FirstOnDate }}
+  <li>&#128467; First hit on {{ .flashData.FirstOnDate }}</li>
   {{ end }}
-  {{ if .newHitFlash.FirstInCounty }}
-  <li>&#128506; First hit in {{ .newHitFlash.FirstInCounty }}</li>
-    {{ if gt (len .newHitFlash.CountyBingoNames) 0 }}
+  {{ if .flashData.FirstInCounty }}
+  <li>&#128506; First hit in {{ .flashData.FirstInCounty }}</li>
+    {{ if gt (len .flashData.CountyBingoNames) 0 }}
     <li>County is part of the following bingo(s):
-      <ul>{{ range .newHitFlash.CountyBingoNames }}<li>{{.}}</li>{{ end }}</ul>
+      <ul>{{ range .flashData.CountyBingoNames }}<li>{{.}}</li>{{ end }}</ul>
     </li>
     {{ end }}
-    {{ if gt (len .newHitFlash.AdjacentCounties) 0 }}
+    {{ if gt (len .flashData.AdjacentCounties) 0 }}
     <li>County is adjacent to the following other counties with hits:
-      <ul>{{ range .newHitFlash.AdjacentCounties }}<li>{{.}}</li>{{ end }}</ul>
+      <ul>{{ range .flashData.AdjacentCounties }}<li>{{.}}</li>{{ end }}</ul>
     </li>
     {{ else }}
     <li>County is adjacent to no other counties with hits.</li>
     {{ end }}
   {{ end }}
 </ul>
-{{ if .newHitFlash.GenericMessage }}<p style="padding-left: 1em">{{ .newHitFlash.GenericMessage }}</p>{{end }}
+{{ if .flashData.GenericMessage }}<p style="padding-left: 1em">{{ .flashData.GenericMessage }}</p>{{end }}
 </div>
 <hr>
 {{ end }}
