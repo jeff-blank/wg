@@ -165,6 +165,22 @@ func (c Reports) TopCounties() revel.Result {
 		rank++
 	}
 
+	data[0].RankStr = "1."
+	for i := range data {
+		if i == 0 {
+			continue
+		}
+		if data[i].Count == data[i-1].Count {
+			if data[i-1].RankStr[:2] != "T-" {
+				data[i-1].RankStr = fmt.Sprintf("T-%d.", data[i-1].Rank)
+			}
+			data[i].Rank = data[i-1].Rank
+			data[i].RankStr = data[i-1].RankStr
+		} else {
+			data[i].RankStr = strconv.Itoa(data[i].Rank) + "."
+		}
+	}
+
 	return c.Render(data)
 }
 
