@@ -32,10 +32,11 @@ type HitsBrkEnt struct {
 }
 
 type DualRegionBrkEnt struct {
-	Rank   int
-	State  string
-	County string
-	Count  int
+	Rank    int
+	RankStr string
+	State   string
+	County  string
+	Count   int
 }
 
 type DayOfMonth struct {
