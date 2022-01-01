@@ -42,11 +42,12 @@ func (c Util) GetResidences() revel.Result {
 	return c.RenderJSON(residences)
 }
 
-func (c Util) GetHitByKey() revel.Result {
-	k := c.Params.Get("rptkey")
-	h, _ := util.GetHits("and rptkey = '" + k + "'")
+func (c Util) GetHitById() revel.Result {
+	id := c.Params.Get("id")
+	revel.AppLog.Errorf("Util.GetHitById(): id=%s", id)
+	h, _ := util.GetHits("and h.id = '" + id + "'")
 	if len(h) != 1 {
-		return c.RenderText("bill with key '" + k + "' not found or too many results")
+		return c.RenderText("bill with id '" + id + "' not found or too many results")
 	}
 	return c.RenderJSON(h[0])
 }

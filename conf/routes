@@ -28,7 +28,7 @@ GET     /util/Counties                          Util.GetCounties
 GET     /util/GetFirstHits                      Util.GetFirstHits
 GET     /util/GetResidences                     Util.GetResidences
 GET     /util/GetCurrentResidence               Util.GetCurrentResidence
-GET     /util/GetHitByKey                       Util.GetHitByKey
+GET     /util/GetHitById                        Util.GetHitById
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
 GET     /entries/:key                           Entries.GetEntryByKey

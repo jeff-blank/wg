@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -79,8 +78,6 @@ func datesOfMonth(e jquery.Event, date string) {
 		selectedMonth string
 		monthStr      string
 	)
-
-	log.Printf("%#v", date)
 
 	monthDays := map[time.Month]int{
 		time.January:   31,
@@ -178,9 +175,8 @@ func initializeForm() {
 		hitStrings map[string]string
 	)
 
-	rptkey := jq("#fkey").Val()
-	if rptkey != "" {
-		jquery.When(jquery.Get("/util/GetHitByKey?rptkey="+rptkey, func(data interface{}) {
+	if jq("#fkey").Val() != "" {
+		jquery.When(jquery.Get("/util/GetHitById?id="+jq("#h_hitid").Val(), func(data interface{}) {
 			var hit map[string]interface{}
 			hit = data.(map[string]interface{})
 			state = hit["State"].(string)
