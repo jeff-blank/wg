@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"net/url"
+
 	"github.com/jeff-blank/wg/app/routes"
 	"github.com/revel/revel"
 )
 
 func Authenticate(c *revel.Controller) revel.Result {
+	var passedQueryString string
+
 	username, err := c.Session.Get("username")
 	if err != nil {
 		if err.Error() == "Session value not found" {
@@ -15,7 +19,13 @@ func Authenticate(c *revel.Controller) revel.Result {
 			revel.AppLog.Debugf("username error: %#v", err)
 			c.Flash.Error(err.Error())
 		}
-		return c.Redirect(routes.Login.Index() + "?back=" + c.Request.URL.Path)
+		if len(c.Params.Values) > 0 {
+			for param := range c.Params.Values {
+				passedQueryString += "&" + param + "=" + c.Params.Get(param)
+			}
+			passedQueryString = url.QueryEscape("?" + passedQueryString[1:])
+		}
+		return c.Redirect(routes.Login.Index() + "?back=" + c.Request.URL.Path + passedQueryString)
 	} else {
 		revel.AppLog.Debugf("username: %#v", username)
 	}
