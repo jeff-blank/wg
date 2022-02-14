@@ -42,20 +42,27 @@
 <div>
   <form>
     <table>
-      <tr><td class="rpad1em">Serial</td><td><input name="serial" type="text" value="{{index .filters "serial"}}" size="10" maxlength="11"></td></tr>
-      <tr><td class="rpad1em">Country</td><td><input name="country" type="text" value="{{index .filters "country"}}" size="10" maxlength="64"></td></tr>
-      <tr><td class="rpad1em">State</td><td><input name="state" type="text" value="{{index .filters "state"}}" size="3" maxlength="2"></td></tr>
-      <tr><td class="rpad1em">County</td><td><input name="county" type="text" value="{{index .filters "county"}}" size="10" maxlength="64"></td></tr>
-      <tr><td class="rpad1em">Year</td><td><input name="year" type="text" value="{{index .filters "year"}}" size="5" maxlength="7"></td></tr>
+      <tr>
+        <td class="rpad1em">Serial</td><td class="rpad1em"><input name="serial" type="text" value="{{index .filters "serial"}}" size="10" maxlength="11" tabindex="1"></td>
+        <td class="rpad1em">Country</td><td><input name="country" type="text" value="{{index .filters "country"}}" size="10" maxlength="64" tabindex="4"></td>
+      </tr>
+      <tr>
+        <td class="rpad1em">Denomination</td><td class="rpad1em"><input name="denom" type="text" value="{{index .filters "denom"}}" size="3" maxlength="3" tabindex="2"></td>
+        <td class="rpad1em">State</td><td><input name="state" type="text" value="{{index .filters "state"}}" size="3" maxlength="2" tabindex="5"></td>
+      </tr>
+      <tr>
+        <td class="rpad1em">Year</td><td class="rpad1em"><input name="year" type="text" value="{{index .filters "year"}}" size="5" maxlength="7" tabindex="3"></td>
+        <td class="rpad1em">County</td><td><input name="county" type="text" value="{{index .filters "county"}}" size="10" maxlength="64" tabindex="6"></td>
+      </tr>
       <tr>
         <td class="rpad1em">Date sort</td>
-        <td>
-          <span class="rpad1em"><input type="radio" name="sort" id="sort_asc" value="asc"{{if eq (index .filters "sort") "asc"}} checked="checked"{{end}}>Ascending</span>
-          <input type="radio" name="sort" id="sort_desc" value="desc"{{if ne (index .filters "sort") "asc"}} checked="checked"{{end}}>Descending
+        <td colspan="3">
+          <span class="rpad1em"><input type="radio" name="sort" id="sort_asc" value="asc"{{if eq (index .filters "sort") "asc"}} checked="checked"{{end}} tabindex="7">Ascending</span>
+          <input type="radio" name="sort" id="sort_desc" value="desc"{{if ne (index .filters "sort") "asc"}} checked="checked"{{end}} tabindex="8">Descending
         </td>
       </tr>
     </table>
-    <p><input type="submit" name="commit" value="Filter"> <input type="reset" value="Reset form inputs"></p>
+    <p><input type="submit" name="commit" value="Filter" tabindex="9"> <input type="reset" value="Reset form inputs" tabindex="10"></p>
   </form>
 </div>
 

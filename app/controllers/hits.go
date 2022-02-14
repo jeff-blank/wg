@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
+	s "strings"
 	"time"
 
 	"database/sql"
@@ -149,22 +149,30 @@ func (c Hits) Index() revel.Result {
 	}
 	revel.AppLog.Debugf("hits.Index(): flashData: %#v", flashData)
 
-	filterCountry := c.Params.Get("country")
-	filterState := c.Params.Get("state")
-	filterCounty := c.Params.Get("county")
-	filterYear := c.Params.Get("year")
+	filterSerial := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(s.ToUpper(c.Params.Get("serial")), `\$1`), ``)
+	filterDenom := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("denom"), `\$1`), ``)
+	filterCountry := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("country"), `\$1`), `''`)
+	filterState := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("state"), `\$1`), `''`)
+	filterCounty := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("county"), `\$1`), `''`)
+	filterYear := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("year"), `\$1`), `''`)
 	filterSort := c.Params.Get("sort")
 
 	where := ""
 
+	if filterSerial != `` {
+		where += ` and serial like '` + filterSerial + `'`
+	}
+	if filterDenom != `` {
+		where += ` and denomination = ` + filterDenom
+	}
 	if filterCountry != `` {
-		where += ` and country = '` + app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(filterCountry, `\$1`), `''`) + `'`
+		where += ` and country = '` + filterCountry + `'`
 	}
 	if filterState != `` {
-		where += ` and state = '` + app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(filterState, `\$1`), `''`) + `'`
+		where += ` and state = '` + filterState + `'`
 	}
 	if filterCounty != `` {
-		where += ` and county = '` + app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(filterCounty, `\$1`), `''`) + `'`
+		where += ` and county = '` + filterCounty + `'`
 	}
 	if filterYear != `` {
 		var year string
@@ -174,7 +182,7 @@ func (c Hits) Index() revel.Result {
 		} else {
 			year = filterYear
 		}
-		where += ` and substr(entdate::varchar, 1, 4) = '` + app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(year, `\$1`), `''`) + `'`
+		where += ` and substr(entdate::varchar, 1, 4) = '` + year + `'`
 		filterYear = year
 	}
 
@@ -204,12 +212,13 @@ func (c Hits) Index() revel.Result {
 	// combine filters for ease of passing data to template
 	filters := make(map[string]string)
 	filters = map[string]string{
+		"denom":   filterDenom,
 		"country": filterCountry,
 		"state":   filterState,
 		"county":  filterCounty,
 		"year":    filterYear,
 		"sort":    filterSort,
-		"serial":  "",
+		"serial":  filterSerial,
 	}
 	links := make(map[string]string)
 	links = map[string]string{
@@ -334,15 +343,15 @@ func (c Hits) Create() revel.Result {
 	isSerial10 := app.RE_serial_10.MatchString(serial)
 	isSerial11 := app.RE_serial_11.MatchString(serial)
 
-	if s, ok := c.Params.Form["series"]; ok && s[0] != "" && isSerial10 {
-		series = strings.ToUpper(s[0])
+	if str, ok := c.Params.Form["series"]; ok && str[0] != "" && isSerial10 {
+		series = s.ToUpper(str[0])
 		if app.RE_series.MatchString(series) {
 			series = dbSanitize(app.RE_whitespace.ReplaceAllString(series, ""))
 		} else {
 			return c.RenderText("invalid bill series")
 		}
-	} else if s, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 {
-		series = s
+	} else if str, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 {
+		series = str
 	} else {
 		return c.RenderText("missing bill series")
 	}
