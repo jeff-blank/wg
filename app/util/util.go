@@ -262,7 +262,7 @@ func GetFirstHits(regionType string) ([]app.Hit, error) {
 	if regionType == "county" {
 		return GetHits(`and h.id IN (SELECT h2.id
           FROM hits h2
-          WHERE h2.country='US' AND h.county=h2.county AND h.state=h2.state AND h2.state <> 'DC'
+          WHERE h2.country='US' AND h.county=h2.county AND h.state=h2.state AND h2.state not in ('DC', 'AE')
           ORDER BY h2.entdate, h2.id LIMIT 1) ORDER BY h.entdate desc, h.id desc`)
 	} else if regionType == "state" {
 		return GetHits(`and h.id IN (SELECT h2.id
