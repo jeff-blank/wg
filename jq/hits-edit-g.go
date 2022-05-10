@@ -192,8 +192,21 @@ func initializeForm() {
 				"entdate":   date,
 			}
 		})).Done(func() {
-			stateProvinceSelect(hitStrings["country"], hitStrings["state"], hitStrings["county"])
-			usCounty(hitStrings["county"])
+			if country == "US" {
+				stateProvinceSelect(hitStrings["country"], hitStrings["state"], hitStrings["county"])
+				usCounty(hitStrings["county"])
+			} else if country == "Canada" {
+				// show province picker and city text-input
+				jq("#stateProvince").Show()
+				jq("#lstate").SetHtml("Hit Province")
+				nonUsCity()
+				stateProvinceSelect("Canada", hitStrings["state"], "")
+			} else {
+				// hide state/province row; replace all options with single option "--"
+				jq("#stateProvince").Hide()
+				clearSelect("#sstate", true)
+				nonUsCity()
+			}
 			datesOfMonth(jquery.Event{}, hitStrings["entdate"])
 			residenceSelect(hitStrings["residence"])
 			jq("#sresidence").SetAttr("disabled", true)
