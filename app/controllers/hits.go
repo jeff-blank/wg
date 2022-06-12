@@ -326,18 +326,24 @@ func (c Hits) Create() revel.Result {
 		infoFlash  app.HitInfo
 		dateHits   int
 		countyHits int
+		zip        int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
-	rptkey := dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["key"][0], ""))
+	rptkey := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["key"][0], ""))
 
-	country := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), "")
-	state := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), "")
-	county := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), "")
-	city := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["city"][0], ""), "")
-	zip, _ := strconv.Atoi(app.RE_nonNumeric.ReplaceAllString(c.Params.Form["zip"][0], ""))
+	country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
+	state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
+	county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+	city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
+	zipStr := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
+	if zipStr == "" {
+		zip = -1
+	} else {
+		zip, _ = strconv.Atoi(zipStr)
+	}
 
-	serial := dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["serial"][0], ""))
+	serial := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["serial"][0], ""))
 	if !app.RE_serial.MatchString(serial) {
 		return c.RenderText("invalid serial number")
 	}
@@ -489,6 +495,7 @@ func (c Hits) Update() revel.Result {
 	var (
 		err         error
 		updateFlash app.HitInfo
+		zip         int
 	)
 
 	year := c.Params.Get("year")
@@ -498,11 +505,17 @@ func (c Hits) Update() revel.Result {
 	if delHit == "on" {
 		err = del(id)
 	} else {
-		country := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), "")
-		state := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), "")
-		county := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), "")
-		city := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["city"][0], ""), "")
-		zip, _ := strconv.Atoi(app.RE_nonNumeric.ReplaceAllString(c.Params.Form["zip"][0], ""))
+		country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
+		state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
+		county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+		city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
+		zipStr := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
+		if zipStr == "" {
+			zip = -1
+		} else {
+			zip, _ = strconv.Atoi(zipStr)
+		}
+
 		date := fmt.Sprintf("%s-%s-%s", year, c.Params.Get("month"), c.Params.Get("day"))
 		if !app.RE_date.MatchString(date) {
 			return c.RenderText("error in date '" + date + "'")
