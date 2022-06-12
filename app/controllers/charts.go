@@ -190,13 +190,20 @@ func (c Charts) Grapher(mapName string) revel.Result {
 			yValBills[m*2] = float64(d["monthBills"].(int))
 			yValBills[m*2+1] = yValBills[m*2]
 
+			yMax = math.Max(yMax, yValBills[m*2])
 			yMax = math.Max(yMax, yValAvgBills[m])
 			yMax = math.Max(yMax, yValAvgHits[m]*10)
 
 			m++
 		}
 
-		yMaxL = float64((int(yMax)/100 + 1)) * 100
+		if yMax < 500 {
+			yMaxL = float64((int(yMax)/50 + 1)) * 50
+			yTickSpaceR = 5.0
+		} else {
+			yMaxL = float64((int(yMax)/100 + 1)) * 100
+			yTickSpaceR = 10.0
+		}
 		yMaxR = yMaxL / 10
 
 		series = make([]chart.Series, 3)
@@ -231,7 +238,6 @@ func (c Charts) Grapher(mapName string) revel.Result {
 				},
 			},
 		}
-		yTickSpaceR = 10.0
 
 	} else {
 		return c.RenderText("unknown chart '" + mapName + "'")
