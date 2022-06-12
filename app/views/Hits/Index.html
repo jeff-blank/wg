@@ -79,7 +79,8 @@
       <th class="bordered">Serial/Series</th>
       <th class="bordered">Hit Date</th>
       <th class="bordered">State</th>
-      <th class="bordered">County or City</th>
+      <th class="bordered">County/Equivalent</th>
+      <th class="bordered">City</th>
     </tr>
       {{ range .hits }}
       <tr>
@@ -88,7 +89,8 @@
         <td class="bordered mono"><a href="bills/{{.BillId}}/edit">{{.Serial}}/{{.Series}}</a> ({{.Count}})</td>
         <td class="bordered"><a class="newWin" href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
         <td class="bordered"><a href="hits?country={{.Country}}{{if .State}}&amp;state={{.State}}{{end}}">{{if ne .State "--"}}{{.State}}{{if ne .Country "US"}}, {{.Country}}{{end}}{{else}}{{.Country}}{{end}}</a></td>
-        <td class="bordered">{{if eq .Country "US"}}<a href="hits?country={{.Country}}&amp;state={{.State}}&amp;county={{.CountyCity}}">{{end}}{{.CountyCity}}{{if eq .Country "US"}}</a>{{end}}</td>
+        <td class="bordered">{{if eq .Country "US"}}<a href="hits?country={{.Country}}&amp;state={{.State}}&amp;county={{.County}}">{{.County}}</a>{{else}}&nbsp;{{end}}</td>
+        <td class="bordered">{{if ne .City ""}}<a href="hits?country={{.Country}}{{if eq .Country "US"}}&amp;state={{.State}}&amp;county={{.County}}{{end}}&amp;city={{.City}}">{{.City}}</a>{{if ne .ZIP -1}} / {{.ZIP}}{{end}}{{else}}&nbsp;{{end}}</td>
       </tr>
       {{ end }}
   </table>

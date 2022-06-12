@@ -11,19 +11,21 @@ import (
 )
 
 type Hit struct {
-	Id         int
-	BillId     int
-	Index      int
-	Denom      int
-	Serial     string
-	Series     string
-	RptKey     string
-	EntDate    string
-	Residence  string
-	Country    string
-	State      string
-	CountyCity string
-	Count      int
+	Id        int
+	BillId    int
+	Index     int
+	Denom     int
+	Serial    string
+	Series    string
+	RptKey    string
+	EntDate   string
+	Residence string
+	Country   string
+	State     string
+	County    string
+	City      string
+	ZIP       int
+	Count     int
 }
 
 type HitsBrkEnt struct {
@@ -111,6 +113,8 @@ const (
 			h.country,
 			h.state,
 			h.county,
+			coalesce(h.city, '') as city,
+			coalesce(h.zip, -1) as zip,
 			(select count(*) from hits where bill_id = b.id)
 		from
 			bills b,
@@ -248,6 +252,7 @@ var (
 	RE_series             *re.Regexp
 	RE_trailingCommas     *re.Regexp
 	RE_date               *re.Regexp
+	RE_nonNumeric         *re.Regexp
 )
 
 func InitDB() {
@@ -274,6 +279,7 @@ func InitRE() {
 	RE_series = re.MustCompile(`^(19|2[0-3])[0-9]{2}[A-NP-Y]?$`)
 	RE_trailingCommas = re.MustCompile(`,*$`)
 	RE_date = re.MustCompile(`^\d{4}-(0\d|1[012])-([012]\d|3[01])$`)
+	RE_nonNumeric = re.MustCompile(`\D+`)
 }
 
 func init() {

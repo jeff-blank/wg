@@ -36,11 +36,22 @@
       <td id="lstate" class="rpad1em">Hit State</td>
       <td id="cstate"><select id="sstate" name="state"><option>--</option></select></td>
     </tr>
-    <tr>
+    <tr id="rCounty">
       <td id="lcounty" class="rpad1em">Hit County</td>
       <td id="ccounty">
         <select name="county" id="scounty"><option>--</option></select>
-        <input type="text" id="fcounty" name="_fcounty" value="{{ .hit.CountyCity }}" size="15" maxlength="64">
+      </td>
+    </tr>
+    <tr>
+      <td id="lcity" class="rpad1em">Hit City (optional)</td>
+      <td id="ccity">
+        <input type="text" id="fcity" name="city" value="{{ .hit.City }}" size="15" maxlength="64">
+      </td>
+    </tr>
+    <tr id="rZIP">
+      <td id="lzip" class="rpad1em">Hit ZIP (optional)</td>
+      <td id="cZIP">
+        <input type="text" id="fzip" name="zip" value="{{ if ne .hit.ZIP -1 }}{{ .hit.ZIP }}{{ end }}" size="6" maxlength="5">
       </td>
     </tr>
     <tr>

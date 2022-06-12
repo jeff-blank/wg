@@ -58,7 +58,7 @@
   </tr>{{ range .hitList }}
   <tr>
     <td class="bordered">{{ .EntDate }}</td>
-    <td class="bordered">{{ .Country }} / {{ if ne .State "--" }}{{ .State }} / {{ end }}{{ .CountyCity }}</td>
+    <td class="bordered">{{ .Country }} / {{ if ne .State "--" }}{{ .State }} / {{ end }}{{ if ne .County "--" }}{{ .County }} / {{ end }}{{ if ne .City "" }}{{ .City }}{{ end }}</td>
   </tr>{{ end }}
 </table>
 

@@ -167,9 +167,10 @@ func residenceSelect(res string) {
 
 func initializeForm() {
 	var (
+		country    string
 		state      string
 		county     string
-		country    string
+		city       string
 		residence  string
 		date       string
 		hitStrings map[string]string
@@ -180,7 +181,10 @@ func initializeForm() {
 			var hit map[string]interface{}
 			hit = data.(map[string]interface{})
 			state = hit["State"].(string)
-			county = hit["CountyCity"].(string)
+			county = hit["County"].(string)
+			city = hit["City"].(string)
+			// TODO: more stuff
+			_ = city
 			country = hit["Country"].(string)
 			residence = hit["Residence"].(string)
 			date = hit["EntDate"].(string)
@@ -221,19 +225,17 @@ func initializeForm() {
 }
 
 func nonUsCity() {
-	jq("#scounty").SetAttr("name", "_scounty")
-	jq("#scounty").Hide()
-	jq("#fcounty").SetAttr("name", "county")
-	jq("#fcounty").Show()
-	jq("#lcounty").SetHtml("Hit City")
+	jq("#stateProvince").Hide()
+	jq("#rCounty").Hide()
+	jq("#rZIP").Hide()
+	jq("#lcity").SetHtml("Hit City")
 }
 
 func usCounty(county string) {
-	jq("#fcounty").SetAttr("name", "_fcounty")
-	jq("#fcounty").Hide()
-	jq("#scounty").SetAttr("name", "county")
-	jq("#scounty").Show()
-	jq("#lcounty").SetHtml("Hit County")
+	jq("#stateProvince").Show()
+	jq("#rCounty").Show()
+	jq("#rZIP").Show()
+	jq("#lcity").SetHtml("Hit City (optional)")
 }
 
 func clearSelect(objId string, firstSelected bool) {
