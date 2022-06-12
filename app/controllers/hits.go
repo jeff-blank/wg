@@ -127,8 +127,8 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, entdate) values ($1, $2, $3, $4, $5)`
-	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, entdate=$4 where id=$5`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, city, zip, entdate) values ($1, $2, $3, $4, $5, $6)`
+	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, city=$4, zip=$5, entdate=$6 where id=$7`
 
 	// }}}
 
@@ -334,6 +334,8 @@ func (c Hits) Create() revel.Result {
 	country := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), "")
 	state := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), "")
 	county := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), "")
+	city := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["city"][0], ""), "")
+	zip, _ := strconv.Atoi(app.RE_nonNumeric.ReplaceAllString(c.Params.Form["zip"][0], ""))
 
 	serial := dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["serial"][0], ""))
 	if !app.RE_serial.MatchString(serial) {
@@ -408,6 +410,9 @@ func (c Hits) Create() revel.Result {
 		} else if err != nil {
 			revel.AppLog.Errorf("is first county hit? err=%#v", err)
 		}
+	} else {
+		state = "--"
+		county = "--"
 	}
 	flashJson, err := json.Marshal(infoFlash)
 	if err == nil {
@@ -445,7 +450,7 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
-	res, err := app.DB.Exec(S_INSERT_HIT, bId, country, state, county, entdate)
+	res, err := app.DB.Exec(S_INSERT_HIT, bId, country, state, county, city, zip, entdate)
 	if err != nil {
 		revel.AppLog.Errorf("insert new hit: %#v", err)
 		return c.RenderText(err.Error())
@@ -493,14 +498,16 @@ func (c Hits) Update() revel.Result {
 	if delHit == "on" {
 		err = del(id)
 	} else {
-		country := c.Params.Get("country")
-		state := c.Params.Get("state")
-		county := c.Params.Get("county")
+		country := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["country"][0], ""), "")
+		state := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["state"][0], ""), "")
+		county := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["county"][0], ""), "")
+		city := app.RE_trailingWhitespace.ReplaceAllString(app.RE_leadingWhitespace.ReplaceAllString(c.Params.Form["city"][0], ""), "")
+		zip, _ := strconv.Atoi(app.RE_nonNumeric.ReplaceAllString(c.Params.Form["zip"][0], ""))
 		date := fmt.Sprintf("%s-%s-%s", year, c.Params.Get("month"), c.Params.Get("day"))
 		if !app.RE_date.MatchString(date) {
 			return c.RenderText("error in date '" + date + "'")
 		}
-		err = update(id, country, state, county, date)
+		err = update(id, country, state, county, city, zip, date)
 	}
 	if err != nil {
 		return c.RenderText(fmt.Sprintf("edit/delete of hit '%s' failed: %s", id, err.Error()))
@@ -608,13 +615,17 @@ func del(id string) error {
 	return nil
 }
 
-func update(id, country, state, county, date string) error {
+func update(id, country, state, county, city string, zip int, date string) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
-	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, date, id)
+	if country != "US" {
+		state = "--"
+		county = "--"
+	}
+	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, city, zip, date, id)
 	if err != nil {
 		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)
-		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s'",
-			S_UPDATE_HIT, country, state, county, date, id)
+		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s', '%s'",
+			S_UPDATE_HIT, country, state, county, city, date, id)
 		return err
 	}
 	n, err := res.RowsAffected()

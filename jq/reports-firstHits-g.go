@@ -35,7 +35,7 @@ func getShowHits(data interface{}) {
 		href := jq("<a/>").SetAttr("href", billUrl).AddClass("newWin").SetHtml(entry["EntDate"].(string))
 		jq("<td/>").SetAttr("id", "l_"+strconv.Itoa(cellNum)).AddClass("c_date bordered").Append(href).AppendTo(row)
 		jq("<td/>").SetAttr("id", "s_"+strconv.Itoa(cellNum)).AddClass("c_state bordered").SetHtml(entry["State"].(string)).AppendTo(row)
-		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_county bordered").SetHtml(entry["CountyCity"].(string)).AppendTo(row)
+		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_county bordered").SetHtml(entry["County"].(string)).AppendTo(row)
 
 		table.Append(row)
 		i--
