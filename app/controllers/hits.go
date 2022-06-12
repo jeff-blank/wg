@@ -127,7 +127,7 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, city, zip, entdate) values ($1, $2, $3, $4, $5, $6)`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7)`
 	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, city=$4, zip=$5, entdate=$6 where id=$7`
 
 	// }}}
