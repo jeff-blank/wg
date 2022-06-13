@@ -154,6 +154,7 @@ func (c Hits) Index() revel.Result {
 	filterCountry := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("country"), `\$1`), `''`)
 	filterState := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("state"), `\$1`), `''`)
 	filterCounty := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("county"), `\$1`), `''`)
+	filterCity := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("city"), `\$1`), `''`)
 	filterYear := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("year"), `\$1`), `''`)
 	filterSort := c.Params.Get("sort")
 
@@ -168,11 +169,20 @@ func (c Hits) Index() revel.Result {
 	if filterCountry != `` {
 		where += ` and country = '` + filterCountry + `'`
 	}
-	if filterState != `` {
+	if filterState == `==` {
+		filterState = ``
+	}
+	if (filterCountry == `US` || filterCountry == `Canada`) && filterState != `` {
 		where += ` and state = '` + filterState + `'`
 	}
-	if filterCounty != `` {
+	if filterCounty == `==` {
+		filterCounty = ``
+	}
+	if filterCountry == `US` && filterCounty != `` {
 		where += ` and county = '` + filterCounty + `'`
+	}
+	if filterCity != `` {
+		where += ` and city = '` + filterCity + `'`
 	}
 	if filterYear != `` {
 		var year string
