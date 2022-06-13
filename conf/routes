@@ -44,6 +44,9 @@ GET     /charts/:mapName                        Charts.Grapher
 GET     /login                                  Login.Index
 GET     /logout                                 Login.Logout
 POST    /login                                  Login.Login
+#GET     /settings                               Settings.Index
+#GET     /settings/WGLogin                       Settings.WGLoginForm
+#POST    /settings/WGLogin                       Settings.WGLogin
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
