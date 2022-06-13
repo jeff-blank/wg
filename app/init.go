@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"net/http"
 	re "regexp"
 	"time"
 
@@ -91,6 +92,21 @@ type DateSelData struct {
 	Years  []int
 	Months [12]string
 	Days   []string
+}
+
+type TZRec struct {
+	TZDescr  string
+	TZString string
+}
+
+type UserPrefs struct {
+	TZString string
+	WGCreds  string
+}
+
+type WGCreds struct {
+	MID     http.Cookie
+	UserKey http.Cookie
 }
 
 const (
