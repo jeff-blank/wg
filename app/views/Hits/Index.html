@@ -84,7 +84,7 @@
     </tr>
       {{ range .hits }}
       <tr>
-        <td class="bordered aright"><a href="hits/{{.Id}}/edit">{{.Index}}</a></td>
+        <td class="bordered aright"><a class="hitEdit" href="hits/{{.Id}}/edit">{{.Index}}</a></td>
         <td class="bordered aright">{{.Denom}}</td>
         <td class="bordered mono"><a href="bills/{{.BillId}}/edit">{{.Serial}}/{{.Series}}</a> ({{.Count}})</td>
         <td class="bordered"><a class="newWin" href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
@@ -97,5 +97,6 @@
 </div>
 
 <script src="/public/js/newWin-g.js"></script>
+<script src="/public/js/hits-index-g.js"></script>
 
 {{template "footer.html" .}}
