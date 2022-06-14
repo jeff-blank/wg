@@ -8,6 +8,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/jeff-blank/wg/app"
 	"github.com/jeff-blank/wg/app/routes"
@@ -16,17 +17,21 @@ import (
 
 const WG_LOGIN_URL = "https://www.wheresgeorge.com/logon.php"
 
+//const WG_LOGIN_URL = "http://test2.mr-happy.com/tmp.php"
+
 type Settings struct {
 	*revel.Controller
 }
 
 func (c Settings) Index() revel.Result {
 	var (
-		userTZ  string
-		tz      string
-		tzDescr string
-		tzList  []app.TZRec
-		prefs   app.UserPrefs
+		userTZ    string
+		tz        string
+		tzDescr   string
+		tzList    []app.TZRec
+		prefs     app.UserPrefs
+		wgCookies app.WGCreds
+		userTZLoc *time.Location
 	)
 
 	rows, err := app.DB.Query(`select display_name, tz_name from tz order by display_name`)
@@ -47,11 +52,35 @@ func (c Settings) Index() revel.Result {
 	if prefs_a != nil {
 		prefs = prefs_a[0]
 	}
-	haveWgSiteCreds := (prefs.WGCreds != "")
+
+	if prefs.TZString != "" {
+		userTZLoc, err = time.LoadLocation(prefs.TZString)
+		if err != nil {
+			return c.RenderError(err)
+		}
+	} else {
+		userTZLoc = time.Local
+	}
+
+	wgCredsStatus := "Not logged in"
+	if prefs.WGCreds != "" {
+		err := json.Unmarshal([]byte(prefs.WGCreds), &wgCookies)
+		if err != nil {
+			return c.RenderError(err)
+		}
+		now := time.Now()
+		wgCredsExpire := wgCookies.UserKey.Expires
+		if now.After(wgCredsExpire) {
+			wgCredsStatus = "Login session expired"
+		} else {
+			wgCredsStatus = "Logged in until " + wgCredsExpire.In(userTZLoc).Format(app.DATE_TIME_LAYOUT)
+		}
+	}
 	wgLoginFormUrl := routes.Settings.WGLoginForm()
+	userTZ = prefs.TZString
 	//clearWgLoginUrl := routes.Settings.ClearWGLogin()
 	clearWgLoginUrl := ""
-	return c.Render(tzList, userTZ, haveWgSiteCreds, wgLoginFormUrl, clearWgLoginUrl)
+	return c.Render(tzList, userTZ, wgCredsStatus, wgLoginFormUrl, clearWgLoginUrl)
 }
 
 func (c Settings) WGLoginForm() revel.Result {
@@ -71,6 +100,12 @@ func (c Settings) WGLogin() revel.Result {
 		"email":    {email},
 		"password": {pw},
 		"duration": {"8760"},
+		"go":       {"Log On"},
+	}
+
+	urlObj, err := url.Parse(WG_LOGIN_URL)
+	if err != nil {
+		return c.RenderError(err)
 	}
 
 	prefs, err := getPrefs()
@@ -81,31 +116,57 @@ func (c Settings) WGLogin() revel.Result {
 	jar, err := cookiejar.New(nil)
 
 	browser := &http.Client{Jar: jar}
-	req, err := http.NewRequest("POST", WG_LOGIN_URL, strings.NewReader(formData.Encode()))
-	if err != nil {
-		return c.RenderError(err)
-	}
-
+	req, err := http.NewRequest("GET", WG_LOGIN_URL, strings.NewReader(formData.Encode()))
 	req.Header.Set("User-Agent", `Mozilla/5.0 (Windows NT 6.3; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36`)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response, err := browser.Do(req)
 	if err != nil {
 		return c.RenderError(err)
 	}
-	//cookies := response.Cookies()
-	urlObj, err := url.Parse(WG_LOGIN_URL)
+	foundMid := false
+	for _, cookie := range jar.Cookies(urlObj) {
+		if cookie.Name == "mid" {
+			tmp := make([]*http.Cookie, 1)
+			tmp[0] = cookie
+			jar.SetCookies(urlObj, tmp)
+			foundMid = true
+			break
+		}
+	}
+	if !foundMid {
+		errMsg := "cookie 'mid' not found in response from " + WG_LOGIN_URL
+		revel.AppLog.Error(errMsg)
+		return c.RenderError(errors.New(errMsg))
+	}
+	//jar.SetCookies(urlObj, []*http.Cookie{{}}
+	req, err = http.NewRequest("POST", WG_LOGIN_URL, strings.NewReader(formData.Encode()))
 	if err != nil {
 		return c.RenderError(err)
 	}
-	cookies := jar.Cookies(urlObj)
+
+	req.Header.Set("User-Agent", `Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36`)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Referer", WG_LOGIN_URL)
+	response, err = browser.Do(req)
+	if err != nil {
+		return c.RenderError(err)
+	}
+	cookies := response.Cookies()
 	revel.AppLog.Debugf("%d cookies: %#v", len(cookies), cookies)
-	revel.AppLog.Debugf("headers: %#v", response.Header)
+	revel.AppLog.Debugf("status: %s; headers: %#v", response.Status, response.Header)
 	for _, cookie := range cookies {
 		if cookie.Name == "mid" {
 			creds.MID = *cookie
+			revel.AppLog.Debugf("mid cookie: %#v", cookie)
 		} else if cookie.Name == "userkey" {
 			creds.UserKey = *cookie
+			revel.AppLog.Debugf("userkey cookie: %#v", cookie)
 		}
+	}
+
+	if creds.UserKey.Name == "" {
+		errMsg := "no 'userkey' cookie returned"
+		revel.AppLog.Error(errMsg)
+		return c.RenderError(errors.New(errMsg))
 	}
 
 	if prefs != nil {
@@ -168,6 +229,5 @@ func getPrefs() ([]app.UserPrefs, error) {
 	}
 	prefs := make([]app.UserPrefs, 1)
 	prefs[0] = app.UserPrefs{TZString: tz, WGCreds: creds}
-	revel.AppLog.Debugf("getPrefs(): returning prefs: %#v", prefs)
 	return prefs, nil
 }
