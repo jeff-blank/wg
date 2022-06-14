@@ -3,11 +3,11 @@
 
 <h1>Settings</h1>
 {{ $userTZ := "" }}
-{{ if eq .userTZ "" }}{{ $userTZ = "New_York" }}{{ else }}{{ $userTZ = .userTZ }}{{ end }}
+{{ if eq .userTZ "" }}{{ $userTZ = "US/Eastern" }}{{ else }}{{ $userTZ = .userTZ }}{{ end }}
 
 <table>
   <tr>
-    <td class="rpad1em">time zone</td>
+    <td class="rpad1em">Your time zone</td>
     <td class="rpad1em">
       <select>{{ range .tzList }}
         <option value="{{.TZString}}"{{if eq .TZString $userTZ}} selected="selected"{{end}}>{{.TZDescr}}</option>{{end}}
@@ -16,9 +16,9 @@
     <td></td>
   </tr>
   <tr>
-    <td class="rpad1em">wg site cookie</td>
+    <td class="rpad1em"><cite>Where's George?</cite> login status</td>
     <td class="rpad1em">
-      {{ if eq .haveWgSiteCreds true }}Logged in until ...{{ else }}Not logged in{{ end }}
+      {{ .wgCredsStatus }}
     </td>
     <td>
       <a href="{{ .wgLoginFormUrl }}">Log in/refresh login</a><div><a href="{{ .clearWgLoginUrl }}">Remove Access</a></div>
