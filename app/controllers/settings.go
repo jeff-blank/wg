@@ -8,10 +8,10 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/jeff-blank/wg/app"
 	"github.com/jeff-blank/wg/app/routes"
+	"github.com/jeff-blank/wg/app/util"
 	"github.com/revel/revel"
 )
 
@@ -25,27 +25,16 @@ type Settings struct {
 
 func (c Settings) Index() revel.Result {
 	var (
-		userTZ    string
-		tz        string
-		tzDescr   string
-		tzList    []app.TZRec
-		prefs     app.UserPrefs
-		wgCookies app.WGCreds
-		userTZLoc *time.Location
+		userTZ string
+		prefs  app.UserPrefs
 	)
 
-	rows, err := app.DB.Query(`select display_name, tz_name from tz order by display_name`)
+	tzList, err := util.GetTZList()
 	if err != nil {
 		return c.RenderError(err)
 	}
-	for rows.Next() {
-		err = rows.Scan(&tzDescr, &tz)
-		if err != nil {
-			return c.RenderError(err)
-		}
-		tzList = append(tzList, app.TZRec{TZDescr: tzDescr, TZString: tz})
-	}
-	prefs_a, err := getPrefs()
+
+	prefs_a, err := util.GetPrefs()
 	if err != nil {
 		return c.RenderError(err)
 	}
@@ -53,28 +42,9 @@ func (c Settings) Index() revel.Result {
 		prefs = prefs_a[0]
 	}
 
-	if prefs.TZString != "" {
-		userTZLoc, err = time.LoadLocation(prefs.TZString)
-		if err != nil {
-			return c.RenderError(err)
-		}
-	} else {
-		userTZLoc = time.Local
-	}
-
-	wgCredsStatus := "Not logged in"
-	if prefs.WGCreds != "" {
-		err := json.Unmarshal([]byte(prefs.WGCreds), &wgCookies)
-		if err != nil {
-			return c.RenderError(err)
-		}
-		now := time.Now()
-		wgCredsExpire := wgCookies.UserKey.Expires
-		if now.After(wgCredsExpire) {
-			wgCredsStatus = "Login session expired"
-		} else {
-			wgCredsStatus = "Logged in until " + wgCredsExpire.In(userTZLoc).Format(app.DATE_TIME_LAYOUT)
-		}
+	wgCredsStatus, err := util.GetWGCredsStatus(&prefs)
+	if err != nil {
+		return c.RenderError(err)
 	}
 	wgLoginFormUrl := routes.Settings.WGLoginForm()
 	userTZ = prefs.TZString
@@ -108,7 +78,7 @@ func (c Settings) WGLogin() revel.Result {
 		return c.RenderError(err)
 	}
 
-	prefs, err := getPrefs()
+	prefs, err := util.GetPrefs()
 	if err != nil {
 		return c.RenderError(err)
 	}
@@ -194,40 +164,4 @@ func (c Settings) WGLogin() revel.Result {
 		return c.RenderText("error:" + " " + errMsg)
 	}
 	return c.Redirect(routes.Settings.Index())
-}
-
-func getPrefs() ([]app.UserPrefs, error) {
-	var tz, creds string
-
-	rows, err := app.DB.Query(`select coalesce(tz, '') as tz, coalesce(wg_site_creds, '') from user_prefs`)
-	if err != nil {
-		if err.Error() != app.SQL_ERR_NO_ROWS {
-			return nil, err
-		} else {
-			// no rows found
-			revel.AppLog.Debug("getPrefs(): no rows selected")
-			return nil, nil
-		}
-	}
-	i := 0
-	for rows.Next() {
-		i++
-		if i > 1 {
-			errMsg := "getPrefs(): found at least 2 rows"
-			revel.AppLog.Error(errMsg)
-			return nil, errors.New(errMsg)
-		}
-		err = rows.Scan(&tz, &creds)
-		if err != nil {
-			return nil, err
-		}
-	}
-	revel.AppLog.Debugf("getPrefs(): found %d rows", i)
-	if i == 0 {
-		revel.AppLog.Debug("getPrefs(): no rows found")
-		return nil, nil
-	}
-	prefs := make([]app.UserPrefs, 1)
-	prefs[0] = app.UserPrefs{TZString: tz, WGCreds: creds}
-	return prefs, nil
 }

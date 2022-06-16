@@ -144,3 +144,19 @@ div.tableCell {
   padding-right: 1em;
   margin: 1px;
 }
+
+.startOff {
+  display: none;
+}
+
+.savedBlip {
+  background-color: #40a040;
+  color: white;
+  text-align: center;
+}
+
+.notSavedBlip {
+  background-color: #b07000;
+  color: white;
+  text-align: center;
+}
