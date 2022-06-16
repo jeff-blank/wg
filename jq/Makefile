@@ -9,7 +9,8 @@ JQSRC=          \
 		${JSDIR}/hits-edit-g.js \
 		${JSDIR}/hits-index-g.js \
 		${JSDIR}/masterStats-g.js \
-		${JSDIR}/reports-firstHits-g.js
+		${JSDIR}/reports-firstHits-g.js \
+		${JSDIR}/settings-index-g.js
 
 all:  ${JQSRC}
 
