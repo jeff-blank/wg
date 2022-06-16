@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"net/http"
 	re "regexp"
 	"time"
 
@@ -93,11 +94,27 @@ type DateSelData struct {
 	Days   []string
 }
 
+type TZRec struct {
+	TZDescr  string
+	TZString string
+}
+
+type UserPrefs struct {
+	TZString string
+	WGCreds  string
+}
+
+type WGCreds struct {
+	MID     http.Cookie
+	UserKey http.Cookie
+}
+
 const (
-	SQL_ERR_NO_ROWS = `sql: no rows in result set`
-	DATE_LAYOUT     = `2006-01-02`
-	START_YEAR      = 2003
-	START_MONTH     = time.November
+	SQL_ERR_NO_ROWS  = `sql: no rows in result set`
+	DATE_LAYOUT      = `2006-01-02`
+	DATE_TIME_LAYOUT = `2006-01-02 15:04:05 MST`
+	START_YEAR       = 2003
+	START_MONTH      = time.November
 
 	// SQL queries {{{
 	Q_HITS = `

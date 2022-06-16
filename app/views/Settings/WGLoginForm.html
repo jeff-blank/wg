@@ -1,0 +1,33 @@
+{{set . "title" "WG Utils 2.0: Where's George? Login"}}
+{{template "header.html" .}}
+
+<h1><cite>Where's George?</cite> Login</h1>
+
+<p>Enter the e-mail address and password you normally use to log in at wheresgeorge.com.</p>
+<p>This information will <em>not</em> be stored at this site; only the browser cookie from
+<cite>Where's George?</cite> will be kept, and
+only for the purpose of retrieving information about a hit and auto-filling the hit-entry form.</p>
+
+<p>To remove this site's access to your <cite>Where's George?</cite> account, click the "Remove
+Access" link on the settings page.</p>
+
+<form action="{{ .wgLoginUrl }}" method="POST">
+  <table>
+    <tr>
+      <td class="rpad1em">E-mail address:</td>
+      <td><input type="text" name="email" size="32" maxlength="128"></td>
+    </tr>
+    <tr>
+      <td class="rpad1em">Password:</td>
+      <td><input type="password" name="password" size="32" maxlength="128"></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <input type="submit" value="Log in">
+        <input type="reset" value="Reset">
+      </td>
+    </tr>
+  </table>
+</form>
+
+{{template "footer.html" .}}

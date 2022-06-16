@@ -29,6 +29,8 @@ GET     /util/GetFirstHits                      Util.GetFirstHits
 GET     /util/GetResidences                     Util.GetResidences
 GET     /util/GetCurrentResidence               Util.GetCurrentResidence
 GET     /util/GetHitById                        Util.GetHitById
+GET     /util/SetTimeZone                       Util.SetTimeZone
+GET     /util/GetWGCredsStatus                  Util.GetWGCredsStatus
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
 GET     /entries/:key                           Entries.GetEntryByKey
@@ -44,6 +46,9 @@ GET     /charts/:mapName                        Charts.Grapher
 GET     /login                                  Login.Index
 GET     /logout                                 Login.Logout
 POST    /login                                  Login.Login
+GET     /settings                               Settings.Index
+GET     /settings/WGLogin                       Settings.WGLoginForm
+POST    /settings/WGLogin                       Settings.WGLogin
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
