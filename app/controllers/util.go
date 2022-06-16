@@ -52,21 +52,4 @@ func (c Util) GetHitById() revel.Result {
 	return c.RenderJSON(h[0])
 }
 
-func (c Util) SetTimeZone() revel.Result {
-	tz := c.Params.Get("tz")
-	err := util.SetTimeZone(tz)
-	if err != nil {
-		return c.RenderText(err.Error())
-	}
-	return c.RenderText("ok")
-}
-
-func (c Util) GetWGCredsStatus() revel.Result {
-	wgCredsStatus, err := util.GetWGCredsStatus(nil)
-	if err != nil {
-		return c.RenderText(err.Error())
-	}
-	return c.RenderText(wgCredsStatus)
-}
-
 // vim:foldmethod=marker:
