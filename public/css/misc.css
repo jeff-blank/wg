@@ -160,3 +160,7 @@ div.tableCell {
   color: white;
   text-align: center;
 }
+
+.fullWidthPlus {
+  min-width: 100%;
+}
