@@ -164,3 +164,7 @@ div.tableCell {
 .fullWidthPlus {
   min-width: 100%;
 }
+
+.brkTableCol {
+  min-width: 25%;
+}
