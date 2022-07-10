@@ -165,6 +165,17 @@ div.tableCell {
   min-width: 100%;
 }
 
-.brkTableCol {
-  min-width: 25%;
+@media only screen and (max-width: 719px) {
+  .brkTable {
+	min-width: 100%;
+  }
+}
+
+@media only screen and (min-width: 720px) {
+  .brkTable {
+	width: 100%;
+  }
+  .brkTableCol {
+	min-width: 25%;
+  }
 }
