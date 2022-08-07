@@ -12,7 +12,7 @@
     <tr>
       <td class="rpad1em">Denomination</td>
       <td>
-        $<select id="sdenom" name="denom">
+        $<select id="sdenom" name="denom"{{ if .hit }} disabled="disabled"{{end}}>
           <option value="0">--</option>
           <option value="1" selected="selected">1</option>
           <option value="2">2</option>
