@@ -110,6 +110,8 @@ func (c Reports) MasterStats() revel.Result {
 
 	tableIn = util.StatsData("table").([]map[string]interface{})
 
+	hitsLink := routes.Hits.Index() + "?year="
+
 	for m, monthData := range tableIn {
 		month := monthData["month"]
 		ents := monthData["monthBills"]
@@ -128,7 +130,7 @@ func (c Reports) MasterStats() revel.Result {
 	graphLinks["score"] = routes.Charts.Grapher("score")
 	graphLinks["hits"] = routes.Charts.Grapher("hits")
 	graphLinks["bills"] = routes.Charts.Grapher("bills")
-	return c.Render(tableOut, entsLink, graphLinks)
+	return c.Render(tableOut, entsLink, graphLinks, hitsLink)
 }
 
 func (c Reports) FirstHits() revel.Result {
