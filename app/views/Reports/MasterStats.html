@@ -18,7 +18,7 @@
     <th id="c_yearHits" class="c_yearHits bordered">Year's<div>Hits</div></th>
   </tr>
   </table><div id="scroller" class="bordered scrollable"><table>
-  {{ $rowTint := "" }}{{ $entsLink := .entsLink }}{{ $monthNum := "" }}{{ $heavy := "" }}
+  {{ $rowTint := "" }}{{ $entsLink := .entsLink }}{{ $hitsLink := .hitsLink}}{{ $monthNum := "" }}{{ $heavy := "" }}
   {{ range $i, $v := .tableOut }}
   {{if even $i}}{{$rowTint = ""}}{{else}}{{$rowTint = " oddRow"}}{{end}}{{$entCell := index . "monthBills"}}{{$yrHitCell := index . "yearHits"}}{{$monthsInYear := index . "monthsInYear"}}{{$monthNum = slice (index . "month") 5 7}}{{if eq $monthNum "12"}}{{$heavy = " topBlack"}}{{end}}
   <tr>
@@ -31,7 +31,7 @@
     <td class="c_allBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ index . "cumulativeBills"}}</td>
     <td class="c_oneYrAvgMonthlyBills bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "oneYrAvgMonthlyBills") }}</td>
     <td class="c_score bordered aright{{$rowTint}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{ printf "%.2f" (index . "score") }}</td>
-    {{ if $monthsInYear }}<td class="c_yearHits bordered aright vmid" rowspan="{{$monthsInYear}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}>{{index . "yearHits"}}</td>{{end}}
+    {{ if $monthsInYear }}<td class="c_yearHits bordered aright vmid" rowspan="{{$monthsInYear}}"{{if eq $monthNum "12"}} style="border-top-color: black;"{{end}}><a target="_blank" href="{{$hitsLink}}{{slice (index . "month") 0 4}}">{{index . "yearHits"}}</a></td>{{end}}
   </tr>
   {{ end }}
 </table></div>
