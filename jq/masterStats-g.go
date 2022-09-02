@@ -58,6 +58,19 @@ func main() {
 
 	})
 
+	dom.GetWindow().AddEventListener("keydown", false, func(e dom.Event) {
+		ke := e.(*dom.KeyboardEvent)
+		if ke.KeyCode == 27 {
+			jq("#graphContainer").Hide()
+			jq("#dimmer").Hide()
+		}
+	})
+
+	jq("#dimmer").On(jquery.CLICK, func(e jquery.Event) {
+		jq("#graphContainer").Hide()
+		jq("#dimmer").Hide()
+	})
+
 	jq("#graphDismiss").On(jquery.CLICK, func(e jquery.Event) {
 		jq("#graphContainer").Hide()
 		jq("#dimmer").Hide()
