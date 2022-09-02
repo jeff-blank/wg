@@ -8,12 +8,16 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-const GRAPH_WIDTH = 0.8
+const (
+	GRAPH_WIDTH_DEFAULT = 0.8
+	GRAPH_WIDTH_MAX     = 1024.0
+)
 
 var jq = jquery.NewJQuery
 
 func main() {
 
+	graphWidth := GRAPH_WIDTH_DEFAULT
 	pagePct := 0.94
 	topElements := [1]string{"#h1"}
 	topExtra := 0
@@ -41,15 +45,21 @@ func main() {
 		wh := dom.GetWindow().InnerHeight()
 		iw := graph.Width()
 
-		graph.SetWidth(fmt.Sprintf("%d", int(GRAPH_WIDTH*float64(ww))))
+		graph.SetWidth(fmt.Sprintf("%d", int(graphWidth*float64(ww))))
 
 		iw = graph.Width()
+
+		if float64(iw) > GRAPH_WIDTH_MAX {
+			graphWidth = GRAPH_WIDTH_MAX / float64(ww)
+			graph.SetWidth(fmt.Sprintf("%d", int(graphWidth*float64(ww))))
+			iw = graph.Width()
+		}
 
 		imgLeft := int(float64(ww)/2) - iw/2
 		graph.SetCss("left", imgLeft)
 		graph.SetCss("top", int(float64(wh)*0.2))
 
-		marginPct := (1 - GRAPH_WIDTH) / 2
+		marginPct := (1 - graphWidth) / 2
 		dismiss.SetCss("left", int((1-marginPct)*float64(ww))+8)
 		dismiss.SetCss("top", int(float64(wh)*0.2))
 

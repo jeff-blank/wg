@@ -51,7 +51,6 @@ div.indexUSCounty, div.worldMap {
 #graph {
   position: fixed;
   width: 80%;
-  height: 448px;
   background-color: white;
   border: outset 4px;
 }
