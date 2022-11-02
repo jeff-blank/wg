@@ -336,7 +336,6 @@ func (c Hits) Create() revel.Result {
 		infoFlash  app.HitInfo
 		dateHits   int
 		countyHits int
-		zip        int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -346,12 +345,7 @@ func (c Hits) Create() revel.Result {
 	state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
 	county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
 	city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
-	zipStr := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
-	if zipStr == "" {
-		zip = -1
-	} else {
-		zip, _ = strconv.Atoi(zipStr)
-	}
+	zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
 
 	serial := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["serial"][0], ""))
 	if !app.RE_serial.MatchString(serial) {
@@ -505,7 +499,6 @@ func (c Hits) Update() revel.Result {
 	var (
 		err         error
 		updateFlash app.HitInfo
-		zip         int
 	)
 
 	year := c.Params.Get("year")
@@ -519,12 +512,7 @@ func (c Hits) Update() revel.Result {
 		state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
 		county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
 		city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
-		zipStr := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
-		if zipStr == "" {
-			zip = -1
-		} else {
-			zip, _ = strconv.Atoi(zipStr)
-		}
+		zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
 
 		date := fmt.Sprintf("%s-%s-%s", year, c.Params.Get("month"), c.Params.Get("day"))
 		if !app.RE_date.MatchString(date) {
@@ -638,7 +626,7 @@ func del(id string) error {
 	return nil
 }
 
-func update(id, country, state, county, city string, zip int, date string) error {
+func update(id, country, state, county, city string, zip string, date string) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
 	if country != "US" {
 		state = "--"

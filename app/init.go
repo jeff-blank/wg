@@ -25,7 +25,7 @@ type Hit struct {
 	State     string
 	County    string
 	City      string
-	ZIP       int
+	ZIP       string
 	Count     int
 }
 
@@ -131,7 +131,7 @@ const (
 			h.state,
 			h.county,
 			coalesce(h.city, '') as city,
-			coalesce(h.zip, -1) as zip,
+			coalesce(h.zip, '') as zip,
 			(select count(*) from hits where bill_id = b.id)
 		from
 			bills b,
