@@ -29,6 +29,7 @@ FROM alpine:latest
 
 COPY --from=builder /wg /wg
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY data /data/
 
 ARG TZ_B
 ENV TZ=$TZ_B

@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"io/ioutil"
 	"net/http"
 	re "regexp"
 	"time"
@@ -9,6 +10,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/revel/modules/server-engine/newrelic"
 	"github.com/revel/revel"
+	"gopkg.in/yaml.v2"
 )
 
 type Hit struct {
@@ -237,24 +239,7 @@ var (
 	BuildTime string
 
 	// my vars
-	SeriesByLetter = map[string]string{
-		"A": "1996",
-		"B": "1999",
-		"C": "2001",
-		"D": "2003",
-		"E": "2004",
-		"F": "2003A",
-		"G": "2004A",
-		"H": "2006",
-		"I": "2006",
-		"J": "2009",
-		"K": "2006A",
-		"L": "2009A",
-		"M": "2013",
-		"N": "2017",
-		"P": "2017A",
-		"Q": "2021",
-	}
+	SeriesByLetter map[string]string
 )
 
 var DB *sql.DB
@@ -300,6 +285,17 @@ func InitRE() {
 	RE_nonNumeric = re.MustCompile(`\D+`)
 }
 
+func InitSeries() {
+	yamlcfg, err := ioutil.ReadFile("data/seriesMap.yaml")
+	if err != nil {
+		revel.AppLog.Fatalf("read config file 'data/seriesMap.yaml': %v", err)
+	}
+
+	if err := yaml.Unmarshal(yamlcfg, &SeriesByLetter); err != nil {
+		revel.AppLog.Fatal("yaml.Unmarshal(): ", err)
+	}
+}
+
 func init() {
 	// Filters is the default set of global filters.
 	revel.Filters = []revel.Filter{
@@ -324,6 +320,7 @@ func init() {
 	// revel.OnAppStart(ExampleStartupScript)
 	revel.OnAppStart(InitDB)
 	revel.OnAppStart(InitRE)
+	revel.OnAppStart(InitSeries)
 	// revel.OnAppStart(FillCache)
 }
 
