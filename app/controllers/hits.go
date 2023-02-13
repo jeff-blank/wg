@@ -327,15 +327,14 @@ func dbSanitize(input string) string {
 
 func (c Hits) Create() revel.Result {
 	var (
-		bId        int
-		bSerial    string
-		bDenom     int
-		bSeries    string
-		bRptkey    string
-		series     string
-		infoFlash  app.HitInfo
-		dateHits   int
-		countyHits int
+		bId       int
+		bSerial   string
+		bDenom    int
+		bSeries   string
+		bRptkey   string
+		series    string
+		infoFlash app.HitInfo
+		dateHits  int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -394,22 +393,11 @@ func (c Hits) Create() revel.Result {
 		revel.AppLog.Errorf("is first date hit? err=%#v", err)
 	}
 	if country == "US" {
-		err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
-		if err == nil && countyHits == 0 {
+		if isNewCounty(state, county) {
 			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
-			rows, err := app.DB.Query(app.Q_BINGOS, state, county)
-			if err == nil {
-				infoFlash.CountyBingoNames = make([]string, 0)
-				defer rows.Close()
-				for rows.Next() {
-					var bingo string
-					err := rows.Scan(&bingo)
-					if err == nil {
-						infoFlash.CountyBingoNames = append(infoFlash.CountyBingoNames, bingo)
-					}
-				}
-			} else if err != nil {
-				revel.AppLog.Errorf("county in bingos err=%#v", err)
+			bingoNames := getBingoNames(state, county)
+			if len(bingoNames) > 0 {
+				infoFlash.CountyBingoNames = bingoNames
 			}
 			borderCounties, err := util.GetAdjacentWithHits(state, county)
 			if err != nil {
@@ -417,8 +405,6 @@ func (c Hits) Create() revel.Result {
 			} else {
 				infoFlash.AdjacentCounties = borderCounties
 			}
-		} else if err != nil {
-			revel.AppLog.Errorf("is first county hit? err=%#v", err)
 		}
 	} else {
 		state = "--"
@@ -650,6 +636,35 @@ func update(id, country, state, county, city string, zip string, date string) er
 		return err
 	}
 	return nil
+}
+
+func isNewCounty(state, county string) bool {
+	var countyHits int
+	err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
+	if err == nil && countyHits == 0 {
+		return true
+	}
+	return false
+}
+
+func getBingoNames(state, county string) []string {
+	bingos := make([]string, 0)
+	rows, err := app.DB.Query(app.Q_BINGOS, state, county)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var bingo string
+			err := rows.Scan(&bingo)
+			if err == nil {
+				bingos = append(bingos, bingo)
+			} else {
+				revel.AppLog.Errorf("county in bingos: fetch/scan row; err=%#v", err)
+			}
+		}
+	} else {
+		revel.AppLog.Errorf("county in bingos err=%#v", err)
+	}
+	return bingos
 }
 
 // vim:foldmethod=marker:
