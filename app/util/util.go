@@ -508,4 +508,13 @@ func GetWGCredsStatus(prefs_in *app.UserPrefs) (string, error) {
 	return wgCredsStatus, nil
 }
 
+func GetFRBFromSerial(serial string) string {
+	if app.RE_serial_11.MatchString(serial) {
+		return serial[1:2]
+	} else if app.RE_serial_10.MatchString(serial) {
+		return serial[:1]
+	}
+	return ""
+}
+
 // vim:foldmethod=marker:

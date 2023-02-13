@@ -74,6 +74,7 @@ type HitInfo struct {
 	FirstInCounty    string
 	CountyBingoNames []string
 	AdjacentCounties []string
+	HARFillers       []string
 	GenericMessage   string
 }
 

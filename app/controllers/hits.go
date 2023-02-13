@@ -327,15 +327,14 @@ func dbSanitize(input string) string {
 
 func (c Hits) Create() revel.Result {
 	var (
-		bId        int
-		bSerial    string
-		bDenom     int
-		bSeries    string
-		bRptkey    string
-		series     string
-		infoFlash  app.HitInfo
-		dateHits   int
-		countyHits int
+		bId       int
+		bSerial   string
+		bDenom    int
+		bSeries   string
+		bRptkey   string
+		series    string
+		infoFlash app.HitInfo
+		dateHits  int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -394,22 +393,11 @@ func (c Hits) Create() revel.Result {
 		revel.AppLog.Errorf("is first date hit? err=%#v", err)
 	}
 	if country == "US" {
-		err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
-		if err == nil && countyHits == 0 {
+		if isNewCounty(state, county) {
 			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
-			rows, err := app.DB.Query(app.Q_BINGOS, state, county)
-			if err == nil {
-				infoFlash.CountyBingoNames = make([]string, 0)
-				defer rows.Close()
-				for rows.Next() {
-					var bingo string
-					err := rows.Scan(&bingo)
-					if err == nil {
-						infoFlash.CountyBingoNames = append(infoFlash.CountyBingoNames, bingo)
-					}
-				}
-			} else if err != nil {
-				revel.AppLog.Errorf("county in bingos err=%#v", err)
+			bingoNames := getBingoNames(state, county)
+			if len(bingoNames) > 0 {
+				infoFlash.CountyBingoNames = bingoNames
 			}
 			borderCounties, err := util.GetAdjacentWithHits(state, county)
 			if err != nil {
@@ -417,12 +405,14 @@ func (c Hits) Create() revel.Result {
 			} else {
 				infoFlash.AdjacentCounties = borderCounties
 			}
-		} else if err != nil {
-			revel.AppLog.Errorf("is first county hit? err=%#v", err)
 		}
 	} else {
 		state = "--"
 		county = "--"
+	}
+	HARFillers := getHARFirsts(serial, series, denom)
+	if len(HARFillers) > 0 {
+		infoFlash.HARFillers = HARFillers
 	}
 	flashJson, err := json.Marshal(infoFlash)
 	if err == nil {
@@ -650,6 +640,117 @@ func update(id, country, state, county, city string, zip string, date string) er
 		return err
 	}
 	return nil
+}
+
+func isNewCounty(state, county string) bool {
+	var countyHits int
+	err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
+	if err == nil && countyHits == 0 {
+		return true
+	}
+	return false
+}
+
+func getBingoNames(state, county string) []string {
+	bingos := make([]string, 0)
+	rows, err := app.DB.Query(app.Q_BINGOS, state, county)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var bingo string
+			err := rows.Scan(&bingo)
+			if err == nil {
+				bingos = append(bingos, bingo)
+			} else {
+				revel.AppLog.Errorf("county in bingos: fetch/scan row; err=%#v", err)
+			}
+		}
+	} else {
+		revel.AppLog.Errorf("county in bingos err=%#v", err)
+	}
+	return bingos
+}
+
+func getHARFirsts(serial, series string, denom int) []string {
+	firsts := make([]string, 0)
+	frb := util.GetFRBFromSerial(serial)
+	block := serial[len(serial)-1:]
+	if isFirstSeriesDenom(series, denom) {
+		firsts = append(firsts, fmt.Sprintf("series %s / $%d", series, denom))
+	}
+	if isFirstFRBDenom(frb, denom) {
+		firsts = append(firsts, fmt.Sprintf("$%d / FRB %s", denom, frb))
+	}
+	if isFirstSeriesFRB(series, frb) {
+		firsts = append(firsts, "series "+series+" / FRB "+frb)
+	}
+	if isFirstFRBBlock(frb, block) {
+		firsts = append(firsts, "FRB/block letter "+frb+"-"+block)
+	}
+	if isFirstSeriesBlock(series, block) {
+		firsts = append(firsts, "series "+series+" / block letter "+block)
+	}
+	return firsts
+}
+
+func isFirstSeriesDenom(series string, denom int) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.denomination = $2`, series, denom).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstSeriesDenom(%s, %d): %#v", series, denom, err)
+	}
+	return false
+}
+
+func isFirstFRBDenom(frb string, denom int) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.serial like '%' || $1 || '_________' and b.denomination = $2`, frb, denom).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBDenom(%s, %d): %#v", frb, denom, err)
+	}
+	return false
+}
+
+func isFirstSeriesFRB(series, frb string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.serial like '%' || $2 || '_________'`, series, frb).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstSeriesFRB(%s, %s): %#v", series, frb, err)
+	}
+	return false
+}
+
+func isFirstFRBBlock(frb, block string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.serial like '%' || $1 || '________' || $2`, frb, block).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBBlock(%s, %s): %#v", frb, block, err)
+	}
+	return false
+}
+
+func isFirstSeriesBlock(series, block string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.serial like '%' || $2`, series, block).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBBlock(%s, %s): %#v", series, block, err)
+	}
+	return false
 }
 
 // vim:foldmethod=marker:
