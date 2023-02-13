@@ -410,6 +410,10 @@ func (c Hits) Create() revel.Result {
 		state = "--"
 		county = "--"
 	}
+	HARFillers := getHARFirsts(serial, series, denom)
+	if len(HARFillers) > 0 {
+		infoFlash.HARFillers = HARFillers
+	}
 	flashJson, err := json.Marshal(infoFlash)
 	if err == nil {
 		c.Flash.Out["info"] = string(flashJson)
@@ -665,6 +669,88 @@ func getBingoNames(state, county string) []string {
 		revel.AppLog.Errorf("county in bingos err=%#v", err)
 	}
 	return bingos
+}
+
+func getHARFirsts(serial, series string, denom int) []string {
+	firsts := make([]string, 0)
+	frb := util.GetFRBFromSerial(serial)
+	block := serial[len(serial)-1:]
+	if isFirstSeriesDenom(series, denom) {
+		firsts = append(firsts, fmt.Sprintf("series %s / $%d", series, denom))
+	}
+	if isFirstFRBDenom(frb, denom) {
+		firsts = append(firsts, fmt.Sprintf("$%d / FRB %s", denom, frb))
+	}
+	if isFirstSeriesFRB(series, frb) {
+		firsts = append(firsts, "series "+series+" / FRB "+frb)
+	}
+	if isFirstFRBBlock(frb, block) {
+		firsts = append(firsts, "FRB/block letter "+frb+"-"+block)
+	}
+	if isFirstSeriesBlock(series, block) {
+		firsts = append(firsts, "series "+series+" / block letter "+block)
+	}
+	return firsts
+}
+
+func isFirstSeriesDenom(series string, denom int) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.denomination = $2`, series, denom).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstSeriesDenom(%s, %d): %#v", series, denom, err)
+	}
+	return false
+}
+
+func isFirstFRBDenom(frb string, denom int) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.serial like '%' || $1 || '_________' and b.denomination = $2`, frb, denom).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBDenom(%s, %d): %#v", frb, denom, err)
+	}
+	return false
+}
+
+func isFirstSeriesFRB(series, frb string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.serial like '%' || $2 || '_________'`, series, frb).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstSeriesFRB(%s, %s): %#v", series, frb, err)
+	}
+	return false
+}
+
+func isFirstFRBBlock(frb, block string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.serial like '%' || $1 || '________' || $2`, frb, block).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBBlock(%s, %s): %#v", frb, block, err)
+	}
+	return false
+}
+
+func isFirstSeriesBlock(series, block string) bool {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.series = $1 and b.serial like '%' || $2`, series, block).Scan(&count)
+	if err == nil && count == 0 {
+		return true
+	} else if err != nil {
+		revel.AppLog.Errorf("isFirstFRBBlock(%s, %s): %#v", series, block, err)
+	}
+	return false
 }
 
 // vim:foldmethod=marker:
