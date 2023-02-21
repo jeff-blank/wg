@@ -203,13 +203,13 @@ func initializeForm() {
 				// show province picker and city text-input
 				jq("#stateProvince").Show()
 				jq("#lstate").SetHtml("Hit Province")
-				nonUsCity()
+				nonUsCity(false)
 				stateProvinceSelect("Canada", hitStrings["state"], "")
 			} else {
 				// hide state/province row; replace all options with single option "--"
 				jq("#stateProvince").Hide()
 				clearSelect("#sstate", true)
-				nonUsCity()
+				nonUsCity(true)
 			}
 			datesOfMonth(jquery.Event{}, hitStrings["entdate"])
 			residenceSelect(hitStrings["residence"])
@@ -224,8 +224,10 @@ func initializeForm() {
 	}
 }
 
-func nonUsCity() {
-	jq("#stateProvince").Hide()
+func nonUsCity(hideStateProvince bool) {
+	if hideStateProvince {
+		jq("#stateProvince").Hide()
+	}
 	jq("#rCounty").Hide()
 	jq("#rZIP").Hide()
 	jq("#lcity").SetHtml("Hit City")
@@ -329,13 +331,13 @@ func main() {
 			// show province picker and city text-input
 			jq("#stateProvince").Show()
 			jq("#lstate").SetHtml("Hit Province")
-			nonUsCity()
+			nonUsCity(false)
 			stateProvinceSelect("Canada", "", "")
 		} else {
 			// hide state/province row; replace all options with single option "--"
 			jq("#stateProvince").Hide()
 			clearSelect("#sstate", true)
-			nonUsCity()
+			nonUsCity(true)
 		}
 	})
 

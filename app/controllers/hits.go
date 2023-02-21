@@ -407,7 +407,9 @@ func (c Hits) Create() revel.Result {
 			}
 		}
 	} else {
-		state = "--"
+		if country != "Canada" {
+			state = "--"
+		}
 		county = "--"
 	}
 	HARFillers := getHARFirsts(serial, series, denom)
@@ -619,7 +621,9 @@ func del(id string) error {
 func update(id, country, state, county, city string, zip string, date string) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
 	if country != "US" {
-		state = "--"
+		if country != "Canada" {
+			state = "--"
+		}
 		county = "--"
 	}
 	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, city, zip, date, id)
