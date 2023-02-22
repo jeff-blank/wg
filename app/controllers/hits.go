@@ -110,7 +110,7 @@ const (
 			country
 	`
 
-	Q_REGION_BREAKDOWN = `
+	Q_REGION_BREAKDOWN_US = `
 		select
 			county,
 			count(1)
@@ -124,6 +124,22 @@ const (
 		order by
 			count desc,
 			county
+	`
+
+	Q_REGION_BREAKDOWN_INTL = `
+		select
+			city as county,
+			count(1)
+		from
+			hits
+		where
+			country = $1 and
+			state = $2
+		group by
+			city
+		order by
+			count desc,
+			city
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
@@ -285,7 +301,11 @@ func (c Hits) Breakdown() revel.Result {
 }
 
 func (c Hits) ShowBrk() revel.Result {
-	var state string
+	var (
+		state string
+		rows  *sql.Rows
+		err   error
+	)
 
 	results := make([]app.HitsBrkEnt, 0)
 	country := c.Params.Get("country")
@@ -295,7 +315,11 @@ func (c Hits) ShowBrk() revel.Result {
 		state = "--"
 	}
 
-	rows, err := app.DB.Query(Q_REGION_BREAKDOWN, country, state)
+	if country == "US" {
+		rows, err = app.DB.Query(Q_REGION_BREAKDOWN_US, country, state)
+	} else {
+		rows, err = app.DB.Query(Q_REGION_BREAKDOWN_INTL, country, state)
+	}
 	if err != nil {
 		msg := fmt.Sprintf("query breakdown: %#v", err)
 		revel.AppLog.Error(msg)
