@@ -517,4 +517,13 @@ func GetFRBFromSerial(serial string) string {
 	return ""
 }
 
+func GetStateCountyCityFromZIP(zip string) (string, string, string, error) {
+	var state, county, city string
+	err := app.DB.QueryRow(`select state, county, city from hits where zip=$1`, zip).Scan(&state, &county, &city)
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		return "", "", "", err
+	}
+	return state, county, city, nil
+}
+
 // vim:foldmethod=marker:
