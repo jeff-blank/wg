@@ -59,6 +59,8 @@ github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqO
 github.com/blend/go-sdk v1.20211204.3 h1:Bgj+Z79Q0toRE/hR2Tsdck+XSiwajTg8bGRF2enQ4yI=
 github.com/blend/go-sdk v1.20211204.3/go.mod h1:nbmX7cdPm66JOqg6M3cKMtuqj6RzkE72sHZue61T5c0=
 github.com/blend/sentry-go v1.0.1/go.mod h1:hgyX3WXen2YBiA0NitlfsXsvS+9ly2YlEBmmmYDgrWY=
+github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
+github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874/go.mod h1:r5xuitiExdLAJ09PR7vBVENGvp4ZuTBeWTGtxuX3K+c=
 github.com/casbin/casbin v1.9.1/go.mod h1:z8uPsfBJGUsnkagrt3G8QvjgTKFMBJ32UP8HpZllfog=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
