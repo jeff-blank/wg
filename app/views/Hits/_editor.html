@@ -32,6 +32,12 @@
       <td class="rpad1em">Hit Country</td>
       <td><input type="text" name="country" id="fcountry" size="15" maxlength="64" value="{{ if .hit }}{{ .hit.Country }}{{ else }}US{{ end }}"></td>
     </tr>
+    <tr id="rZIP">
+      <td id="lzip" class="rpad1em">Hit ZIP (optional)</td>
+      <td id="cZIP">
+        <input type="text" id="fzip" name="zip" value="{{ .hit.ZIP }}" size="6" maxlength="5">
+      </td>
+    </tr>
     <tr id="stateProvince">
       <td id="lstate" class="rpad1em">Hit State</td>
       <td id="cstate"><select id="sstate" name="state"><option>--</option></select></td>
@@ -46,12 +52,6 @@
       <td id="lcity" class="rpad1em">Hit City (optional)</td>
       <td id="ccity">
         <input type="text" id="fcity" name="city" value="{{ .hit.City }}" size="15" maxlength="64">
-      </td>
-    </tr>
-    <tr id="rZIP">
-      <td id="lzip" class="rpad1em">Hit ZIP (optional)</td>
-      <td id="cZIP">
-        <input type="text" id="fzip" name="zip" value="{{ .hit.ZIP }}" size="6" maxlength="5">
       </td>
     </tr>
     <tr>

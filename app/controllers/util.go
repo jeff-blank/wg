@@ -69,4 +69,13 @@ func (c Util) GetWGCredsStatus() revel.Result {
 	return c.RenderText(wgCredsStatus)
 }
 
+func (c Util) GetStateCountyCityFromZIP() revel.Result {
+	zip := c.Params.Get("zip")
+	state, county, city, err := util.GetStateCountyCityFromZIP(zip)
+	if err != nil {
+		return c.RenderText(err.Error())
+	}
+	return c.RenderJSON(map[string]string{"state": state, "county": county, "city": city})
+}
+
 // vim:foldmethod=marker:

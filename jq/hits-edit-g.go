@@ -319,6 +319,26 @@ func main() {
 		}
 	})
 
+	zipLocation := make(map[string]string)
+	jq("#fzip").On(jquery.CHANGE, func(e jquery.Event) {
+		jquery.When(jquery.Get("/util/GetStateCountyCityFromZIP?zip="+jq("#fzip").Val(), func(data interface{}) {
+			sc_in := data.(map[string]interface{})
+			zipLocation["state"] = string(sc_in["state"].(string))
+			zipLocation["county"] = string(sc_in["county"].(string))
+			zipLocation["city"] = string(sc_in["city"].(string))
+			if zipLocation["state"] != "" {
+				clearSelect("#sstate", true)
+				clearSelect("#scounty", true)
+			}
+		})).Done(func() {
+			if zipLocation["state"] != "" {
+				stateProvinceSelect("US", zipLocation["state"], zipLocation["county"])
+			}
+			jq("#fcity").SetVal(zipLocation["city"])
+		})
+
+	})
+
 	jq("#fcountry").On(jquery.CHANGE, func(e jquery.Event) {
 		country := jq(e.Target).Val()
 		if country == "US" {
