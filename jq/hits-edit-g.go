@@ -20,27 +20,30 @@ func stateProvinceSelect(country, defState, defCounty string) {
 	var homeState string
 
 	clearSelect("#sstate", false)
-	if country == "US" {
-		jquery.Get("/util/GetHomeState", func(data interface{}) {
-			homeState = data.(string)
+
+	if country == "US" || country == "Canada" {
+		jquery.When(jquery.Get("/util/GetHomeState", func(data interface{}) {
+			if country == "US" {
+				homeState = data.(string)
+			}
+		})).Done(func() {
+			jquery.When(jquery.Get("/util/StatesProvinces?country="+country, func(data interface{}) {
+				sel := jq("#sstate")
+				for _, state := range data.([]interface{}) {
+					sel.Append(jq(`<option>`).SetText(state.(string)))
+					if state == defState || (defState == "" && state == homeState) {
+						sel.Children("option").Last().SetAttr("selected", "selected")
+					}
+				}
+			})).Done(func() {
+				state := jq("#sstate").Val()
+				countySelect(state, defCounty)
+			})
 		})
-	} else if country != "Canada" {
+	} else {
 		jq("#cstate").SetHtml(`<div>unexpected country "` + country + `"</div>`)
 		homeState = "--"
 	}
-
-	jquery.When(jquery.Get("/util/StatesProvinces?country="+country, func(data interface{}) {
-		sel := jq("#sstate")
-		for _, state := range data.([]interface{}) {
-			sel.Append(jq(`<option>`).SetText(state.(string)))
-			if state == defState || (defState == "" && state == homeState) {
-				sel.Children("option").Last().SetAttr("selected", "selected")
-			}
-		}
-	})).Done(func() {
-		state := jq("#sstate").Val()
-		countySelect(state, defCounty)
-	})
 }
 
 func countySelect(defState, defCounty string) {
