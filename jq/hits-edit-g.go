@@ -336,8 +336,10 @@ func main() {
 		})).Done(func() {
 			if zipLocation["state"] != "" {
 				stateProvinceSelect("US", zipLocation["state"], zipLocation["county"])
+				if zipLocation["city"] != "" {
+					jq("#fcity").SetVal(zipLocation["city"])
+				}
 			}
-			jq("#fcity").SetVal(zipLocation["city"])
 		})
 
 	})
