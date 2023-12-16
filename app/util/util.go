@@ -120,6 +120,20 @@ func GetCounties(state string) ([]app.Region, error) {
 	return counties, nil
 }
 
+func GetCountyById(id int) (app.USCounty, error) {
+	var (
+		id_db  int
+		state  string
+		county string
+	)
+	err := app.DB.QueryRow(`select id, state, county from counties_master where id=$1`, id).Scan(&id_db, &state, &county)
+	if err != nil {
+		revel.AppLog.Error(err.Error())
+		return app.USCounty{}, err
+	}
+	return app.USCounty{Id: id_db, State: state, County: county}, nil
+}
+
 func GetHomeRegion(regionColumn string) string {
 	var homeRegion string
 

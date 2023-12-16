@@ -54,6 +54,12 @@ type Region struct {
 	Region string
 }
 
+type USCounty struct {
+	Id     int
+	State  string
+	County string
+}
+
 type BingoSummary struct {
 	Id    int
 	Label string
