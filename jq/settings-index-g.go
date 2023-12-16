@@ -24,9 +24,6 @@ func main() {
 				jq("#d_saveStatus").SetHtml("Error; not saved")
 				log.Print(data.(string))
 			}
-			jquery.Get(`/util/GetWGCredsStatus`, func(dataExpire interface{}) {
-				jq("#credsStatus").SetHtml(dataExpire.(string))
-			})
 			jq("#d_saveStatus").FadeIn(500)
 			time.AfterFunc(time.Second*3, func() {
 				jq("#d_saveStatus").FadeOut(1000)

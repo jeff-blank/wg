@@ -1,7 +1,6 @@
 package util
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -429,9 +428,9 @@ func SetTimeZone(tz_in string) error {
 }
 
 func GetPrefs() ([]app.UserPrefs, error) {
-	var tz, creds string
+	var tz string
 
-	rows, err := app.DB.Query(`select coalesce(tz, '') as tz, coalesce(wg_site_creds, '') from user_prefs`)
+	rows, err := app.DB.Query(`select coalesce(tz, '') as tz from user_prefs`)
 	if err != nil {
 		if err.Error() != app.SQL_ERR_NO_ROWS {
 			return nil, err
@@ -449,7 +448,7 @@ func GetPrefs() ([]app.UserPrefs, error) {
 			revel.AppLog.Error(errMsg)
 			return nil, errors.New(errMsg)
 		}
-		err = rows.Scan(&tz, &creds)
+		err = rows.Scan(&tz)
 		if err != nil {
 			return nil, err
 		}
@@ -460,52 +459,8 @@ func GetPrefs() ([]app.UserPrefs, error) {
 		return nil, nil
 	}
 	prefs := make([]app.UserPrefs, 1)
-	prefs[0] = app.UserPrefs{TZString: tz, WGCreds: creds}
+	prefs[0] = app.UserPrefs{TZString: tz}
 	return prefs, nil
-}
-
-func GetWGCredsStatus(prefs_in *app.UserPrefs) (string, error) {
-	var (
-		userTZLoc *time.Location
-		prefs     app.UserPrefs
-		err       error
-		wgCookies app.WGCreds
-	)
-
-	if prefs_in == nil {
-		prefs_a, err := GetPrefs()
-		if err != nil {
-			return "", err
-		}
-		if prefs_a != nil {
-			prefs = prefs_a[0]
-		}
-	} else {
-		prefs = *prefs_in
-	}
-	if prefs.TZString != "" {
-		userTZLoc, err = time.LoadLocation(prefs.TZString)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		userTZLoc = time.Local
-	}
-	wgCredsStatus := "Not logged in"
-	if prefs.WGCreds != "" {
-		err := json.Unmarshal([]byte(prefs.WGCreds), &wgCookies)
-		if err != nil {
-			return "", err
-		}
-		now := time.Now()
-		wgCredsExpire := wgCookies.UserKey.Expires
-		if now.After(wgCredsExpire) {
-			wgCredsStatus = "Login session expired"
-		} else {
-			wgCredsStatus = "Logged in until " + wgCredsExpire.In(userTZLoc).Format(app.DATE_TIME_LAYOUT)
-		}
-	}
-	return wgCredsStatus, nil
 }
 
 func GetFRBFromSerial(serial string) string {

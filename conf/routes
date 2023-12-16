@@ -30,7 +30,6 @@ GET     /util/GetResidences                     Util.GetResidences
 GET     /util/GetCurrentResidence               Util.GetCurrentResidence
 GET     /util/GetHitById                        Util.GetHitById
 GET     /util/SetTimeZone                       Util.SetTimeZone
-GET     /util/GetWGCredsStatus                  Util.GetWGCredsStatus
 GET     /util/GetStateCountyCityFromZIP         Util.GetStateCountyCityFromZIP
 POST    /entries                                Entries.Update
 GET     /entries/edit                           Entries.Edit
@@ -48,8 +47,6 @@ GET     /login                                  Login.Index
 GET     /logout                                 Login.Logout
 POST    /login                                  Login.Login
 GET     /settings                               Settings.Index
-GET     /settings/WGLogin                       Settings.WGLoginForm
-POST    /settings/WGLogin                       Settings.WGLogin
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

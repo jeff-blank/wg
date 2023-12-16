@@ -61,14 +61,6 @@ func (c Util) SetTimeZone() revel.Result {
 	return c.RenderText("ok")
 }
 
-func (c Util) GetWGCredsStatus() revel.Result {
-	wgCredsStatus, err := util.GetWGCredsStatus(nil)
-	if err != nil {
-		return c.RenderText(err.Error())
-	}
-	return c.RenderText(wgCredsStatus)
-}
-
 func (c Util) GetStateCountyCityFromZIP() revel.Result {
 	zip := c.Params.Get("zip")
 	state, county, city, err := util.GetStateCountyCityFromZIP(zip)

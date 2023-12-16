@@ -3,7 +3,6 @@ package app
 import (
 	"database/sql"
 	"io/ioutil"
-	"net/http"
 	re "regexp"
 	"time"
 
@@ -103,13 +102,8 @@ type TZRec struct {
 }
 
 type UserPrefs struct {
-	TZString string
-	WGCreds  string
-}
-
-type WGCreds struct {
-	MID     http.Cookie
-	UserKey http.Cookie
+	TZString     string
+	WGProfileKey string
 }
 
 const (
