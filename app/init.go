@@ -131,16 +131,18 @@ const (
 			b.residence,
 			h.entdate,
 			h.country,
-			h.state,
-			h.county,
+			cm.state,
+			cm.county,
 			coalesce(h.city, '') as city,
 			coalesce(h.zip, '') as zip,
 			(select count(*) from hits where bill_id = b.id)
 		from
 			bills b,
-			hits h
+			hits h,
+			counties_master cm
 		where
-			h.bill_id = b.id
+			h.bill_id = b.id and
+			h.county_id = cm.id
 	`
 
 	Q_BINGOS = `

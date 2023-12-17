@@ -80,14 +80,31 @@ const (
 			h.bill_id = b.id
 	`
 
-	Q_BREAKDOWN_US_CA = `
+	Q_BREAKDOWN_US = `
+		select distinct
+			cm.state,
+			count(1) as count
+		from
+			hits h,
+			counties_master cm
+		where
+			h.country = 'US' and
+			h.county_id = cm.id
+		group by
+			cm.state
+		order by
+			count desc,
+			cm.state
+	`
+
+	Q_BREAKDOWN_CA = `
 		select distinct
 			state,
 			count(1) as count
 		from
 			hits
 		where
-			country = $1
+			country = 'Canada'
 		group by
 			state
 		order by
@@ -112,18 +129,20 @@ const (
 
 	Q_REGION_BREAKDOWN_US = `
 		select
-			county,
+			cm.county,
 			count(1)
 		from
-			hits
+			hits h,
+			counties_master cm
 		where
-			country = $1 and
-			state = $2
+			h.country = $1 and
+			h.county_id = cm.id and
+			cm.state = $2
 		group by
-			county
+			cm.county
 		order by
 			count desc,
-			county
+			cm.county
 	`
 
 	Q_REGION_BREAKDOWN_INTL = `
@@ -273,10 +292,12 @@ func (c Hits) Breakdown() revel.Result {
 	for _, hitSet := range [3]string{"US", "Canada", "Other"} {
 		var rows *sql.Rows
 		var err error
-		if hitSet == "Other" {
-			rows, err = app.DB.Query(Q_BREAKDOWN_OTHER)
+		if hitSet == "US" {
+			rows, err = app.DB.Query(Q_BREAKDOWN_US)
+		} else if hitSet == "Canada" {
+			rows, err = app.DB.Query(Q_BREAKDOWN_CA)
 		} else {
-			rows, err = app.DB.Query(Q_BREAKDOWN_US_CA, hitSet)
+			rows, err = app.DB.Query(Q_BREAKDOWN_OTHER)
 		}
 		if err != nil {
 			revel.AppLog.Error(err.Error())

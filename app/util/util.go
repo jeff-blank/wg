@@ -276,13 +276,13 @@ func wgScore(ents, hits int) float64 {
 func GetFirstHits(regionType string) ([]app.Hit, error) {
 	if regionType == "county" {
 		return GetHits(`and h.id IN (SELECT h2.id
-          FROM hits h2
-          WHERE h2.country='US' AND h.county=h2.county AND h.state=h2.state AND h2.state not in ('DC', 'AE', 'GU', 'PR')
+          FROM hits h2, counties_master cm2
+          WHERE h2.country='US' AND h.county_id=h2.county_id AND h2.county_id=cm2.id AND cm2.state not in ('DC', 'AE', 'GU', 'PR')
           ORDER BY h2.entdate, h2.id LIMIT 1) ORDER BY h.entdate desc, h.id desc`)
 	} else if regionType == "state" {
 		return GetHits(`and h.id IN (SELECT h2.id
-          FROM hits h2
-          WHERE h.state=h2.state AND h2.country='US'
+          FROM hits h2, counties_master cm2
+          WHERE h2.country='US' AND h2.county_id=cm2.id AND cm.state=cm2.state
           ORDER BY h2.entdate LIMIT 1) ORDER BY h.entdate desc`)
 	} else {
 		return nil, nil
@@ -348,7 +348,7 @@ func GetAdjacentWithHits(state, county string) ([]string, error) {
 			return nil, err
 		}
 		revel.AppLog.Debugf("checking %s, %s", county, state)
-		hits, _ := GetHits("and h.state='" + hitState + "' and h.county='" + hitCounty + "'")
+		hits, _ := GetHits("and cm.state='" + hitState + "' and cm.county='" + hitCounty + "'")
 		if len(hits) > 0 {
 			counties = append(counties, fmt.Sprintf("%s, %s", hitCounty, hitState))
 		}
@@ -488,7 +488,7 @@ func GetFRBFromSerial(serial string) string {
 
 func GetStateCountyCityFromZIP(zip string) (string, string, string, error) {
 	var state, county, city string
-	err := app.DB.QueryRow(`select state, county, city from hits where zip=$1`, zip).Scan(&state, &county, &city)
+	err := app.DB.QueryRow(`select cm.state, cm.county, h.city from hits h, counties_master cm where h.county_id=cm.id and h.zip=$1`, zip).Scan(&state, &county, &city)
 	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 		return "", "", "", err
 	}
