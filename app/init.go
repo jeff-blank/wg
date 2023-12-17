@@ -131,18 +131,20 @@ const (
 			b.residence,
 			h.entdate,
 			h.country,
-			cm.state,
-			cm.county,
+			coalesce(cm.state, '--') as state,
+			coalesce(cm.county, '--') as county,
 			coalesce(h.city, '') as city,
 			coalesce(h.zip, '') as zip,
 			(select count(*) from hits where bill_id = b.id)
 		from
 			bills b,
-			hits h,
+			hits h
+		left outer join
 			counties_master cm
-		where
-			h.bill_id = b.id and
+		on
 			h.county_id = cm.id
+		where
+			h.bill_id = b.id
 	`
 
 	Q_BINGOS = `
@@ -194,28 +196,38 @@ const (
 	`
 
 	Q_LAST_50_STATES = `
-		select state, count(1)
-		from hits
-		where id in (` + Q_LAST_50_HIT_IDS + `) and state <> '--'
-		group by state
+		select cm.state, count(1)
+		from hits h, counties_master cm
+		where h.id in (` + Q_LAST_50_HIT_IDS + `) and cm.id = h.county_id and country = 'US'
+		group by cm.state
 		union
-		  select country, count(1)
+		  select state, count(1)
 		  from hits
-		  where id in (` + Q_LAST_50_HIT_IDS + `) and state = '--'
-		  group by country
+		  where id in (` + Q_LAST_50_HIT_IDS + `) and country = 'Canada'
+		  group by state
+		  union
+		    select country, count(1)
+		    from hits
+		    where id in (` + Q_LAST_50_HIT_IDS + `) and country not in ('US', 'Canada')
+		    group by country
 		order by count desc, state asc
 	`
 
 	Q_LAST_50_COUNTIES = `
-		select state, county, count(1)
-		from hits
-		where id in (` + Q_LAST_50_HIT_IDS + `) and state <> '--'
-		group by state, county
+		select cm.state, cm.county, count(1)
+		from hits h, counties_master cm
+		where h.id in (` + Q_LAST_50_HIT_IDS + `) and cm.id = h.county_id and country = 'US'
+		group by cm.state, cm.county
 		union
-		  select country, county, count(1)
+		  select state, city, count(1)
 		  from hits
-		  where id in (` + Q_LAST_50_HIT_IDS + `) and state = '--'
-		  group by country, county
+		  where id in (` + Q_LAST_50_HIT_IDS + `) and country = 'Canada'
+		  group by state, city
+		  union
+		    select country, city, count(1)
+		    from hits
+		    where id in (` + Q_LAST_50_HIT_IDS + `) and country not in ('US', 'Canada')
+		    group by country, city
 		order by count desc, state asc, county asc
 	`
 

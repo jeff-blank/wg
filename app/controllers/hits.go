@@ -162,7 +162,7 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, county_id, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7, $8)`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county%s, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7%s)`
 	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, county_id=$4, city=$5, zip=$6, entdate=$7 where id=$8`
 
 	// }}}
@@ -204,17 +204,22 @@ func (c Hits) Index() revel.Result {
 	if filterCountry != `` {
 		where += ` and country = '` + filterCountry + `'`
 	}
-	if filterState == `==` {
+	if filterState == `--` {
 		filterState = ``
 	}
-	if (filterCountry == `US` || filterCountry == `Canada`) && filterState != `` {
-		where += ` and state = '` + filterState + `'`
+	if filterState != `` {
+		if filterCountry == `US` {
+			where += ` and cm.state = '` + filterState + `'`
+		}
+		if filterCountry == `Canada` {
+			where += ` and h.state = '` + filterState + `'`
+		}
 	}
-	if filterCounty == `==` {
+	if filterCounty == `--` {
 		filterCounty = ``
 	}
 	if filterCountry == `US` && filterCounty != `` {
-		where += ` and county = '` + filterCounty + `'`
+		where += ` and cm.county = '` + filterCounty + `'`
 	}
 	if filterCity != `` {
 		where += ` and city = '` + filterCity + `'`
@@ -382,6 +387,7 @@ func (c Hits) Create() revel.Result {
 		dateHits  int
 		state     string
 		county    string
+		res       sql.Result
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -508,7 +514,18 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
-	res, err := app.DB.Exec(S_INSERT_HIT, bId, country, state, county, countyId, city, zip, entdate)
+	if country != "Canada" {
+		state = "--"
+		county = "--"
+	}
+	if country == "US" {
+		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", countyId", ", $8")
+		res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate)
+	} else {
+		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
+		res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate)
+	}
+	//res, err := app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate)
 	if err != nil {
 		revel.AppLog.Errorf("insert new hit: %#v", err)
 		return c.RenderText(err.Error())
@@ -681,18 +698,10 @@ func del(id string) error {
 
 func update(id, country, state, county string, countyId int, city string, zip string, date string) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
-	if country == "US" {
-		countyRec, err := util.GetCountyById(countyId)
-		if err != nil {
-			return err
-		}
-		state = countyRec.State
-		county = countyRec.County
-	} else if country != "Canada" {
+	if country != "Canada" {
 		state = "--"
-	} else {
-		county = "--"
 	}
+	county = "--"
 	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, countyId, city, zip, date, id)
 	if err != nil {
 		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)

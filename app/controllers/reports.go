@@ -140,7 +140,7 @@ func (c Reports) FirstHits() revel.Result {
 func (c Reports) TopCounties() revel.Result {
 	data := make([]app.DualRegionBrkEnt, 0)
 
-	query := `select state, county, count(1) from hits where country='US' group by state, county order by count desc, state, county limit 25`
+	query := `select cm.state, cm.county, count(1) from hits h, counties_master cm where country='US' and h.county_id=cm.id group by cm.state, cm.county order by count desc, cm.state, cm.county limit 25`
 	rows, err := app.DB.Query(query)
 	if err != nil {
 		revel.AppLog.Errorf("query top counties: %#v", err)
