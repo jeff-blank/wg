@@ -459,7 +459,7 @@ func (c Hits) Create() revel.Result {
 	bId = -1
 	err = app.DB.QueryRow(Q_BILL, rptkey, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 	if err != nil {
-		if err.Error() != "sql: no rows in result set" {
+		if err.Error() != app.SQL_ERR_NO_ROWS {
 			revel.AppLog.Errorf("search for existing bill: %#v", err)
 			return c.RenderText(err.Error())
 		}

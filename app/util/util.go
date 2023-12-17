@@ -196,7 +196,7 @@ func StatsData(returnType string) interface{} {
 		allData[m]["oneYrAvgMonthlyHits"] = avgVal(oneYrHits)
 
 		err = q_entCount.QueryRow(monthStr).Scan(&billCount)
-		if err != nil && err.Error() != "sql: no rows in result set" {
+		if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 			// TODO: return an error
 			revel.AppLog.Errorf("query q_entCount: %v", err)
 			return nil
@@ -489,7 +489,7 @@ func GetFRBFromSerial(serial string) string {
 func GetStateCountyCityFromZIP(zip string) (string, string, string, error) {
 	var state, county, city string
 	err := app.DB.QueryRow(`select state, county, city from hits where zip=$1`, zip).Scan(&state, &county, &city)
-	if err != nil && err.Error() != "sql: no rows in result set" {
+	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 		return "", "", "", err
 	}
 	return state, county, city, nil
