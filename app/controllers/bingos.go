@@ -58,8 +58,7 @@ const (
 			counties_master cm
 		where
 			cm.id = $1 and
-			cm.state = h.state and
-			cm.county = h.county
+			cm.id = h.county_id
 `
 	// }}}
 )
