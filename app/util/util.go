@@ -495,4 +495,17 @@ func GetStateCountyCityFromZIP(zip string) (string, string, string, error) {
 	return state, county, city, nil
 }
 
+func CountyHasHits(id int) (bool, error) {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from hits where county_id = $1`, id).Scan(&count)
+	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 // vim:foldmethod=marker:

@@ -455,7 +455,13 @@ func (c Hits) Create() revel.Result {
 		}
 		state = countyRec.State
 		county = countyRec.County
-		if isNewCounty(countyId) {
+		hasHits, err := util.CountyHasHits(countyId)
+		if err != nil {
+			msg := fmt.Sprintf("new-county check for county %d (%s): ", countyId, county)
+			revel.AppLog.Errorf("%s%#v", msg, err)
+			return c.RenderText(msg + err.Error())
+		}
+		if !hasHits {
 			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
 			bingoNames := getBingoNames(state, county)
 			if len(bingoNames) > 0 {
@@ -719,15 +725,6 @@ func update(id, country, state, county string, countyId int, city string, zip st
 		return err
 	}
 	return nil
-}
-
-func isNewCounty(countyId int) bool {
-	var countyHits int
-	err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and county_id = $1`, countyId).Scan(&countyHits)
-	if err == nil && countyHits == 0 {
-		return true
-	}
-	return false
 }
 
 func getBingoNames(state, county string) []string {
