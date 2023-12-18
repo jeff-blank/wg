@@ -13,17 +13,17 @@
 {{ if .resPrefix }}
   {{ printf "%c%c%c" (index .resPrefix 0) (index .resPrefix 1) (index .resPrefix 2) }}
 {{ else }}
-  <a class="newWin" href="{{index .links "hitAdd"}}">Add Hit</a> |
-  <a class="newWin" href="{{index .links "hits"}}">Hits</a> |
-  <a class="newWin" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
-  <a class="newWin" href="{{index .links "reports"}}">Reports</a> |
-  <a class="newWin" href="{{index .links "bingos"}}">Bingos</a> ||
-  <a class="newWin" href="https://www.wheresgeorge.com/ybs.php">Your Bills</a> |
-  <a class="newWin" href="https://www.wheresgeorge.com/u:USBUOywJ">Profile</a> |
-  <a class="newWin" href="{{index .links "newrelic"}}">APM</a> |
-  <a class="newWin" href="/?res=cmx">CMX charts</a> |
-  <a class="newWin" href="/?res=pdx">PDX charts</a> ||
-  <a class="newWin" href="https://wg-dev.mr-happy.com/">Dev</a> | <a class="newWin" href="https://wg.mr-happy.com/">Prod</a>
+  <a target="_blank" href="{{index .links "hitAdd"}}">Add Hit</a> |
+  <a target="_blank" href="{{index .links "hits"}}">Hits</a> |
+  <a target="_blank" href="{{index .links "hitsBreak"}}">Hits Breakdown</a> |
+  <a target="_blank" href="{{index .links "reports"}}">Reports</a> |
+  <a target="_blank" href="{{index .links "bingos"}}">Bingos</a> ||
+  <a target="_blank" href="https://www.wheresgeorge.com/ybs.php">Your Bills</a> |
+  <a target="_blank" href="https://www.wheresgeorge.com/u:USBUOywJ">Profile</a> |
+  <a target="_blank" href="{{index .links "newrelic"}}">APM</a> |
+  <a target="_blank" href="/?res=cmx">CMX charts</a> |
+  <a target="_blank" href="/?res=pdx">PDX charts</a> ||
+  <a target="_blank" href="https://wg-dev.mr-happy.com/">Dev</a> | <a target="_blank" href="https://wg.mr-happy.com/">Prod</a>
 {{ end }}
 </div>
 
@@ -71,14 +71,13 @@
 <div><img src="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgfrb.png" alt="FRB" /></div>
 <hr />
 {{ end }}
-<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc.svg" alt="USHBC" width="1500" height="950" /></a></div>
+<div class="indexUSCounty"><a target="_blank" href="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc.svg"><img src="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc.svg" alt="USHBC" width="1500" height="950" /></a></div>
 <hr />
-<div class="indexUSCounty"><a class="newWin" href="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc_glob.svg" alt="USHBC globs" width="1500" height="950" /></a></div>
+<div class="indexUSCounty"><a target="_blank" href="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc_glob.svg"><img src="https://home.mr-happy.com/{{.imgPrefix}}{{.resPrefix}}wgushbc_glob.svg" alt="USHBC globs" width="1500" height="950" /></a></div>
 <hr />
-<div class="worldMap"><a class="newWin" href="https://home.mr-happy.com/wgworld.svg"><img src="https://home.mr-happy.com/wgworld.svg" alt="World" width="1500" height="761" /></a></div>
+<div class="worldMap"><a target="_blank" href="https://home.mr-happy.com/wgworld.svg"><img src="https://home.mr-happy.com/wgworld.svg" alt="World" width="1500" height="761" /></a></div>
 
 <script src="/public/js/app-index-g.js"></script>
-<script src="/public/js/newWin-g.js"></script>
 
 </body></html>
 {{template "footer.html" .}}
