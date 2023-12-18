@@ -42,7 +42,7 @@ func getShowHits(data interface{}) {
 		cellNum++
 	}
 	jq("#dataTable").Remove()
-	jq("#scroller").RemoveAttr("style")
+	jq("#scroller").RemoveAttr("style").Append(table)
 }
 
 func winSize() map[string]int {
