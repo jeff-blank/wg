@@ -258,6 +258,7 @@ var (
 )
 
 var DB *sql.DB
+var Environment string
 var (
 	RE_dbUnsafe           *re.Regexp
 	RE_singleQuote        *re.Regexp

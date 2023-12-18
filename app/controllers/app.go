@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	s "strings"
+
+	"github.com/jeff-blank/wg/app"
 	"github.com/jeff-blank/wg/app/routes"
 	"github.com/revel/revel"
 )
@@ -10,7 +13,14 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
-	var resPrefix string
+	var resPrefix, imgPrefix string
+
+	if s.Index(revel.AppName, "(dev)") >= 0 {
+		app.Environment = "dev"
+	} else {
+		app.Environment = "prod"
+		revel.AppLog.Infof("revel.AppName='%s' -> Environment=prod", revel.AppName)
+	}
 
 	residence := c.Params.Get("res")
 	if residence == "pdx" || residence == "cmx" {
@@ -32,5 +42,10 @@ func (c App) Index() revel.Result {
 		links["newrelic"] += "45030346"
 	}
 
-	return c.Render(links, resPrefix)
+	revel.AppLog.Debugf("env = %s", app.Environment)
+	if app.Environment != "" && app.Environment != "prod" {
+		imgPrefix = app.Environment + "-"
+	}
+
+	return c.Render(links, resPrefix, imgPrefix)
 }
