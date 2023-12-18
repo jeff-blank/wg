@@ -59,7 +59,7 @@ func (c Entries) Edit() revel.Result {
 	}
 	err = q.QueryRow(month).Scan(&entries)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
+		if err.Error() == app.SQL_ERR_NO_ROWS {
 			res, err := app.DB.Exec(`insert into entries(month, bills)values($1, $2)`, month, 0)
 			if err != nil {
 				revel.AppLog.Errorf("create month in 'entries': %#v", err)

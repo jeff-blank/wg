@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"github.com/jeff-blank/wg/app"
 	"github.com/jeff-blank/wg/app/routes"
+	"github.com/jeff-blank/wg/app/util"
 	"github.com/revel/revel"
 )
 
@@ -49,18 +50,6 @@ const (
 			cm.state,
 			cm.county
 `
-
-	Q_COUNTY_HAS_HITS = `
-		select
-			count(1)
-		from
-			hits h,
-			counties_master cm
-		where
-			cm.id = $1 and
-			cm.state = h.state and
-			cm.county = h.county
-`
 	// }}}
 )
 
@@ -72,12 +61,6 @@ func (c Bingos) Index() revel.Result {
 	q_counties, err := app.DB.Prepare(Q_BINGO_COUNTIES)
 	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 		msg := `prepare counties query: `
-		revel.AppLog.Errorf("%s%#v", msg, err)
-		return c.RenderText(msg + err.Error())
-	}
-	q_countyHasHits, err := app.DB.Prepare(Q_COUNTY_HAS_HITS)
-	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
-		msg := `prepare county-has-hits query: `
 		revel.AppLog.Errorf("%s%#v", msg, err)
 		return c.RenderText(msg + err.Error())
 	}
@@ -117,7 +100,6 @@ func (c Bingos) Index() revel.Result {
 		for cRows.Next() {
 			var (
 				cId     int
-				count   int
 				discard string
 			)
 			err := cRows.Scan(&cId, &discard, &discard)
@@ -127,13 +109,13 @@ func (c Bingos) Index() revel.Result {
 				return c.RenderText(msg + err.Error())
 			}
 			nCounties++
-			err = q_countyHasHits.QueryRow(cId).Scan(&count)
+			hasHits, err := util.CountyHasHits(cId)
 			if err != nil {
 				msg := fmt.Sprintf("query hits for county %d (bingo %s): ", cId, bName)
 				revel.AppLog.Errorf("%s%#v", msg, err)
 				return c.RenderText(msg + err.Error())
 			}
-			if count > 0 {
+			if hasHits {
 				nhCounties++
 			}
 		}
@@ -234,11 +216,6 @@ func (c Bingos) New() revel.Result {
 
 func getBingoDetail(id int) ([]app.BingoDetail, string) {
 	results := make([]app.BingoDetail, 0)
-	q_hasHits, err := app.DB.Prepare(Q_COUNTY_HAS_HITS)
-	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
-		return nil, fmt.Sprintf("prepare county-has-hits query: %#v", err)
-	}
-
 	rows, err := app.DB.Query(Q_BINGO_COUNTIES, id)
 	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 		return nil, fmt.Sprintf("query counties in bingo: %#v", err)
@@ -247,7 +224,7 @@ func getBingoDetail(id int) ([]app.BingoDetail, string) {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			cId, nHits    int
+			cId           int
 			hitsFound     bool
 			state, county string
 		)
@@ -255,11 +232,11 @@ func getBingoDetail(id int) ([]app.BingoDetail, string) {
 		if err != nil {
 			return nil, fmt.Sprintf("read county id: %#v", err)
 		}
-		err = q_hasHits.QueryRow(cId).Scan(&nHits)
+		hasHits, err := util.CountyHasHits(cId)
 		if err != nil {
 			return nil, fmt.Sprintf("get hits for county %d: %#v", cId, err)
 		}
-		if nHits > 0 {
+		if hasHits {
 			hitsFound = true
 		}
 		results = append(results, app.BingoDetail{Id: cId, State: state, County: county, Hits: hitsFound})

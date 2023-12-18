@@ -80,14 +80,31 @@ const (
 			h.bill_id = b.id
 	`
 
-	Q_BREAKDOWN_US_CA = `
+	Q_BREAKDOWN_US = `
+		select distinct
+			cm.state,
+			count(1) as count
+		from
+			hits h,
+			counties_master cm
+		where
+			h.country = 'US' and
+			h.county_id = cm.id
+		group by
+			cm.state
+		order by
+			count desc,
+			cm.state
+	`
+
+	Q_BREAKDOWN_CA = `
 		select distinct
 			state,
 			count(1) as count
 		from
 			hits
 		where
-			country = $1
+			country = 'Canada'
 		group by
 			state
 		order by
@@ -112,18 +129,20 @@ const (
 
 	Q_REGION_BREAKDOWN_US = `
 		select
-			county,
+			cm.county,
 			count(1)
 		from
-			hits
+			hits h,
+			counties_master cm
 		where
-			country = $1 and
-			state = $2
+			h.country = $1 and
+			h.county_id = cm.id and
+			cm.state = $2
 		group by
-			county
+			cm.county
 		order by
 			count desc,
-			county
+			cm.county
 	`
 
 	Q_REGION_BREAKDOWN_INTL = `
@@ -143,8 +162,8 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7)`
-	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, city=$4, zip=$5, entdate=$6 where id=$7`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county%s, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7%s)`
+	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, county_id=$4, city=$5, zip=$6, entdate=$7 where id=$8`
 
 	// }}}
 
@@ -185,17 +204,22 @@ func (c Hits) Index() revel.Result {
 	if filterCountry != `` {
 		where += ` and country = '` + filterCountry + `'`
 	}
-	if filterState == `==` {
+	if filterState == `--` {
 		filterState = ``
 	}
-	if (filterCountry == `US` || filterCountry == `Canada`) && filterState != `` {
-		where += ` and state = '` + filterState + `'`
+	if filterState != `` {
+		if filterCountry == `US` {
+			where += ` and cm.state = '` + filterState + `'`
+		}
+		if filterCountry == `Canada` {
+			where += ` and h.state = '` + filterState + `'`
+		}
 	}
-	if filterCounty == `==` {
+	if filterCounty == `--` {
 		filterCounty = ``
 	}
 	if filterCountry == `US` && filterCounty != `` {
-		where += ` and county = '` + filterCounty + `'`
+		where += ` and cm.county = '` + filterCounty + `'`
 	}
 	if filterCity != `` {
 		where += ` and city = '` + filterCity + `'`
@@ -273,10 +297,12 @@ func (c Hits) Breakdown() revel.Result {
 	for _, hitSet := range [3]string{"US", "Canada", "Other"} {
 		var rows *sql.Rows
 		var err error
-		if hitSet == "Other" {
-			rows, err = app.DB.Query(Q_BREAKDOWN_OTHER)
+		if hitSet == "US" {
+			rows, err = app.DB.Query(Q_BREAKDOWN_US)
+		} else if hitSet == "Canada" {
+			rows, err = app.DB.Query(Q_BREAKDOWN_CA)
 		} else {
-			rows, err = app.DB.Query(Q_BREAKDOWN_US_CA, hitSet)
+			rows, err = app.DB.Query(Q_BREAKDOWN_OTHER)
 		}
 		if err != nil {
 			revel.AppLog.Error(err.Error())
@@ -359,14 +385,20 @@ func (c Hits) Create() revel.Result {
 		series    string
 		infoFlash app.HitInfo
 		dateHits  int
+		state     string
+		county    string
+		res       sql.Result
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
 	rptkey := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["key"][0], ""))
 
 	country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
-	state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
-	county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+	countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+	countyId, err := strconv.Atoi(countyId_in)
+	if err != nil {
+		return c.RenderText("invalid county id")
+	}
 	city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
 	zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
 
@@ -410,14 +442,26 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
-	err := app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
+	err = app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
 	if err == nil && dateHits == 0 {
 		infoFlash.FirstOnDate = entdate[5:]
 	} else if err != nil {
 		revel.AppLog.Errorf("is first date hit? err=%#v", err)
 	}
 	if country == "US" {
-		if isNewCounty(state, county) {
+		countyRec, err := util.GetCountyById(countyId)
+		if err != nil {
+			return c.RenderText(err.Error())
+		}
+		state = countyRec.State
+		county = countyRec.County
+		hasHits, err := util.CountyHasHits(countyId)
+		if err != nil {
+			msg := fmt.Sprintf("new-county check for county %d (%s): ", countyId, county)
+			revel.AppLog.Errorf("%s%#v", msg, err)
+			return c.RenderText(msg + err.Error())
+		}
+		if !hasHits {
 			infoFlash.FirstInCounty = fmt.Sprintf("%s, %s", county, state)
 			bingoNames := getBingoNames(state, county)
 			if len(bingoNames) > 0 {
@@ -448,7 +492,7 @@ func (c Hits) Create() revel.Result {
 	bId = -1
 	err = app.DB.QueryRow(Q_BILL, rptkey, denom, series).Scan(&bId, &bSerial, &bDenom, &bSeries, &bRptkey)
 	if err != nil {
-		if err.Error() != "sql: no rows in result set" {
+		if err.Error() != app.SQL_ERR_NO_ROWS {
 			revel.AppLog.Errorf("search for existing bill: %#v", err)
 			return c.RenderText(err.Error())
 		}
@@ -476,7 +520,17 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
-	res, err := app.DB.Exec(S_INSERT_HIT, bId, country, state, county, city, zip, entdate)
+	if country != "Canada" {
+		state = "--"
+		county = "--"
+	}
+	if country == "US" {
+		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", county_id", ", $8")
+		res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate)
+	} else {
+		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
+		res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate)
+	}
 	if err != nil {
 		revel.AppLog.Errorf("insert new hit: %#v", err)
 		return c.RenderText(err.Error())
@@ -515,6 +569,8 @@ func (c Hits) Update() revel.Result {
 	var (
 		err         error
 		updateFlash app.HitInfo
+		state       string
+		county      string
 	)
 
 	year := c.Params.Get("year")
@@ -525,8 +581,11 @@ func (c Hits) Update() revel.Result {
 		err = del(id)
 	} else {
 		country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
-		state := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["state"][0], ""), "")
-		county := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+		countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+		countyId, err := strconv.Atoi(countyId_in)
+		if err != nil {
+			return c.RenderText("invalid county id")
+		}
 		city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
 		zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
 
@@ -534,7 +593,7 @@ func (c Hits) Update() revel.Result {
 		if !app.RE_date.MatchString(date) {
 			return c.RenderText("error in date '" + date + "'")
 		}
-		err = update(id, country, state, county, city, zip, date)
+		err = update(id, country, state, county, countyId, city, zip, date)
 	}
 	if err != nil {
 		return c.RenderText(fmt.Sprintf("edit/delete of hit '%s' failed: %s", id, err.Error()))
@@ -642,15 +701,13 @@ func del(id string) error {
 	return nil
 }
 
-func update(id, country, state, county, city string, zip string, date string) error {
+func update(id, country, state, county string, countyId int, city string, zip string, date string) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
-	if country != "US" {
-		if country != "Canada" {
-			state = "--"
-		}
-		county = "--"
+	if country != "Canada" {
+		state = "--"
 	}
-	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, city, zip, date, id)
+	county = "--"
+	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, countyId, city, zip, date, id)
 	if err != nil {
 		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)
 		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s', '%s'",
@@ -668,15 +725,6 @@ func update(id, country, state, county, city string, zip string, date string) er
 		return err
 	}
 	return nil
-}
-
-func isNewCounty(state, county string) bool {
-	var countyHits int
-	err := app.DB.QueryRow(`select count(1) from hits where country = 'US' and state = $1 and county = $2`, state, county).Scan(&countyHits)
-	if err == nil && countyHits == 0 {
-		return true
-	}
-	return false
 }
 
 func getBingoNames(state, county string) []string {

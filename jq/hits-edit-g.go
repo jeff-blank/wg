@@ -63,7 +63,7 @@ func countySelect(defState, defCounty string) {
 				sel := jq("#scounty")
 				for _, county := range data.([]interface{}) {
 					countyRec := county.(map[string]interface{})
-					sel.Append(jq(`<option>`).SetText(countyRec["Region"]))
+					sel.Append(jq(`<option>`).SetText(countyRec["Region"]).SetVal(countyRec["Id"]))
 					if countyRec["Region"] == defCounty {
 						sel.Children("option").Last().SetAttr("selected", "selected")
 					}

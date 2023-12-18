@@ -91,7 +91,7 @@ func main() {
 			for _, ent := range data.([]interface{}) {
 				region := ent.(map[string]interface{})["Region"].(string)
 				count := int(ent.(map[string]interface{})["Count"].(float64))
-				uri := hitsFilterPath + `&county=` + region
+				uri := hitsFilterPath + "&" + s.ToLower(subRegionType) + "=" + region
 				rankCell := jq("<td/>").AddClass("bordered aright " + rankColumn).SetHtml(fmt.Sprintf(`%d.`, rank))
 				rank++
 				regionCell := jq("<td/>").AddClass("bordered " + regionColumn).SetHtml(fmt.Sprintf(`<a href="%s">%s</a>`, uri, region))
