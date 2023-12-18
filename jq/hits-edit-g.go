@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	s "strings"
 	"time"
 
 	"github.com/gopherjs/gopherjs/js"
@@ -261,7 +262,7 @@ func denomSeries(e jquery.Event) {
 	denom0 := dSel.Children(`option[value="0"]`)
 	denom1 := dSel.Children(`option[value="1"]`)
 	denom2 := dSel.Children(`option[value="2"]`)
-	serial := jq(e.Target).Val()
+	serial := s.ToUpper(jq(e.Target).Val())
 	if len(serial) > 0 {
 		seriesCode = serial[:1]
 		frb = serial[1:2]

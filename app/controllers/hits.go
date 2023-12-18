@@ -371,10 +371,6 @@ func (c Hits) ShowBrk() revel.Result {
 	return c.RenderJSON(results)
 }
 
-func dbSanitize(input string) string {
-	return app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(input, `\$1`), `''`)
-}
-
 func (c Hits) Create() revel.Result {
 	var (
 		bId       int
@@ -388,10 +384,11 @@ func (c Hits) Create() revel.Result {
 		state     string
 		county    string
 		res       sql.Result
+		series_in string
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
-	rptkey := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["key"][0], ""))
+	rptkey := util.DbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["key"][0], ""))
 
 	country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
 	countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
@@ -402,28 +399,19 @@ func (c Hits) Create() revel.Result {
 	city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
 	zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
 
-	serial := dbSanitize(app.RE_whitespace.ReplaceAllLiteralString(c.Params.Form["serial"][0], ""))
-	if !app.RE_serial.MatchString(serial) {
-		return c.RenderText("invalid serial number")
+	seriesParam := c.Params.Form["series"]
+	if len(seriesParam) > 0 {
+		series_in = seriesParam[0]
 	}
 
-	isSerial10 := app.RE_serial_10.MatchString(serial)
-	isSerial11 := app.RE_serial_11.MatchString(serial)
+	denom, _ := strconv.Atoi(util.DbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["denom"][0], "")))
 
-	if str, ok := c.Params.Form["series"]; ok && str[0] != "" && isSerial10 {
-		series = s.ToUpper(str[0])
-		if app.RE_series.MatchString(series) {
-			series = dbSanitize(app.RE_whitespace.ReplaceAllString(series, ""))
-		} else {
-			return c.RenderText("invalid bill series")
-		}
-	} else if str, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 {
-		series = str
-	} else {
-		return c.RenderText("missing bill series")
+	serial, series, err := util.GetSerialSeries(c.Params.Form["serial"][0], series_in, denom)
+	if err != nil {
+		return c.RenderText(err.Error())
 	}
-	denom, _ := strconv.Atoi(dbSanitize(app.RE_whitespace.ReplaceAllString(c.Params.Form["denom"][0], "")))
-	entdate := dbSanitize(c.Params.Form["year"][0]) + "-" + dbSanitize(c.Params.Form["month"][0]) + "-" + dbSanitize(c.Params.Form["day"][0])
+
+	entdate := util.DbSanitize(c.Params.Form["year"][0]) + "-" + util.DbSanitize(c.Params.Form["month"][0]) + "-" + util.DbSanitize(c.Params.Form["day"][0])
 
 	residence := ""
 	if r, ok := c.Params.Form["residence"]; ok {

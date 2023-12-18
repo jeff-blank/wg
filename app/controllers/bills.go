@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/jeff-blank/wg/app"
 	"github.com/jeff-blank/wg/app/routes"
@@ -39,13 +40,19 @@ func (c Bills) Edit() revel.Result {
 func (c Bills) Update() revel.Result {
 	var updateFlash app.HitInfo
 
+	denom, _ := strconv.Atoi(c.Params.Get("denom"))
+	serial, series, err := util.GetSerialSeries(c.Params.Get("serial"), c.Params.Get("series"), denom)
+	if err != nil {
+		return c.RenderError(err)
+	}
+	revel.AppLog.Debugf("serial='%s'; series='%s'", serial, series)
 	billId := c.Params.Route.Get("id")
 	res, err := app.DB.Exec(
 		`update bills set rptkey=$1, serial=$2, denomination=$3, series=$4, residence=$5 where id=$6`,
 		c.Params.Get("key"),
-		c.Params.Get("serial"),
-		c.Params.Get("denom"),
-		c.Params.Get("series"),
+		serial,
+		denom,
+		series,
 		c.Params.Get("residence"),
 		billId,
 	)
