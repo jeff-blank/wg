@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	s "strings"
 	"time"
 
 	"database/sql"
@@ -506,6 +507,42 @@ func CountyHasHits(id int) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+func GetSerialSeries(serial_in, series_in string, denom int) (string, string, error) {
+	revel.AppLog.Debugf("serial_in='%s'", serial_in)
+
+	serial := s.ToUpper(DbSanitize(app.RE_whitespace.ReplaceAllLiteralString(serial_in, "")))
+	if !app.RE_serial.MatchString(serial) {
+		return "", "", errors.New("util.GetSerialSeries(): invalid serial number '" + serial + "'")
+	}
+
+	revel.AppLog.Debugf("serial_in='%s' -> serial='%s'", serial_in, serial)
+
+	series := s.ToUpper(series_in)
+
+	isSerial10 := app.RE_serial_10.MatchString(serial)
+	isSerial11 := app.RE_serial_11.MatchString(serial)
+
+	revel.AppLog.Debugf("series='%s'", series)
+	if series != "" && isSerial10 {
+		if app.RE_series.MatchString(series) {
+			series = DbSanitize(app.RE_whitespace.ReplaceAllString(series, ""))
+		} else {
+			return "", "", errors.New("util.GetSerialSeries(): invalid bill series '" + series + "'")
+		}
+	} else if str, ok := app.SeriesByLetter[serial[:1]]; ok && isSerial11 && denom >= 5 {
+		series = str
+	} else if isSerial11 && denom < 5 {
+		return "", "", errors.New(fmt.Sprintf("invalid bill serial/denomination (serial='%s'; denom='%d')", serial, denom))
+	} else {
+		return "", "", errors.New(fmt.Sprintf("missing or invalid bill series (series='%s')", series))
+	}
+	return serial, series, nil
+}
+
+func DbSanitize(input string) string {
+	return app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(input, `\$1`), `''`)
 }
 
 // vim:foldmethod=marker:
