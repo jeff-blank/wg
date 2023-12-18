@@ -32,7 +32,7 @@ func getShowHits(data interface{}) {
 		serialSeries := fmt.Sprintf("%s&nbsp;/&nbsp;%s", serial, entry["Series"].(string))
 		jq("<td/>").SetAttr("id", "b_"+strconv.Itoa(cellNum)).AddClass("c_bill mono bordered").SetHtml(serialSeries).AppendTo(row)
 		billUrl := "https://www.wheresgeorge.com/" + entry["RptKey"].(string)
-		href := jq("<a/>").SetAttr("href", billUrl).AddClass("newWin").SetHtml(entry["EntDate"].(string))
+		href := jq("<a/>").SetAttr("href", billUrl).SetAttr("target", "_blank").SetHtml(entry["EntDate"].(string))
 		jq("<td/>").SetAttr("id", "l_"+strconv.Itoa(cellNum)).AddClass("c_date bordered").Append(href).AppendTo(row)
 		jq("<td/>").SetAttr("id", "s_"+strconv.Itoa(cellNum)).AddClass("c_state bordered").SetHtml(entry["State"].(string)).AppendTo(row)
 		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_county bordered").SetHtml(entry["County"].(string)).AppendTo(row)
@@ -43,14 +43,6 @@ func getShowHits(data interface{}) {
 	}
 	jq("#dataTable").Remove()
 	jq("#scroller").RemoveAttr("style")
-	jquery.When(jq("#scroller").Append(table)).Done(func() {
-		jq(".newWin").On(jquery.CLICK, func(e jquery.Event) {
-			linkObj := jq(e.Target)
-			e.PreventDefault()
-			href := linkObj.Attr("href")
-			js.Global.Get("window").Call("open", href, "", "")
-		})
-	})
 }
 
 func winSize() map[string]int {

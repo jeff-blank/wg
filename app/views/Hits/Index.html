@@ -92,7 +92,7 @@
         <td class="bordered aright"><a class="hitEdit" href="hits/{{.Id}}/edit">{{.Index}}</a></td>
         <td class="bordered aright">{{.Denom}}</td>
         <td class="bordered mono"><a href="bills/{{.BillId}}/edit">{{.Serial}}/{{.Series}}</a> ({{.Count}})</td>
-        <td class="bordered"><a class="newWin" href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
+        <td class="bordered"><a target="_blank" href="https://www.wheresgeorge.com/{{.RptKey}}">{{.EntDate}}</a></td>
         <td class="bordered"><a href="hits?country={{.Country}}{{if .State}}&amp;state={{.State}}{{end}}">{{if ne .State "--"}}{{.State}}{{if ne .Country "US"}}, {{.Country}}{{end}}{{else}}{{.Country}}{{end}}</a></td>
         <td class="bordered">{{if eq .Country "US"}}<a href="hits?country={{.Country}}&amp;state={{.State}}&amp;county={{.County}}">{{.County}}</a>{{else}}&nbsp;{{end}}</td>
         <td class="bordered">{{if ne .City ""}}<a href="hits?country={{.Country}}{{if eq .Country "US"}}&amp;state={{.State}}&amp;county={{.County}}{{end}}&amp;city={{.City}}">{{.City}}</a>{{if ne .ZIP ""}} / {{.ZIP}}{{end}}{{else}}&nbsp;{{end}}</td>
@@ -101,7 +101,6 @@
   </table>
 </div>
 
-<script src="/public/js/newWin-g.js"></script>
 <script src="/public/js/hits-index-g.js"></script>
 
 {{template "footer.html" .}}
