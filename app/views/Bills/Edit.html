@@ -64,6 +64,14 @@
 
 <p class="tpad12pt">Link to tracking report: <a target="_blank" href="https://www.wheresgeorge.com/{{ .bill.Rptkey }}">https://www.wheresgeorge.com/{{ .bill.Rptkey }}</a>
 
+<script type="text/javascript">
+document.body.addEventListener('keydown', (event) => {
+    if(event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+        event.target.form?.submit();
+    }
+});
+</script>
+
 {{ end }}
 
 {{template "footer.html" .}}
