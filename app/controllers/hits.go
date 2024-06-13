@@ -385,6 +385,8 @@ func (c Hits) Create() revel.Result {
 		county    string
 		res       sql.Result
 		series_in string
+		countyId  int
+		err       error
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -392,9 +394,11 @@ func (c Hits) Create() revel.Result {
 
 	country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
 	countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
-	countyId, err := strconv.Atoi(countyId_in)
-	if err != nil {
-		return c.RenderText("invalid county id")
+	if country == "US" {
+		countyId, err = strconv.Atoi(countyId_in)
+		if err != nil {
+			return c.RenderText("invalid county id")
+		}
 	}
 	city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
 	zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
