@@ -176,7 +176,10 @@ type Hits struct {
 
 func (c Hits) Index() revel.Result {
 
-	var flashData app.HitInfo
+	var (
+		flashData    app.HitInfo
+		filterBillId int
+	)
 
 	if c.Flash.Data["info"] != "" {
 		revel.AppLog.Debugf("hits.Index(): flashdatainfo: %#v", c.Flash.Data)
@@ -192,6 +195,17 @@ func (c Hits) Index() revel.Result {
 	filterCity := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("city"), `\$1`), `''`)
 	filterYear := app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(c.Params.Get("year"), `\$1`), `''`)
 	filterSort := c.Params.Get("sort")
+	filterBillId = -1
+	filterBillId_str := c.Params.Get("billId")
+	if len(filterBillId_str) > 0 {
+		var err error
+
+		filterBillId, err = strconv.Atoi(filterBillId_str)
+		if err != nil {
+			filterBillId = -1
+			revel.AppLog.Debugf("not filtering billid=%d (string '%s')", filterBillId, filterBillId_str)
+		}
+	}
 
 	where := ""
 
@@ -234,6 +248,9 @@ func (c Hits) Index() revel.Result {
 		}
 		where += ` and substr(entdate::varchar, 1, 4) = '` + year + `'`
 		filterYear = year
+	}
+	if filterBillId >= 0 {
+		where += fmt.Sprintf(` and h.bill_id = %d`, filterBillId)
 	}
 
 	order := " "
