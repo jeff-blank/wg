@@ -404,6 +404,7 @@ func (c Hits) Create() revel.Result {
 		series_in string
 		countyId  int
 		err       error
+		hitNum    int
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -449,6 +450,10 @@ func (c Hits) Create() revel.Result {
 		if residence == "" {
 			return c.RenderText(fmt.Sprintf("residence \"%s\" not found", r[0]))
 		}
+	}
+
+	if hitNumStr, ok := c.Params.Form["hitNum"]; ok {
+		hitNum, _ = strconv.Atoi(hitNumStr[0])
 	}
 
 	err = app.DB.QueryRow(`select count(1) from hits where substr(entdate::text, 6) = $1`, entdate[5:]).Scan(&dateHits)
@@ -535,7 +540,11 @@ func (c Hits) Create() revel.Result {
 	}
 	if country == "US" {
 		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", county_id", ", $9")
-		res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate)
+		if hitNum > 0 {
+			res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate, hitNum)
+		} else {
+			res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate, sql.NullInt32{})
+		}
 	} else {
 		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
 		res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate)
