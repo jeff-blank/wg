@@ -619,7 +619,7 @@ func (c Hits) Update() revel.Result {
 				revel.AppLog.Errorf(`update hits set wg_hit_number = wg_hit_number+1 where wg_hit_number >= %v and id <> %v: %#v`, wgHitNum, id, err)
 				return c.RenderText(fmt.Sprintf("error updating hit sequence numbers: %#v", err))
 			}
-		} else {
+		} else if err.Error() != app.SQL_ERR_NO_ROWS {
 			revel.AppLog.Errorf(`select id from hits where wg_hit_number=%v: %#v`, wgHitNum, err)
 			return c.RenderText(fmt.Sprintf("error checking hit sequence numbers: %#v", err))
 		}
