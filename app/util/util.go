@@ -317,6 +317,7 @@ func GetHits(whereGroupOrder string) ([]app.Hit, error) {
 			&newHit.City,
 			&newHit.ZIP,
 			&newHit.Count,
+			&newHit.WGHitNum,
 		)
 		if err != nil {
 			revel.AppLog.Errorf("%v", err)

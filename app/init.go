@@ -28,6 +28,7 @@ type Hit struct {
 	City      string
 	ZIP       string
 	Count     int
+	WGHitNum  int
 }
 
 type HitsBrkEnt struct {
@@ -135,7 +136,8 @@ const (
 			coalesce(cm.county, '--') as county,
 			coalesce(h.city, '') as city,
 			coalesce(h.zip, '') as zip,
-			(select count(*) from hits where bill_id = b.id)
+			(select count(*) from hits where bill_id = b.id),
+			coalesce(h.wg_hit_number, -1)
 		from
 			bills b,
 			hits h

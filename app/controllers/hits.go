@@ -162,8 +162,8 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county%s, city, zip, entdate) values ($1, $2, $3, $4, $5, $6, $7%s)`
-	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, county_id=$4, city=$5, zip=$6, entdate=$7 where id=$8`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county%s, city, zip, entdate, wg_hit_number) values ($1, $2, $3, $4, $5, $6, $7, $8%s)`
+	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, county_id=$4, city=$5, zip=$6, entdate=$7, wg_hit_number=$8 where id=$9`
 
 	// }}}
 
@@ -255,10 +255,10 @@ func (c Hits) Index() revel.Result {
 
 	order := " "
 	if filterSort == "asc" {
-		order += "order by entdate, h.id"
+		order += "order by entdate, h.wg_hit_number h.id"
 	} else {
 		filterSort = ""
-		order += "order by entdate desc, h.id desc"
+		order += "order by entdate desc, wg_hit_number desc, h.id desc"
 	}
 
 	hits, err := util.GetHits(where + order)
@@ -534,7 +534,7 @@ func (c Hits) Create() revel.Result {
 		county = "--"
 	}
 	if country == "US" {
-		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", county_id", ", $8")
+		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", county_id", ", $9")
 		res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate)
 	} else {
 		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
@@ -580,6 +580,8 @@ func (c Hits) Update() revel.Result {
 		updateFlash app.HitInfo
 		state       string
 		county      string
+		wgHitNum    int
+		hitId       int
 	)
 
 	year := c.Params.Get("year")
@@ -602,7 +604,26 @@ func (c Hits) Update() revel.Result {
 		if !app.RE_date.MatchString(date) {
 			return c.RenderText("error in date '" + date + "'")
 		}
-		err = update(id, country, state, county, countyId, city, zip, date)
+
+		hitNumStr := c.Params.Get("hitnum")
+		if len(hitNumStr) > 0 {
+			wgHitNum, err = strconv.Atoi(hitNumStr)
+		} else {
+			wgHitNum = -1
+		}
+		// check and update subsequent hit numbers
+		err = app.DB.QueryRow(`select id from hits where wg_hit_number=$1`, wgHitNum).Scan(&hitId)
+		if err == nil {
+			_, err = app.DB.Exec(`update hits set wg_hit_number = wg_hit_number+1 where wg_hit_number >= $1 and id <> $2`, wgHitNum, id)
+			if err != nil {
+				revel.AppLog.Errorf(`update hits set wg_hit_number = wg_hit_number+1 where wg_hit_number >= %v and id <> %v: %#v`, wgHitNum, id, err)
+				return c.RenderText(fmt.Sprintf("error updating hit sequence numbers: %#v", err))
+			}
+		} else {
+			revel.AppLog.Errorf(`select id from hits where wg_hit_number=%v: %#v`, wgHitNum, err)
+			return c.RenderText(fmt.Sprintf("error checking hit sequence numbers: %#v", err))
+		}
+		err = update(id, country, state, county, countyId, city, zip, date, wgHitNum)
 	}
 	if err != nil {
 		return c.RenderText(fmt.Sprintf("edit/delete of hit '%s' failed: %s", id, err.Error()))
@@ -710,13 +731,13 @@ func del(id string) error {
 	return nil
 }
 
-func update(id, country, state, county string, countyId int, city string, zip string, date string) error {
+func update(id, country, state, county string, countyId int, city string, zip string, date string, hitNum int) error {
 	revel.AppLog.Debugf("updating hit id '%s'", id)
 	if country != "Canada" {
 		state = "--"
 	}
 	county = "--"
-	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, countyId, city, zip, date, id)
+	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, countyId, city, zip, date, hitNum, id)
 	if err != nil {
 		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)
 		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s', '%s'",
