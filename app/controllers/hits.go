@@ -800,10 +800,20 @@ func getHARFirsts(serial, series string, denom int) []string {
 		firsts = append(firsts, "series "+series+" / FRB "+frb)
 	}
 	if isFirstFRBBlock(frb, block) {
-		firsts = append(firsts, "FRB/block letter "+frb+"-"+block)
+		if block == "*" {
+			firsts = append(firsts, "FRB "+frb+" star note")
+		} else {
+			firsts = append(firsts, "FRB/block letter "+frb+"-"+block)
+		}
 	}
 	if isFirstSeriesBlock(series, block) {
-		firsts = append(firsts, "series "+series+" / block letter "+block)
+		var blockDesc string
+		if block == "*" {
+			blockDesc = "star note"
+		} else {
+			blockDesc = "/ block letter " + block
+		}
+		firsts = append(firsts, "series "+series+" "+blockDesc)
 	}
 	return firsts
 }
