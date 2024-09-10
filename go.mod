@@ -1,8 +1,6 @@
 module github.com/jeff-blank/wg
 
-go 1.22.0
-
-toolchain go1.22.6
+go 1.19
 
 require (
 	github.com/gopherjs/gopherjs v1.19.0-beta1
