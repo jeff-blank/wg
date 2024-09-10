@@ -4,7 +4,7 @@ ENV GO111MODULE=on
 
 COPY go.mod go.sum /go/src/github.com/jeff-blank/wg/
 
-RUN sh -c "cd /go/src/github.com/jeff-blank/wg && go install github.com/gopherjs/gopherjs@1.17.1+go1.17.3"
+RUN sh -c "cd /go/src/github.com/jeff-blank/wg && go install github.com/gopherjs/gopherjs@v1.19.0-beta1"
 RUN sh -c "cd /go/src/github.com/jeff-blank/wg && go install github.com/revel/cmd/revel@latest"
 
 COPY app /go/src/github.com/jeff-blank/wg/app/
