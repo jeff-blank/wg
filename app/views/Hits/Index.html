@@ -7,7 +7,7 @@
 </p>
 <hr>
 
-{{ if or .flashData.FirstOnDate .flashData.FirstInCounty .flashData.GenericMessage (gt (len .flashData.HARFillers) 0) }}
+{{ if or .flashData.FirstOnDate .flashData.FirstInCounty .flashData.GenericMessage .flashData.HARFillers.AnyFirst }}
 <div class="firsts">
 <ul>
   {{ if .flashData.FirstOnDate }}
@@ -28,9 +28,15 @@
     <li>County is adjacent to no other counties with hits.</li>
     {{ end }}
   {{ end }}
-  {{ if gt (len .flashData.HARFillers) 0 }}
+  {{ if .flashData.HARFillers.AnyFirst }}
     <li>HAR squares filled:
-      <ul>{{ range .flashData.HARFillers }} <li>{{.}}</li>{{ end }}</ul>
+      <ul>
+      {{ if .flashData.HARFillers.SeriesDenom }}<li>series {{ .flashData.HARFillers.Series }} / ${{ .flashData.HARFillers.Denom }}{{ end }}
+      {{ if .flashData.HARFillers.DenomFRB }}<li>${{ .flashData.HARFillers.Denom }} / FRB {{ .flashData.HARFillers.FRB }}{{ end }}
+      {{ if .flashData.HARFillers.SeriesFRB }}<li>series {{ .flashData.HARFillers.Series }} / FRB {{ .flashData.HARFillers.FRB }}{{ end }}
+      {{ if .flashData.HARFillers.FRBBlockLetter }}<li>FRB{{ if ne .flashData.HARFillers.BlockLetter "*" }}/block letter{{ end }} {{ .flashData.HARFillers.FRB }}{{ if eq .flashData.HARFillers.BlockLetter "*" }} star note{{ else }}-{{ .flashData.HARFillers.BlockLetter }}{{ end }}{{ end }}
+      {{ if .flashData.HARFillers.SeriesBlockLetter }}<li>series {{ .flashData.HARFillers.Series }} {{ if eq .flashData.HARFillers.BlockLetter "*" }}star note{{ else }}/ block letter {{ .flashData.HARFillers.BlockLetter }}{{ end }}{{ end }}
+      </ul>
     </li>
   {{ end }}
 </ul>

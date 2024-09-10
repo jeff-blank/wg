@@ -75,12 +75,25 @@ type BingoDetail struct {
 	Hits   bool
 }
 
+type HARFillerSet struct {
+	Series            string
+	Denom             int
+	FRB               string
+	BlockLetter       string
+	AnyFirst          bool
+	SeriesDenom       bool
+	DenomFRB          bool
+	SeriesFRB         bool
+	FRBBlockLetter    bool
+	SeriesBlockLetter bool
+}
+
 type HitInfo struct {
 	FirstOnDate      string
 	FirstInCounty    string
 	CountyBingoNames []string
 	AdjacentCounties []string
-	HARFillers       []string
+	HARFillers       HARFillerSet
 	GenericMessage   string
 }
 

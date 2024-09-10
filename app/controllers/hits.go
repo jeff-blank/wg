@@ -494,10 +494,7 @@ func (c Hits) Create() revel.Result {
 		}
 		county = "--"
 	}
-	HARFillers := getHARFirsts(serial, series, denom)
-	if len(HARFillers) > 0 {
-		infoFlash.HARFillers = HARFillers
-	}
+	infoFlash.HARFillers = getHARFirsts(serial, series, denom)
 	flashJson, err := json.Marshal(infoFlash)
 	if err == nil {
 		c.Flash.Out["info"] = string(flashJson)
@@ -786,35 +783,36 @@ func getBingoNames(state, county string) []string {
 	return bingos
 }
 
-func getHARFirsts(serial, series string, denom int) []string {
-	firsts := make([]string, 0)
+func getHARFirsts(serial, series string, denom int) app.HARFillerSet {
+	var firsts app.HARFillerSet
 	frb := util.GetFRBFromSerial(serial)
 	block := serial[len(serial)-1:]
 	if isFirstSeriesDenom(series, denom) {
-		firsts = append(firsts, fmt.Sprintf("series %s / $%d", series, denom))
+		firsts.Series = series
+		firsts.Denom = denom
+		firsts.SeriesDenom = true
 	}
-	if isFirstFRBDenom(frb, denom) {
-		firsts = append(firsts, fmt.Sprintf("$%d / FRB %s", denom, frb))
+	if isFirstDenomFRB(frb, denom) {
+		firsts.Denom = denom
+		firsts.FRB = frb
+		firsts.DenomFRB = true
 	}
 	if isFirstSeriesFRB(series, frb) {
-		firsts = append(firsts, "series "+series+" / FRB "+frb)
+		firsts.Series = series
+		firsts.FRB = frb
+		firsts.SeriesFRB = true
 	}
 	if isFirstFRBBlock(frb, block) {
-		if block == "*" {
-			firsts = append(firsts, "FRB "+frb+" star note")
-		} else {
-			firsts = append(firsts, "FRB/block letter "+frb+"-"+block)
-		}
+		firsts.FRB = frb
+		firsts.BlockLetter = block
+		firsts.FRBBlockLetter = true
 	}
 	if isFirstSeriesBlock(series, block) {
-		var blockDesc string
-		if block == "*" {
-			blockDesc = "star note"
-		} else {
-			blockDesc = "/ block letter " + block
-		}
-		firsts = append(firsts, "series "+series+" "+blockDesc)
+		firsts.Series = series
+		firsts.BlockLetter = block
+		firsts.SeriesBlockLetter = true
 	}
+	firsts.AnyFirst = (firsts.SeriesDenom || firsts.DenomFRB || firsts.SeriesFRB || firsts.FRBBlockLetter || firsts.SeriesBlockLetter)
 	return firsts
 }
 
@@ -830,14 +828,14 @@ func isFirstSeriesDenom(series string, denom int) bool {
 	return false
 }
 
-func isFirstFRBDenom(frb string, denom int) bool {
+func isFirstDenomFRB(frb string, denom int) bool {
 	var count int
 
 	err := app.DB.QueryRow(`select count(1) from bills b, hits h where b.id = h.bill_id and b.serial like '%' || $1 || '_________' and b.denomination = $2`, frb, denom).Scan(&count)
 	if err == nil && count == 0 {
 		return true
 	} else if err != nil {
-		revel.AppLog.Errorf("isFirstFRBDenom(%s, %d): %#v", frb, denom, err)
+		revel.AppLog.Errorf("isFirstDenomFRB(%s, %d): %#v", frb, denom, err)
 	}
 	return false
 }
