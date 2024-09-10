@@ -1,9 +1,11 @@
 module github.com/jeff-blank/wg
 
-go 1.17
+go 1.22.0
+
+toolchain go1.22.6
 
 require (
-	github.com/gopherjs/gopherjs v0.0.0-20211228203721-be292294a697
+	github.com/gopherjs/gopherjs v1.17.2
 	github.com/gopherjs/jquery v0.0.0-20191017083323-73f4c7416038
 	github.com/lib/pq v1.10.4
 	github.com/revel/modules v1.1.0
