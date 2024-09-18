@@ -633,6 +633,10 @@ func (c Hits) Update() revel.Result {
 			revel.AppLog.Errorf(`select id from hits where wg_hit_number=%v: %#v`, wgHitNum, err)
 			return c.RenderText(fmt.Sprintf("error checking hit sequence numbers: %#v", err))
 		}
+		county = "--"
+		if country != "Canada" {
+			state = "--"
+		}
 		err = update(id, country, state, county, countyId, city, zip, date, wgHitNum)
 	}
 	if err != nil {
