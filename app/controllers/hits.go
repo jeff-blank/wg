@@ -452,7 +452,7 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
-	if hitNumStr, ok := c.Params.Form["hitNum"]; ok {
+	if hitNumStr, ok := c.Params.Form["hitnum"]; ok {
 		hitNum, _ = strconv.Atoi(hitNumStr[0])
 	}
 
