@@ -544,7 +544,7 @@ func (c Hits) Create() revel.Result {
 		}
 	} else {
 		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
-		res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate)
+		res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate, hitNum)
 	}
 	if err != nil {
 		revel.AppLog.Errorf("insert new hit: %#v", err)
