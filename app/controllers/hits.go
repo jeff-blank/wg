@@ -162,7 +162,7 @@ const (
 	`
 
 	S_INSERT_BILL = `insert into bills (serial, series, denomination, rptkey, residence)values($1, $2, $3, $4, $5)`
-	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county%s, city, zip, entdate, wg_hit_number) values ($1, $2, $3, $4, $5, $6, $7, $8%s)`
+	S_INSERT_HIT  = `insert into hits (bill_id, country, state, county, county_id, city, zip, entdate, wg_hit_number) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 	S_UPDATE_HIT  = `update hits set country=$1, state=$2, county=$3, county_id=$4, city=$5, zip=$6, entdate=$7, wg_hit_number=$8 where id=$9`
 
 	// }}}
@@ -390,21 +390,23 @@ func (c Hits) ShowBrk() revel.Result {
 
 func (c Hits) Create() revel.Result {
 	var (
-		bId       int
-		bSerial   string
-		bDenom    int
-		bSeries   string
-		bRptkey   string
-		series    string
-		infoFlash app.HitInfo
-		dateHits  int
-		state     string
-		county    string
-		res       sql.Result
-		series_in string
-		countyId  int
-		err       error
-		hitNum    int
+		bId            int
+		bSerial        string
+		bDenom         int
+		bSeries        string
+		bRptkey        string
+		series         string
+		infoFlash      app.HitInfo
+		dateHits       int
+		state          string
+		county         string
+		res            sql.Result
+		series_in      string
+		countyId       int
+		err            error
+		hitNum         int
+		insertHitNum   interface{}
+		insertCountyId interface{}
 	)
 	revel.AppLog.Debugf("%#v", c.Params.Form)
 
@@ -531,25 +533,21 @@ func (c Hits) Create() revel.Result {
 		}
 	}
 
+	county = "--"
 	if country != "Canada" {
 		state = "--"
-		county = "--"
 	}
-	if country == "US" {
-		insertStmt := fmt.Sprintf(S_INSERT_HIT, ", county_id", ", $9")
-		if hitNum > 0 {
-			res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate, hitNum)
-		} else {
-			res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate, sql.NullInt32{})
-		}
+	if countyId < 1 {
+		insertCountyId = sql.NullInt32{}
 	} else {
-		insertStmt := fmt.Sprintf(S_INSERT_HIT, "", "")
-		if hitNum > 0 {
-			res, err = app.DB.Exec(insertStmt, bId, country, state, county, city, zip, entdate, hitNum)
-		} else {
-			res, err = app.DB.Exec(insertStmt, bId, country, state, county, countyId, city, zip, entdate, sql.NullInt32{})
-		}
+		insertCountyId = countyId
 	}
+	if hitNum < 1 {
+		insertHitNum = sql.NullInt32{}
+	} else {
+		insertHitNum = hitNum
+	}
+	res, err = app.DB.Exec(S_INSERT_HIT, bId, country, state, county, insertCountyId, city, zip, entdate, insertHitNum)
 	if err != nil {
 		revel.AppLog.Errorf("insert new hit: %#v", err)
 		return c.RenderText(err.Error())
@@ -592,6 +590,7 @@ func (c Hits) Update() revel.Result {
 		county      string
 		wgHitNum    int
 		hitId       int
+		countyId    int
 	)
 
 	year := c.Params.Get("year")
@@ -602,10 +601,12 @@ func (c Hits) Update() revel.Result {
 		err = del(id)
 	} else {
 		country := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["country"][0], ""), "")
-		countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
-		countyId, err := strconv.Atoi(countyId_in)
-		if err != nil {
-			return c.RenderText("invalid county id")
+		if country == "US" {
+			countyId_in := app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["county"][0], ""), "")
+			countyId, err = strconv.Atoi(countyId_in)
+			if err != nil {
+				return c.RenderText("invalid county id")
+			}
 		}
 		city := app.RE_whitespace.ReplaceAllLiteralString(app.RE_trailingWhitespace.ReplaceAllLiteralString(app.RE_leadingWhitespace.ReplaceAllLiteralString(c.Params.Form["city"][0], ""), ""), " ")
 		zip := app.RE_nonNumeric.ReplaceAllLiteralString(c.Params.Form["zip"][0], "")
@@ -616,6 +617,7 @@ func (c Hits) Update() revel.Result {
 		}
 
 		hitNumStr := c.Params.Get("hitnum")
+		revel.AppLog.Debugf("hitNumStr=%s", hitNumStr)
 		if len(hitNumStr) > 0 {
 			wgHitNum, err = strconv.Atoi(hitNumStr)
 		} else {
@@ -746,12 +748,28 @@ func del(id string) error {
 }
 
 func update(id, country, state, county string, countyId int, city string, zip string, date string, hitNum int) error {
+	var (
+		updateHitNum   interface{}
+		updateCountyId interface{}
+	)
+
 	revel.AppLog.Debugf("updating hit id '%s'", id)
 	if country != "Canada" {
 		state = "--"
 	}
 	county = "--"
-	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, countyId, city, zip, date, hitNum, id)
+	if countyId < 1 {
+		updateCountyId = sql.NullInt32{}
+	} else {
+		updateCountyId = countyId
+	}
+	if hitNum < 1 {
+		updateHitNum = sql.NullInt32{}
+	} else {
+		updateHitNum = hitNum
+	}
+	revel.AppLog.Debugf("update hit: country=%s state=%s county=%s updateCountyId=%#v city=%s zip=%s date=%s updateHitNum=%#v id=%s", country, state, county, updateCountyId, city, zip, date, updateHitNum, id)
+	res, err := app.DB.Exec(S_UPDATE_HIT, country, state, county, updateCountyId, city, zip, date, updateHitNum, id)
 	if err != nil {
 		revel.AppLog.Errorf("hits.update(): update hit %s: %#v", id, err)
 		revel.AppLog.Errorf("hits.update(): query:\n\t%s\n\t'%s', '%s', '%s', '%s', '%s', '%s'",
