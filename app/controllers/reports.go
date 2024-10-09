@@ -27,6 +27,7 @@ func (c Reports) Index() revel.Result {
 	links["first"] = routes.Reports.FirstHits()
 	links["last50"] = routes.Reports.Last50Counts()
 	links["topCounties"] = routes.Reports.TopCounties()
+	links["centuryClub"] = routes.Reports.CenturyClub()
 	return c.Render(links)
 }
 
