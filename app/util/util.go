@@ -546,4 +546,69 @@ func DbSanitize(input string) string {
 	return app.RE_singleQuote.ReplaceAllString(app.RE_dbUnsafe.ReplaceAllString(input, `\$1`), `''`)
 }
 
+func GetCenturyItems() (map[string][]app.SimpleCount, error) {
+	rows, err := app.DB.Query(`select cm.state, count(1) from hits h, counties_master cm where h.country='US' and h.county_id=cm.id group by cm.state order by count desc`)
+	if err != nil {
+		return nil, err
+	}
+	states, err := countCutoff(rows, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err = app.DB.Query(`select h.city || ', ' || cm.state, count(1) from hits h, counties_master cm where h.country='US' and h.county_id=cm.id group by cm.state, h.city order by count desc`)
+	if err != nil {
+		return nil, err
+	}
+	cities, err := countCutoff(rows, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err = app.DB.Query(`select cm.county || ', ' || cm.state, count(1) from hits h, counties_master cm where country='US' and h.county_id=cm.id group by cm.state, cm.county order by count desc`)
+	if err != nil {
+		return nil, err
+	}
+	counties, err := countCutoff(rows, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err = app.DB.Query(`select h.zip || ' (' || h.city || ', ' || cm.county || ', ' || cm.state || ')', count(1) from hits h, counties_master cm where country='US' and h.county_id=cm.id group by cm.state, cm.county, h.city, h.zip order by count desc`)
+	if err != nil {
+		return nil, err
+	}
+	zips, err := countCutoff(rows, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string][]app.SimpleCount{
+		"00States":    states,
+		"01Counties":  counties,
+		"02Cities":    cities,
+		"03ZIP codes": zips,
+	}, nil
+}
+
+func countCutoff(rows *sql.Rows, cutoff int) ([]app.SimpleCount, error) {
+	var (
+		label string
+		count int
+	)
+
+	results := make([]app.SimpleCount, 0)
+	for rows.Next() {
+		err := rows.Scan(&label, &count)
+		if err != nil {
+			return nil, err
+		}
+		if count < 100 {
+			break
+		}
+		results = append(results, app.SimpleCount{Label: label, Count: count})
+	}
+	return results, nil
+}
+
 // vim:foldmethod=marker:

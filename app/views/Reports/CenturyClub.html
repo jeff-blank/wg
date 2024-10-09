@@ -1,0 +1,21 @@
+{{set . "title" "WG Utils 2.0: Reports: Century Club"}}
+{{template "header.html" .}}
+
+<h1>Century Club</h1>
+
+<table class="fullWidthPlus">
+  <tr>
+    {{ range $tableName, $tableData := .data }}
+    <td class="innerTable">
+      <table class="bordered">
+        <tr><th class="bordered" colspan="2">{{ slice $tableName 2 }}</th></tr>
+        {{ range $tableData }}
+        <tr><td class="bordered">{{ .Label }}</td><td class="aright bordered">{{ .Count }}</td></tr>
+        {{ end }}
+      </table>
+    </td>
+    {{ end }}
+  </tr>
+</table>
+
+{{template "footer.html" .}}

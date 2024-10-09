@@ -269,4 +269,12 @@ func (c Reports) Last50Counts() revel.Result {
 	return c.Render(denomData, seriesData, stateData, countyData)
 }
 
+func (c Reports) CenturyClub() revel.Result {
+	data, err := util.GetCenturyItems()
+	if err != nil {
+		return c.RenderError(err)
+	}
+	return c.Render(data)
+}
+
 // vim:foldmethod=marker:

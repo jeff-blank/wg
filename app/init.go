@@ -126,6 +126,11 @@ type UserPrefs struct {
 	WGProfileKey string
 }
 
+type SimpleCount struct {
+	Label string
+	Count int
+}
+
 const (
 	SQL_ERR_NO_ROWS  = `sql: no rows in result set`
 	DATE_LAYOUT      = `2006-01-02`
