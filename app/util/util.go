@@ -603,10 +603,11 @@ func countCutoff(rows *sql.Rows, cutoff int) ([]app.SimpleCount, error) {
 		if err != nil {
 			return nil, err
 		}
-		if count < 100 {
+		results = append(results, app.SimpleCount{Label: label, Count: count})
+		// allow one result below the cutoff for "coming soon" purposes
+		if count < cutoff {
 			break
 		}
-		results = append(results, app.SimpleCount{Label: label, Count: count})
 	}
 	return results, nil
 }

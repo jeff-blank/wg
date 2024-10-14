@@ -10,7 +10,7 @@
       <table class="bordered">
         <tr><th class="bordered" colspan="2">{{ slice $tableName 2 }}</th></tr>
         {{ range $tableData }}
-        <tr><td class="bordered">{{ .Label }}</td><td class="aright bordered">{{ .Count }}</td></tr>
+        <tr><td class="bordered{{ if lt .Count 100 }} not100{{ end }}">{{ .Label }}</td><td class="aright bordered{{ if lt .Count 100 }} not100{{ end }}">{{ .Count }}</td></tr>
         {{ end }}
       </table>
     </td>
