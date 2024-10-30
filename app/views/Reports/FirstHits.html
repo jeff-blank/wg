@@ -1,7 +1,7 @@
-{{set . "title" "WG Utils 2.0: Reports: First Hits in States/Counties"}}
+{{set . "title" "WG Utils 2.0: Reports: First Hits in States/Counties/ZIP3s"}}
 {{template "header.html" .}}
 
-<h1 id="h1">First Hits in States/Counties</h1>
+<h1 id="h1">First Hits in States/Counties/ZIP3s</h1>
 
 <div id="dimmer"></div>
 <div id="throbber"><img src="/public/img/throbber.gif" /></div>
@@ -12,6 +12,9 @@
     </td>
     <td id="c_counties" class="tab-inactive">
       <div id="counties" class="tab-click tab-inactive">Counties</div>
+    </td>
+    <td id="c_zip3" class="tab-inactive">
+      <div id="zip3" class="tab-click tab-inactive">ZIP3s</div>
     </td>
   </tr>
 </table>
@@ -24,6 +27,7 @@
     <th id="c_date" class="c_date bordered">Hit Date</th>
     <th id="c_state" class="c_state bordered">State</th>
     <th id="c_county" class="c_county bordered">County</th>
+    <th id="c_city" class="c_city bordered">City</th>
   </tr>
 </table>
 <div id="scroller" class="bordered scrollable"></div>

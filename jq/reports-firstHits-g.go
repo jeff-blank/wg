@@ -14,7 +14,9 @@ const HITS_PATH = "/util/GetFirstHits?type="
 
 var jq = jquery.NewJQuery
 
-func getShowHits(data interface{}) {
+func getShowHits(data interface{}, regionType string) {
+	var state string
+
 	table := jq("<table/>").SetAttr("id", "dataTable")
 	i := len(data.([]interface{}))
 	cellNum := 0
@@ -34,12 +36,23 @@ func getShowHits(data interface{}) {
 		billUrl := "https://www.wheresgeorge.com/" + entry["RptKey"].(string)
 		href := jq("<a/>").SetAttr("href", billUrl).SetAttr("target", "_blank").SetHtml(entry["EntDate"].(string))
 		jq("<td/>").SetAttr("id", "l_"+strconv.Itoa(cellNum)).AddClass("c_date bordered").Append(href).AppendTo(row)
-		jq("<td/>").SetAttr("id", "s_"+strconv.Itoa(cellNum)).AddClass("c_state bordered").SetHtml(entry["State"].(string)).AppendTo(row)
+		if regionType == "zip3" && entry["ZIP"].(string) != "" {
+			state = fmt.Sprintf("%s / %s", entry["ZIP"].(string)[:3], entry["State"].(string))
+		} else {
+			state = entry["State"].(string)
+		}
+		jq("<td/>").SetAttr("id", "s_"+strconv.Itoa(cellNum)).AddClass("c_state bordered").SetHtml(state).AppendTo(row)
 		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_county bordered").SetHtml(entry["County"].(string)).AppendTo(row)
+		jq("<td/>").SetAttr("id", "c_"+strconv.Itoa(cellNum)).AddClass("c_city bordered").SetHtml(entry["City"].(string)).AppendTo(row)
 
 		table.Append(row)
 		i--
 		cellNum++
+	}
+	if regionType == "zip3" {
+		jq("#c_state").SetHtml("ZIP3&nbsp;/&nbsp;State")
+	} else {
+		jq("#c_state").SetHtml("State")
 	}
 	jq("#dataTable").Remove()
 	jq("#scroller").RemoveAttr("style").Append(table)
@@ -68,14 +81,23 @@ func setActiveTab(tabName string) {
 	if tabName == "counties" {
 		jq("#c_states").RemoveClass("tab-active").AddClass("tab-inactive")
 		jq("#states").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#c_zip3").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#zip3").RemoveClass("tab-active").AddClass("tab-inactive")
+	} else if tabName == "zip3" {
+		jq("#c_counties").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#counties").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#c_states").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#states").RemoveClass("tab-active").AddClass("tab-inactive")
 	} else {
 		jq("#c_counties").RemoveClass("tab-active").AddClass("tab-inactive")
 		jq("#counties").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#c_zip3").RemoveClass("tab-active").AddClass("tab-inactive")
+		jq("#zip3").RemoveClass("tab-active").AddClass("tab-inactive")
 	}
 }
 
 func main() {
-	var hitsPath string
+	var hitsPath, regionType string
 	throbber := jq("#throbber")
 	dimmer := jq("#dimmer")
 
@@ -85,15 +107,22 @@ func main() {
 		url := js.Global.Get("location").String()
 		typeOffset := s.Index(url, "#")
 		hitsPath = HITS_PATH
-		if typeOffset < 0 || url[typeOffset+1:] != "counties" {
-			hitsPath = HITS_PATH + "state"
+		if typeOffset < 0 {
 			setActiveTab("states")
-		} else {
-			hitsPath = HITS_PATH + "county"
+			regionType = "state"
+		} else if url[typeOffset+1:] == "counties" {
+			regionType = "county"
 			setActiveTab("counties")
+		} else if url[typeOffset+1:] == "zip3" {
+			setActiveTab("zip3")
+			regionType = "zip3"
+		} else {
+			setActiveTab("states")
+			regionType = "state"
 		}
+		hitsPath = HITS_PATH + regionType
 		jquery.Get(hitsPath, func(data interface{}) {
-			getShowHits(data)
+			getShowHits(data, regionType)
 			js.Global.Get("tableFix").Call("tf", "c_county")
 			throbber.Hide()
 			dimmer.Hide()
@@ -107,25 +136,33 @@ func main() {
 		url := js.Global.Get("location").String()
 		typeOffset := s.Index(url, "#")
 		if tabClick == "counties" {
-			hitsPath = HITS_PATH + "county"
+			regionType = "county"
 			if typeOffset < 0 {
 				url += "#counties"
 			} else {
 				url = url[:typeOffset] + "#counties"
 			}
+		} else if tabClick == "zip3" {
+			regionType = "zip3"
+			if typeOffset < 0 {
+				url += "#zip3"
+			} else {
+				url = url[:typeOffset] + "#zip3"
+			}
 		} else {
-			hitsPath = HITS_PATH + "state"
+			regionType = "state"
 			if typeOffset < 0 {
 				url += "#states"
 			} else {
 				url = url[:typeOffset] + "#states"
 			}
 		}
+		hitsPath = HITS_PATH + regionType
 		js.Global.Set("location", url)
 
 		jquery.Get(hitsPath, func(data interface{}) {
-			getShowHits(data)
-			js.Global.Get("tableFix").Call("tf", "c_county")
+			getShowHits(data, regionType)
+			js.Global.Get("tableFix").Call("tf", "c_city")
 			throbber.Hide()
 			dimmer.Hide()
 		})

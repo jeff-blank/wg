@@ -275,16 +275,22 @@ func wgScore(ents, hits int) float64 {
 }
 
 func GetFirstHits(regionType string) ([]app.Hit, error) {
+	orderBy := `entdate desc, h.wg_hit_number desc, h.id desc`
 	if regionType == "county" {
 		return GetHits(`and h.id IN (SELECT h2.id
           FROM hits h2, counties_master cm2
           WHERE h2.country='US' AND h.county_id=h2.county_id AND h2.county_id=cm2.id AND cm2.state not in ('DC', 'AE', 'GU', 'PR')
-          ORDER BY h2.entdate, h2.id LIMIT 1) ORDER BY h.entdate desc, h.id desc`)
+          ORDER BY h2.entdate, h2.id LIMIT 1) ORDER BY ` + orderBy)
 	} else if regionType == "state" {
 		return GetHits(`and h.id IN (SELECT h2.id
           FROM hits h2, counties_master cm2
           WHERE h2.country='US' AND h2.county_id=cm2.id AND cm.state=cm2.state
-          ORDER BY h2.entdate LIMIT 1) ORDER BY h.entdate desc`)
+          ORDER BY h2.entdate LIMIT 1) ORDER BY ` + orderBy)
+	} else if regionType == "zip3" {
+		return GetHits(`and h.country='US' and h.zip is not null and h.id in (select h2.id
+          from hits h2
+		  where substr(h.zip, 1, 3)=substr(h2.zip, 1, 3)
+		  order by h2.entdate limit 1) order by ` + orderBy)
 	} else {
 		return nil, nil
 	}
@@ -501,6 +507,19 @@ func CountyHasHits(id int) (bool, error) {
 	var count int
 
 	err := app.DB.QueryRow(`select count(1) from hits where county_id = $1`, id).Scan(&count)
+	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func ZIP3HasHits(zip string) (bool, error) {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from hits where substr(zip, 1, 3) = $1`, zip[:3]).Scan(&count)
 	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
 		return false, err
 	}

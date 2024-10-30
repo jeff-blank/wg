@@ -490,6 +490,15 @@ func (c Hits) Create() revel.Result {
 				infoFlash.AdjacentCounties = borderCounties
 			}
 		}
+		hasZIP3Hits, err := util.ZIP3HasHits(zip)
+		if err != nil {
+			msg := fmt.Sprintf("new-ZIP3 check for ZIP %s: ", zip)
+			revel.AppLog.Errorf("%s%#v", msg, err)
+			return c.RenderText(msg + err.Error())
+		}
+		if !hasZIP3Hits {
+			infoFlash.FirstInZIP3 = fmt.Sprintf("%s (%s)", zip[:3], state)
+		}
 	} else {
 		if country != "Canada" {
 			state = "--"
