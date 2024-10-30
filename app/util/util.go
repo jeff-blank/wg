@@ -516,6 +516,19 @@ func CountyHasHits(id int) (bool, error) {
 	return false, nil
 }
 
+func ZIP3HasHits(zip string) (bool, error) {
+	var count int
+
+	err := app.DB.QueryRow(`select count(1) from hits where substr(zip, 1, 3) = $1`, zip[:3]).Scan(&count)
+	if err != nil && err.Error() != app.SQL_ERR_NO_ROWS {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func GetSerialSeries(serial_in, series_in string, denom int) (string, string, error) {
 	revel.AppLog.Debugf("serial_in='%s'", serial_in)
 

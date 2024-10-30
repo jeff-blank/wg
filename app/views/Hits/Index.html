@@ -7,7 +7,7 @@
 </p>
 <hr>
 
-{{ if or .flashData.FirstOnDate .flashData.FirstInCounty .flashData.GenericMessage .flashData.HARFillers.AnyFirst }}
+{{ if or .flashData.FirstOnDate .flashData.FirstInZIP3 .flashData.FirstInCounty .flashData.GenericMessage .flashData.HARFillers.AnyFirst }}
 <div class="firsts">
 <ul>
   {{ if .flashData.FirstOnDate }}
@@ -27,6 +27,9 @@
     {{ else }}
     <li>County is adjacent to no other counties with hits.</li>
     {{ end }}
+  {{ end }}
+  {{ if .flashData.FirstInZIP3 }}
+  <li>&#128506; First hit in ZIP3 {{ .flashData.FirstInZIP3 }}</li>
   {{ end }}
   {{ if .flashData.HARFillers.AnyFirst }}
     <li>HAR squares filled:

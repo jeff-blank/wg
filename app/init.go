@@ -91,6 +91,7 @@ type HARFillerSet struct {
 type HitInfo struct {
 	FirstOnDate      string
 	FirstInCounty    string
+	FirstInZIP3      string
 	CountyBingoNames []string
 	AdjacentCounties []string
 	HARFillers       HARFillerSet
