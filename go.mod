@@ -31,8 +31,8 @@ require (
 	github.com/revel/pathtree v0.0.0-20140121041023-41257a1839e9 // indirect
 	github.com/xeonx/timeago v1.0.0-rc5 // indirect
 	golang.org/x/image v0.18.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/stack.v0 v0.0.0-20141108040640-9b43fcefddd0 // indirect
